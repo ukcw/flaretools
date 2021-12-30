@@ -59,29 +59,86 @@ async function getZoneSetting(request) {
 
   /* Firewall */
   /*
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/firewall/rules
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/waf
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/firewall/waf/packages
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/rulesets
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/firewall/access_rules/rules
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/rate_limits
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/firewall/ua_rules
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/firewall/lockdowns
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/security_level
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/challenge_ttl
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/browser_check
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/privacy_pass
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/rules
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/waf
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/waf/packages
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/access_rules/rules
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rate_limits
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/ua_rules
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/lockdowns
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/security_level
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/challenge_ttl
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/browser_check
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/privacy_pass
   */
 
   /* Speed */
   /*
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/mirage
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/image_resizing
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/polish
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/minify
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/brotli
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/early_hints
-  https://api.cloudflare.com/client/v4/zones/{{:zone_identifier}}/settings/automatic_platform_optimization
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/mirage
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/image_resizing
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/polish
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/minify
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/brotli
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/early_hints
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/automatic_platform_optimization
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/h2_prioritization
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/rocket_loader
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/railguns
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/prefetch_preload
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/mobile_redirect
+  */
+
+  /* Caching */
+  /*
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}//argo/tiered_caching
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/cache/tiered_cache_smart_topology_enable
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/cache_level
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/browser_cache_ttl
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/flags "cache": "crawlhints_enabled"
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/always_online
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/development_mode
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/sort_query_string_for_cache
+  */
+
+  /* Workers */
+  /*
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/workers/routes
+  */
+
+  /* Rules */
+  /*
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/pagerules
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets/phases/http_request_transform/entrypoint
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets/phases/http_request_late_transform/entrypoint
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets/phases/http_response_headers_transform/entrypoint
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets ":id"
+  */
+
+  /* Network */
+  /*
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/http2
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/http3
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/0rtt
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/ipv6
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/flags "protocol": { "gRPC": boolean }
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/websockets
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/opportunistic_onion
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/pseudo_ipv4
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/ip_geolocation
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/max_upload
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/response_buffering
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/true_client_ip_header
+  */
+
+  /* Traffic */
+  /*
+  to be added
+  */
+
+  /* Custom Pages */
+  /*
+  to be added
   */
 }
 
