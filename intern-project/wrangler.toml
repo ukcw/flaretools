@@ -1,0 +1,15 @@
+name = "intern-project"
+account_id = "0d13146e53ce108313d59c78906cd900"
+type = "webpack"
+usage_model = ''
+compatibility_flags = []
+workers_dev = true
+site = {bucket = "./build",entry-point = "workers-site"}
+compatibility_date = "2021-12-20"
+
+[env.dev]
+workers_dev = false
+zone_id = 'e6bf1f06148cb143e391370e9edf3aef'
+route = 'https://intern-project.ulysseskee.software/*'
+
+
