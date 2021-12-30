@@ -1,8 +1,9 @@
 name = "serverless-api"
-type = "javascript"
-
+type = "webpack"
 account_id = "0d13146e53ce108313d59c78906cd900"
+route = ''
+zone_id = ''
+usage_model = ''
+compatibility_flags = []
 workers_dev = true
-route = ""
-zone_id = ""
 compatibility_date = "2021-12-28"

@@ -12,5 +12,10 @@
   "license": "MIT",
   "devDependencies": {
     "prettier": "^1.18.2"
+  },
+  "dependencies": {
+    "itty-router": "^2.4.8",
+    "openssl": "^2.0.0",
+    "webpack": "^5.65.0"
   }
 }

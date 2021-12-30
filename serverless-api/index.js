@@ -1,6 +1,7 @@
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
+import { Router } from 'itty-router'
+
+// Create a new router
+const router = Router()
 
 const corsHeaders = {
   'Access-Control-Allow-Headers': '*',
@@ -8,41 +9,52 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
 }
 
-async function getZoneSetting(request) {
+async function getZoneSetting(request, endpoint) {
+  const { query } = await request.json()
 
-  const { query } = await request.json();
-
-  var myHeaders = new Headers();
-  //myHeaders.append("Authorization", "Bearer HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3");
-  myHeaders.append("Authorization", `${query.apiToken}`);
-  myHeaders.append("Content-Type", "application/json");
+  var myHeaders = new Headers()
+  /* myHeaders.append("Authorization", "Bearer HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"); */
+  myHeaders.append('Authorization', `${query.apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
 
   var requestOptions = {
     method: 'GET',
     headers: myHeaders,
-    redirect: 'follow'
-  };
+    redirect: 'follow',
+  }
 
-  //const resp = await fetch("https://api.cloudflare.com/client/v4/zones/e6bf1f06148cb143e391370e9edf3aef/settings", requestOptions);
-  const resp = await fetch(`https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings`, requestOptions);
-  const data = await resp.json();
+  /* const resp = await fetch("https://api.cloudflare.com/client/v4/zones/e6bf1f06148cb143e391370e9edf3aef/settings", requestOptions); */
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/zones/${query.zoneId}/${endpoint}`,
+    requestOptions,
+  )
+  const data = await resp.json()
   return new Response(JSON.stringify(data), {
     headers: {
       'Content-type': 'application/json',
-      ...corsHeaders
-    }
-  });
+      ...corsHeaders,
+    },
+  })
+}
 
-  /* DNS */
-  /*
+router.options('*', () => {
+  return new Response('OK', { headers: corsHeaders })
+})
+
+router.post('/', request => {
+  return getZoneSetting(request, '')
+})
+
+/* DNS */
+/*
   const dnsReqs = https://api.cloudflare.com/client/v4/zones/${query.zoneId}/dns_records
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/custom_ns
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/dnssec
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/cname_flattening
   */
 
-  /* SSL/TLS */
-  /*
+/* SSL/TLS */
+/*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/ssl
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/ssl/recommendation
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/ssl/certificate_packs
@@ -57,8 +69,8 @@ async function getZoneSetting(request) {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/custom_hostnames/:identifier
   */
 
-  /* Firewall */
-  /*
+/* Firewall */
+/*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/rules
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/waf
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/waf/packages
@@ -73,8 +85,8 @@ async function getZoneSetting(request) {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/privacy_pass
   */
 
-  /* Speed */
-  /*
+/* Speed */
+/*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/mirage
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/image_resizing
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/polish
@@ -89,8 +101,8 @@ async function getZoneSetting(request) {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/mobile_redirect
   */
 
-  /* Caching */
-  /*
+/* Caching */
+/*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}//argo/tiered_caching
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/cache/tiered_cache_smart_topology_enable
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/cache_level
@@ -101,13 +113,13 @@ async function getZoneSetting(request) {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/sort_query_string_for_cache
   */
 
-  /* Workers */
-  /*
+/* Workers */
+/*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/workers/routes
   */
 
-  /* Rules */
-  /*
+/* Rules */
+/*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/pagerules
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets/phases/http_request_transform/entrypoint
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets/phases/http_request_late_transform/entrypoint
@@ -115,8 +127,8 @@ async function getZoneSetting(request) {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets ":id"
   */
 
-  /* Network */
-  /*
+/* Network */
+/*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/http2
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/http3
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/0rtt
@@ -131,21 +143,21 @@ async function getZoneSetting(request) {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/true_client_ip_header
   */
 
-  /* Traffic */
-  /*
+/* Traffic */
+/*
   to be added
   */
 
-  /* Custom Pages */
-  /*
+/* Custom Pages */
+/*
   to be added
   */
-}
 
 /**
  * Respond with hello worker text
  * @param {Request} request
  */
+/*
 async function handleRequest(request) {
 
   if (request.method === "OPTIONS") {
@@ -155,4 +167,8 @@ async function handleRequest(request) {
   if (request.method === "POST") {
     return getZoneSetting(request)
   }
-}
+}*/
+
+addEventListener('fetch', event => {
+  event.respondWith(router.handle(event.request))
+})
