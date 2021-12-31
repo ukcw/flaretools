@@ -9,11 +9,12 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
 }
 
+/*
 async function getZoneSetting(request, endpoint) {
   const { query } = await request.json()
 
   var myHeaders = new Headers()
-  /* myHeaders.append("Authorization", "Bearer HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"); */
+  // myHeaders.append("Authorization", "Bearer HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3");
   myHeaders.append('Authorization', `${query.apiToken}`)
   myHeaders.append('Content-Type', 'application/json')
 
@@ -23,7 +24,7 @@ async function getZoneSetting(request, endpoint) {
     redirect: 'follow',
   }
 
-  /* const resp = await fetch("https://api.cloudflare.com/client/v4/zones/e6bf1f06148cb143e391370e9edf3aef/settings", requestOptions); */
+  // const resp = await fetch("https://api.cloudflare.com/client/v4/zones/e6bf1f06148cb143e391370e9edf3aef/settings", requestOptions);
   const resp = await fetch(
     `https://api.cloudflare.com/client/v4/zones/${query.zoneId}/${endpoint}`,
     requestOptions,
@@ -36,22 +37,80 @@ async function getZoneSetting(request, endpoint) {
     },
   })
 }
+*/
 
+async function getZoneSetting(zoneId, apiToken, endpoint) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow',
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/zones/${zoneId}${endpoint}`,
+    requestOptions,
+  )
+  const data = await resp.json()
+  return data
+}
+
+/**
+ * To enable preflight requests to succeed.
+ */
 router.options('*', () => {
   return new Response('OK', { headers: corsHeaders })
 })
 
-router.post('/', request => {
-  return getZoneSetting(request, '')
-})
-
 /* DNS */
 /*
-  const dnsReqs = https://api.cloudflare.com/client/v4/zones/${query.zoneId}/dns_records
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/dns_records
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/custom_ns
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/dnssec
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/cname_flattening
   */
+
+router.post('/dns', async request => {
+  const { query } = await request.json()
+
+  try {
+    const [
+      dns_records,
+      custom_ns,
+      dnssec,
+      cname_flattening,
+    ] = await Promise.all([
+      getZoneSetting(query.zoneId, query.apiToken, '/dns_records'),
+      getZoneSetting(query.zoneId, query.apiToken, '/custom_ns'),
+      getZoneSetting(query.zoneId, query.apiToken, '/dnssec'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/cname_flattening',
+      ),
+    ])
+
+    return new Response(
+      JSON.stringify({ dns_records, custom_ns, dnssec, cname_flattening }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
 
 /* SSL/TLS */
 /*
