@@ -1,9 +1,11 @@
 //import logo from "./logo.svg";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
+import DNSViewer from "./components/dnsComponents/DNSViewer";
+import SSLTLSViewer from "./components/sslTlsComponents/SSLTLSViewer";
 
-const getZoneSetting = async (query) => {
-  const url = "https://serverless-api.ulysseskcw96.workers.dev/dns";
+const getZoneSetting = async (query, endpoint) => {
+  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {
@@ -18,18 +20,18 @@ const getZoneSetting = async (query) => {
 function App() {
   const [zoneId, setZoneId] = useState("");
   const [apiToken, setApiToken] = useState("");
-  const [zoneData, setZoneData] = useState([]);
-  const [searchData, setSearchData] = useState({});
+  const [dnsData, setDnsData] = useState({});
+  const [sslTlsData, setSslTlsData] = useState({});
 
   const search = async () => {
     const payload = {
       zoneId: zoneId,
       apiToken: apiToken,
     };
-    const results = await getZoneSetting(payload);
-    setSearchData(payload);
-    console.log(results);
-    setZoneData(results.result);
+    const dnsResults = await getZoneSetting(payload, "/dns");
+    setDnsData(dnsResults);
+    const sslTlsResults = await getZoneSetting(payload, "/ssl_tls");
+    setSslTlsData(sslTlsResults);
   };
 
   return (
@@ -40,37 +42,19 @@ function App() {
           type="text"
           onChange={(e) => setZoneId(e.target.value)}
           placeholder="Zone ID"
+          style={{ width: 400 }}
         />
         <input
           id="apiToken"
           type="text"
           onChange={(e) => setApiToken(e.target.value)}
           placeholder="API Token"
+          style={{ width: 400 }}
         />
         <button onClick={search}>Search</button>
       </div>
-      {zoneData ? (
-        <table>
-          <thead>
-            <tr>
-              <th>Setting</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {zoneData.map((setting, i) => (
-              <tbody key={i}>
-                <tr>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </tbody>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        ""
-      )}
+      {dnsData ? <DNSViewer data={dnsData} /> : null}
+      {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
     </div>
   );
 }

@@ -79,11 +79,13 @@ router.post('/dns', async request => {
   try {
     const [
       dns_records,
+      name_servers,
       custom_ns,
       dnssec,
       cname_flattening,
     ] = await Promise.all([
       getZoneSetting(query.zoneId, query.apiToken, '/dns_records'),
+      getZoneSetting(query.zoneId, query.apiToken, '/'),
       getZoneSetting(query.zoneId, query.apiToken, '/custom_ns'),
       getZoneSetting(query.zoneId, query.apiToken, '/dnssec'),
       getZoneSetting(
@@ -94,7 +96,13 @@ router.post('/dns', async request => {
     ])
 
     return new Response(
-      JSON.stringify({ dns_records, custom_ns, dnssec, cname_flattening }),
+      JSON.stringify({
+        dns_records,
+        name_servers,
+        custom_ns,
+        dnssec,
+        cname_flattening,
+      }),
       {
         headers: {
           'Content-type': 'application/json',
@@ -128,6 +136,79 @@ router.post('/dns', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/custom_hostnames/:identifier
   */
 
+router.post('/ssl_tls', async request => {
+  const { query } = await request.json()
+
+  try {
+    const [
+      ssl_setting,
+      ssl_recommendation,
+      ssl_certificate_packs,
+      always_use_https,
+      min_tls_version,
+      opportunistic_encryption,
+      tls_1_3,
+      automatic_https_rewrites,
+      ssl_universal,
+      tls_client_auth,
+      custom_hostnames,
+    ] = await Promise.all([
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/ssl'),
+      getZoneSetting(query.zoneId, query.apiToken, '/ssl/recommendation'),
+      getZoneSetting(query.zoneId, query.apiToken, '/ssl/certificate_packs'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/always_use_https',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/min_tls_version'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/opportunistic_encryption',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/tls_1_3'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/automatic_https_rewrites',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/ssl/universal/settings'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/tls_client_auth'),
+      getZoneSetting(query.zoneId, query.apiToken, '/custom_hostnames'),
+    ])
+
+    return new Response(
+      JSON.stringify({
+        ssl_setting,
+        ssl_recommendation,
+        ssl_certificate_packs,
+        always_use_https,
+        min_tls_version,
+        opportunistic_encryption,
+        tls_1_3,
+        automatic_https_rewrites,
+        ssl_universal,
+        tls_client_auth,
+        custom_hostnames,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
+
 /* Firewall */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/rules
@@ -143,6 +224,78 @@ router.post('/dns', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/browser_check
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/privacy_pass
   */
+
+router.post('/firewall', async request => {
+  const { query } = await request.json()
+
+  try {
+    const [
+      firewall_rules,
+      setting_waf,
+      firewall_waf_packages,
+      rulesets,
+      firewall_access_rules_rules,
+      rate_limits,
+      firewall_ua_rules,
+      firewall_lockdowns,
+      settings_security_level,
+      setting_tls_client_auth,
+      custom_hostnames,
+    ] = await Promise.all([
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/ssl'),
+      getZoneSetting(query.zoneId, query.apiToken, '/ssl/recommendation'),
+      getZoneSetting(query.zoneId, query.apiToken, '/ssl/certificate_packs'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/always_use_https',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/min_tls_version'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/opportunistic_encryption',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/tls_1_3'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/automatic_https_rewrites',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/ssl/universal/settings'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/tls_client_auth'),
+      getZoneSetting(query.zoneId, query.apiToken, '/custom_hostnames'),
+    ])
+
+    return new Response(
+      JSON.stringify({
+        setting_ssl,
+        ssl_recommendation,
+        ssl_certificate_packs,
+        setting_always_use_https,
+        setting_opportunistic_encryption,
+        setting_tls_1_3,
+        setting_automatic_https_rewrites,
+        ssl_universal_setting,
+        setting_tls_client_auth,
+        custom_hostnames,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
 
 /* Speed */
 /*
