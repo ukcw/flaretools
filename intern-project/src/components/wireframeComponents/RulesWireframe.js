@@ -58,6 +58,126 @@ const RulesWireframe = () => {
             </Tbody>
           </Table>
         </Stack>
+        <Stack w="100%" spacing={4}>
+          <Heading size="md">Transform Rules: URL Rewrite</Heading>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>Priority</Th>
+                <Th>Description</Th>
+                <Th>Target</Th>
+                <Th>Status</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </Stack>
+        <Stack w="100%" spacing={4}>
+          <Heading size="md">
+            Transform Rules: HTTP Request Header Modification
+          </Heading>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>Priority</Th>
+                <Th>Description</Th>
+                <Th>Target</Th>
+                <Th>Status</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </Stack>
+        <Stack w="100%" spacing={4}>
+          <Heading size="md">
+            Transform Rules: HTTP Response Header Modification
+          </Heading>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>Priority</Th>
+                <Th>Description</Th>
+                <Th>Target</Th>
+                <Th>Status</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </Stack>
+        <Stack w="100%" spacing={4}>
+          <Heading size="md">Rules Subcategories</Heading>
+          <Table>
+            <Tr>
+              <Th>Normalize incoming URLs</Th>
+              <Td>
+                <CloseIcon />
+              </Td>
+            </Tr>
+            <Tr>
+              <Th>Normalize URLs to origin</Th>
+              <Td>
+                <CloseIcon />
+              </Td>
+            </Tr>
+          </Table>
+        </Stack>
       </Stack>
     </Container>
   );
