@@ -1,4 +1,14 @@
 import React from "react";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+} from "@chakra-ui/react";
 import UnsuccessfulDefault from "./UnsuccessfulDefault";
 
 function humanize(str) {
@@ -12,24 +22,22 @@ function humanize(str) {
 
 const SuccessfulRequest = (props) => {
   return (
-    <table>
-      <thead>
-        <tr>
+    <Table>
+      <Thead>
+        <Tr>
           {props.tableHeaders.map((header) => (
-            <th key={header}>{humanize(header)}</th>
+            <Th key={header}>{humanize(header)}</Th>
           ))}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
           {props.tableHeaders.map((header) => (
-            <td key={header}>
-              {props.data[header] ? props.data[header].toString() : "null"}
-            </td>
+            <Td key={header}>{String(props.data[header])}</Td>
           ))}
-        </tr>
-      </tbody>
-    </table>
+        </Tr>
+      </Tbody>
+    </Table>
   );
 };
 
