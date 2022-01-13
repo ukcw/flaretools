@@ -2,6 +2,7 @@ import { Container } from "@chakra-ui/react";
 import React from "react";
 import CachingWireframe from "../components/wireframeComponents/CachingWireframe";
 import DnsWireframe from "../components/wireframeComponents/DnsWireframe";
+import NetworkWireframe from "../components/wireframeComponents/NetworkWireframe";
 import RulesWireframe from "../components/wireframeComponents/RulesWireframe";
 import SpeedWireframe from "../components/wireframeComponents/SpeedWireframe";
 import SslTlsWireframe from "../components/wireframeComponents/SslTlsWireframe";
@@ -16,6 +17,7 @@ const WireframeZoneViewer = () => {
       <CachingWireframe />
       <WorkersWireframe />
       <RulesWireframe />
+      <NetworkWireframe />
     </Container>
   );
 };
