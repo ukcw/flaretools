@@ -1,3 +1,4 @@
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
@@ -10,14 +11,14 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
-import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
-const Dnssec = (props) => {
+const NameServersRT = (props) => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Property",
-        accessor: "property",
+        Header: "Type",
+        accessor: "type",
+        Cell: (props) => "NS",
       },
       {
         Header: "Value",
@@ -28,33 +29,26 @@ const Dnssec = (props) => {
   );
 
   const makeData = (data) => {
-    const keys = Object.keys(props.data.result);
-    return keys.map((key) => {
+    return data.map((nameServer) => {
       const dataObj = {
-        property: key,
-        value: props.data.result[key],
+        type: "NS",
+        value: nameServer,
       };
       return dataObj;
     });
   };
 
-  const data = React.useMemo(() => {
-    if (props.success) {
-      return makeData(props.data.result);
-    } else {
-      return [];
-    }
-  }, [props.data.result]);
+  const data = React.useMemo(
+    () => makeData(props.data.result.name_servers),
+    [props.data.result]
+  );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Custom Nameservers</Heading>
-      {props.data.result.hasOwnProperty("vanity_name_servers") ? null : (
-        <UnsuccessfulDefault errors={props.errors} />
-      )}
+      <Heading size="md">Cloudflare Nameservers</Heading>
       {props.data.result && (
         <Table {...getTableProps}>
           <Thead>
@@ -113,4 +107,4 @@ const Dnssec = (props) => {
   );
 };
 
-export default Dnssec;
+export default NameServersRT;

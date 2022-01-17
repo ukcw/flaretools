@@ -12,30 +12,41 @@ import React from "react";
 import { useTable } from "react-table";
 import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
-const Dnssec = (props) => {
+const CustomNsRT = (props) => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Property",
-        accessor: "property",
+        Header: "Nameserver",
+        accessor: "nameserver",
       },
       {
-        Header: "Value",
-        accessor: "value",
+        Header: "IPv4 Address",
+        accessor: "ipv4",
+      },
+      {
+        Header: "IPv6 Address",
+        accessor: "ipv6",
       },
     ],
     []
   );
 
   const makeData = (data) => {
-    const keys = Object.keys(props.data.result);
-    return keys.map((key) => {
-      const dataObj = {
-        property: key,
-        value: props.data.result[key],
-      };
-      return dataObj;
-    });
+    if (
+      data.hasOwnProperty("vanity_name_servers") &&
+      data.hasOwnProperty("vanity_name_servers_ips")
+    ) {
+      return data.vanity_name_servers.map((nameServer) => {
+        const dataObj = {
+          nameserver: nameServer,
+          ipv4: data.vanity_name_servers_ips.nameServer["ipv4"],
+          ipv6: data.vanity_name_servers_ips.nameServer["ipv6"],
+        };
+        return dataObj;
+      });
+    } else {
+      return null;
+    }
   };
 
   const data = React.useMemo(() => {
@@ -44,7 +55,7 @@ const Dnssec = (props) => {
     } else {
       return [];
     }
-  }, [props.data.result]);
+  }, [props.data.result, props.success]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
@@ -113,4 +124,4 @@ const Dnssec = (props) => {
   );
 };
 
-export default Dnssec;
+export default CustomNsRT;

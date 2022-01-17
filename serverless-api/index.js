@@ -86,7 +86,7 @@ router.post('/dns', async request => {
     ] = await Promise.all([
       getZoneSetting(query.zoneId, query.apiToken, '/dns_records'),
       getZoneSetting(query.zoneId, query.apiToken, '/'),
-      getZoneSetting(query.zoneId, query.apiToken, '/custom_ns'),
+      getZoneSetting(query.zoneId, query.apiToken, '/'),
       getZoneSetting(query.zoneId, query.apiToken, '/dnssec'),
       getZoneSetting(
         query.zoneId,

@@ -1,7 +1,9 @@
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
   Table,
+  Text,
   Tbody,
   Td,
   Th,
@@ -10,51 +12,45 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
-import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
-const Dnssec = (props) => {
+const DnsRecordsRT = (props) => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Property",
-        accessor: "property",
+        Header: "Type",
+        accessor: "type",
       },
       {
-        Header: "Value",
-        accessor: "value",
+        Header: "Name",
+        accessor: "name",
+      },
+      {
+        Header: "Content",
+        accessor: "content",
+      },
+      {
+        Header: "Proxied",
+        accessor: "proxied",
+        Cell: (props) =>
+          props.value ? <CheckIcon color="green" /> : <CloseIcon color="red" />,
+      },
+      {
+        Header: "TTL",
+        accessor: "ttl",
+        Cell: (props) => (props.value === 1 ? <Text>Auto</Text> : props.value),
       },
     ],
     []
   );
 
-  const makeData = (data) => {
-    const keys = Object.keys(props.data.result);
-    return keys.map((key) => {
-      const dataObj = {
-        property: key,
-        value: props.data.result[key],
-      };
-      return dataObj;
-    });
-  };
-
-  const data = React.useMemo(() => {
-    if (props.success) {
-      return makeData(props.data.result);
-    } else {
-      return [];
-    }
-  }, [props.data.result]);
+  const data = React.useMemo(() => props.data.result, [props.data.result]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Custom Nameservers</Heading>
-      {props.data.result.hasOwnProperty("vanity_name_servers") ? null : (
-        <UnsuccessfulDefault errors={props.errors} />
-      )}
+      <Heading size="md">DNS Management</Heading>
       {props.data.result && (
         <Table {...getTableProps}>
           <Thead>
@@ -113,4 +109,4 @@ const Dnssec = (props) => {
   );
 };
 
-export default Dnssec;
+export default DnsRecordsRT;

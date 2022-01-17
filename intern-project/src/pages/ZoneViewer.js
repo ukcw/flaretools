@@ -1,9 +1,16 @@
 //import logo from "./logo.svg";
 import React, { useState } from "react";
-import "./App.css";
-import DNSViewer from "./components/dnsComponents/DNSViewer";
-import SSLTLSViewer from "./components/sslTlsComponents/SSLTLSViewer";
-import FirewallViewer from "./components/firewallComponents/FirewallViewer";
+import DNSViewer from "../components/dnsComponents/DNSViewer";
+import SSLTLSViewer from "../components/sslTlsComponents/SSLTLSViewer";
+import FirewallViewer from "../components/firewallComponents/FirewallViewer";
+import {
+  Button,
+  Container,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  Stack,
+} from "@chakra-ui/react";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -18,9 +25,25 @@ const getZoneSetting = async (query, endpoint) => {
   return resp.json();
 };
 
-function App() {
-  const [zoneId, setZoneId] = useState("");
-  const [apiToken, setApiToken] = useState("");
+const InputSection = () => {
+  <Container maxW="container.xl">
+    <Stack
+      spacing={8}
+      borderColor="#ccc"
+      borderWidth={0.1}
+      borderRadius={10}
+      padding={8}
+      margin={8}
+      boxShadow="0 0 3px #ccc"
+    ></Stack>
+  </Container>;
+};
+
+function ZoneViewer() {
+  const [zoneId, setZoneId] = useState("e6bf1f06148cb143e391370e9edf3aef");
+  const [apiToken, setApiToken] = useState(
+    "HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
+  );
   const [dnsData, setDnsData] = useState({});
   const [sslTlsData, setSslTlsData] = useState({});
   const [firewallData, setFirewallData] = useState({});
@@ -28,7 +51,7 @@ function App() {
   const search = async () => {
     const payload = {
       zoneId: zoneId,
-      apiToken: apiToken,
+      apiToken: `Bearer ${apiToken}`,
     };
     const dnsResults = await getZoneSetting(payload, "/dns");
     setDnsData(dnsResults);
@@ -39,29 +62,42 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <div className="form">
-        <input
-          id="zoneId"
-          type="text"
-          onChange={(e) => setZoneId(e.target.value)}
-          placeholder="Zone ID"
-          style={{ width: 400 }}
-        />
-        <input
-          id="apiToken"
-          type="text"
-          onChange={(e) => setApiToken(e.target.value)}
-          placeholder="API Token"
-          style={{ width: 400 }}
-        />
-        <button onClick={search}>Search</button>
-      </div>
+    <Container maxW="container.xl">
+      <Stack
+        spacing={8}
+        borderColor="#ccc"
+        borderWidth={0.1}
+        borderRadius={10}
+        padding={8}
+        margin={8}
+        boxShadow="0 0 3px #ccc"
+      >
+        <InputGroup>
+          <InputLeftAddon children="Zone ID" />
+          <Input
+            type="text"
+            placeholder="Zone ID"
+            onChange={(e) => setZoneId(e.target.value)}
+            //defaultValue="e6bf1f06148cb143e391370e9edf3aef"
+          />
+        </InputGroup>
+        <InputGroup>
+          <InputLeftAddon children="Bearer" />
+          <Input
+            type="text"
+            placeholder="API Token"
+            onChange={(e) => setApiToken(e.target.value)}
+            //defaultValue="HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
+          />
+        </InputGroup>
+        <Button onClick={search}>Search</Button>
+      </Stack>
+
       {dnsData ? <DNSViewer data={dnsData} /> : null}
       {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
       {firewallData ? <FirewallViewer data={firewallData} /> : null}
-    </div>
+    </Container>
   );
 }
 
-export default App;
+export default ZoneViewer;
