@@ -27,8 +27,10 @@ const CNAMEFlattening = (props) => {
           </Tr>
         </Thead>
         <Tbody>
-          <Td>CNAME Flattening</Td>
-          <Td>{Humanize(props.data.result.value)}</Td>
+          <Tr>
+            <Td>CNAME Flattening</Td>
+            <Td>{Humanize(props.data.result.value)}</Td>
+          </Tr>
         </Tbody>
       </Table>
     </Stack>

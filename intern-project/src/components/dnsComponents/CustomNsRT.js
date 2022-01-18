@@ -51,12 +51,12 @@ const CustomNsRT = (props) => {
   };
 
   const data = React.useMemo(() => {
-    if (props.success) {
+    if (props.data.result.vanity_name_servers.length) {
       return makeData(props.data.result);
     } else {
       return [];
     }
-  }, [props.data.result, props.success]);
+  }, [props.data.result]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
