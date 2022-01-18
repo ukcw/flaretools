@@ -25,20 +25,6 @@ const getZoneSetting = async (query, endpoint) => {
   return resp.json();
 };
 
-const InputSection = () => {
-  <Container maxW="container.xl">
-    <Stack
-      spacing={8}
-      borderColor="#ccc"
-      borderWidth={0.1}
-      borderRadius={10}
-      padding={8}
-      margin={8}
-      boxShadow="0 0 3px #ccc"
-    ></Stack>
-  </Container>;
-};
-
 function ZoneViewer() {
   const [zoneId, setZoneId] = useState("e6bf1f06148cb143e391370e9edf3aef");
   const [apiToken, setApiToken] = useState(
@@ -72,30 +58,27 @@ function ZoneViewer() {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        <Stack w="100%" spacing={4}>
-          <InputGroup>
-            <InputLeftAddon children="Zone ID" />
-            <Input
-              type="text"
-              placeholder="Zone ID"
-              onChange={(e) => setZoneId(e.target.value)}
-              //defaultValue="e6bf1f06148cb143e391370e9edf3aef"
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftAddon children="Bearer" />
-            <Input
-              type="text"
-              placeholder="API Token"
-              onChange={(e) => setApiToken(e.target.value)}
-              //defaultValue="HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
-            />
-          </InputGroup>
-          <Button onClick={search}>Search</Button>
-        </Stack>
+        <InputGroup>
+          <InputLeftAddon children="Zone ID" />
+          <Input
+            type="text"
+            placeholder="Zone ID"
+            onChange={(e) => setZoneId(e.target.value)}
+            //defaultValue="e6bf1f06148cb143e391370e9edf3aef"
+          />
+        </InputGroup>
+        <InputGroup>
+          <InputLeftAddon children="Bearer" />
+          <Input
+            type="text"
+            placeholder="API Token"
+            onChange={(e) => setApiToken(e.target.value)}
+            //defaultValue="HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
+          />
+        </InputGroup>
+        <Button onClick={search}>Search</Button>
       </Stack>
       {dnsData && <DNSViewer data={dnsData} />}
-      {console.log(dnsData)}
       {sslTlsData && <SSLTLSViewer data={sslTlsData} />}
       {firewallData && <FirewallViewer data={firewallData} />}
     </Container>
