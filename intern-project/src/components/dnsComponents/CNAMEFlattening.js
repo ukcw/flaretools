@@ -1,16 +1,37 @@
+import {
+  Heading,
+  HStack,
+  Stack,
+  Switch,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import React from "react";
-import UnsuccessfulDefault from "../UnsuccessfulDefault";
+import { Humanize } from "../../utils/utils";
 
 const CNAMEFlattening = (props) => {
   return (
-    <div>
-      <h2>CNAME Flattening</h2>
-      {props.success ? (
-        <span>Enabled</span>
-      ) : (
-        <UnsuccessfulDefault errors={props.errors} />
-      )}
-    </div>
+    <Stack w="100%" spacing={4}>
+      <HStack w="100%" spacing={4}>
+        <Heading size="md">CNAME Flattening</Heading>
+      </HStack>
+      <Table>
+        <Thead>
+          <Tr>
+            <Th>Setting</Th>
+            <Th>Value</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          <Td>CNAME Flattening</Td>
+          <Td>{Humanize(props.data.result.value)}</Td>
+        </Tbody>
+      </Table>
+    </Stack>
   );
 };
 

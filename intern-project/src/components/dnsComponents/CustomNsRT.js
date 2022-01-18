@@ -1,6 +1,8 @@
 import {
   Heading,
+  HStack,
   Stack,
+  Switch,
   Table,
   Tbody,
   Td,
@@ -10,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
-import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const CustomNsRT = (props) => {
   const columns = React.useMemo(
@@ -33,14 +34,14 @@ const CustomNsRT = (props) => {
 
   const makeData = (data) => {
     if (
-      data.hasOwnProperty("vanity_name_servers") &&
-      data.hasOwnProperty("vanity_name_servers_ips")
+      data.vanity_name_servers.length !== 0 &&
+      data.vanity_name_servers_ips !== null
     ) {
       return data.vanity_name_servers.map((nameServer) => {
         const dataObj = {
           nameserver: nameServer,
-          ipv4: data.vanity_name_servers_ips.nameServer["ipv4"],
-          ipv6: data.vanity_name_servers_ips.nameServer["ipv6"],
+          ipv4: data.vanity_name_servers_ips[nameServer]["ipv4"],
+          ipv6: data.vanity_name_servers_ips[nameServer]["ipv6"],
         };
         return dataObj;
       });
@@ -62,11 +63,13 @@ const CustomNsRT = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Custom Nameservers</Heading>
-      {props.data.result.hasOwnProperty("vanity_name_servers") ? null : (
-        <UnsuccessfulDefault errors={props.errors} />
-      )}
-      {props.data.result && (
+      <HStack w="100%" spacing={4}>
+        <Heading size="md">Custom Nameservers</Heading>
+        {props.data.result.vanity_name_servers.length === 0 && (
+          <Switch isReadOnly isChecked={false} />
+        )}
+      </HStack>
+      {props.data.result.vanity_name_servers.length !== 0 && (
         <Table {...getTableProps}>
           <Thead>
             {
