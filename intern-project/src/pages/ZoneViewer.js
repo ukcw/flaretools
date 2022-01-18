@@ -72,30 +72,32 @@ function ZoneViewer() {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        <InputGroup>
-          <InputLeftAddon children="Zone ID" />
-          <Input
-            type="text"
-            placeholder="Zone ID"
-            onChange={(e) => setZoneId(e.target.value)}
-            //defaultValue="e6bf1f06148cb143e391370e9edf3aef"
-          />
-        </InputGroup>
-        <InputGroup>
-          <InputLeftAddon children="Bearer" />
-          <Input
-            type="text"
-            placeholder="API Token"
-            onChange={(e) => setApiToken(e.target.value)}
-            //defaultValue="HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
-          />
-        </InputGroup>
-        <Button onClick={search}>Search</Button>
+        <Stack w="100%" spacing={4}>
+          <InputGroup>
+            <InputLeftAddon children="Zone ID" />
+            <Input
+              type="text"
+              placeholder="Zone ID"
+              onChange={(e) => setZoneId(e.target.value)}
+              //defaultValue="e6bf1f06148cb143e391370e9edf3aef"
+            />
+          </InputGroup>
+          <InputGroup>
+            <InputLeftAddon children="Bearer" />
+            <Input
+              type="text"
+              placeholder="API Token"
+              onChange={(e) => setApiToken(e.target.value)}
+              //defaultValue="HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
+            />
+          </InputGroup>
+          <Button onClick={search}>Search</Button>
+        </Stack>
       </Stack>
-
-      {dnsData ? <DNSViewer data={dnsData} /> : null}
-      {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
-      {firewallData ? <FirewallViewer data={firewallData} /> : null}
+      {dnsData && <DNSViewer data={dnsData} />}
+      {console.log(dnsData)}
+      {sslTlsData && <SSLTLSViewer data={sslTlsData} />}
+      {firewallData && <FirewallViewer data={firewallData} />}
     </Container>
   );
 }

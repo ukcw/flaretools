@@ -1,6 +1,7 @@
 import React from "react";
 import SSLRecommendation from "./SSLRecommendation";
 import SuccessfulDefault from "../SuccessfulDefault";
+import SslSetting from "./SslSetting";
 
 const SSLTLSViewer = (props) => {
   const titles = Object.keys(props.data);
@@ -9,7 +10,7 @@ const SSLTLSViewer = (props) => {
     switch (title) {
       case "ssl_setting":
         return (
-          <SuccessfulDefault
+          <SslSetting
             data={props.data[title]}
             errors={props.data[title].errors}
             success={props.data[title].success}
