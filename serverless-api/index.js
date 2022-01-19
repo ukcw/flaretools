@@ -451,7 +451,7 @@ router.post('/speed', async request => {
 })
 /* Caching */
 /*
-  https://api.cloudflare.com/client/v4/zones/${query.zoneId}//argo/tiered_caching
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/argo/tiered_caching
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/cache/tiered_cache_smart_topology_enable
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/cache_level
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/browser_cache_ttl
@@ -461,10 +461,109 @@ router.post('/speed', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/sort_query_string_for_cache
   */
 
+router.post('/caching', async request => {
+  const { query } = await request.json()
+
+  try {
+    const [
+      argo_tiered_caching,
+      tiered_cache_topology,
+      cache_level,
+      browser_cache_ttl,
+      crawlhints,
+      always_online,
+      development_mode,
+      query_string_sort,
+    ] = await Promise.all([
+      getZoneSetting(query.zoneId, query.apiToken, '/argo/tiered_caching'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/cache/tiered_cache_smart_topology_enable',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/cache_level'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/browser_cache_ttl',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/flags'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/always_online'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/development_mode',
+      ),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/sort_query_string_for_cache',
+      ),
+    ])
+
+    return new Response(
+      JSON.stringify({
+        argo_tiered_caching,
+        tiered_cache_topology,
+        cache_level,
+        browser_cache_ttl,
+        crawlhints,
+        always_online,
+        development_mode,
+        query_string_sort,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
+
 /* Workers */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/workers/routes
   */
+
+router.post('/caching', async request => {
+  const { query } = await request.json()
+
+  try {
+    const workers_routes = await getZoneSetting(
+      query.zoneId,
+      query.apiToken,
+      '/workers/routes',
+    )
+
+    return new Response(
+      JSON.stringify({
+        workers_routes,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
 
 /* Rules */
 /*
