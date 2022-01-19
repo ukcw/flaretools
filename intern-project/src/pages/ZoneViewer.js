@@ -11,6 +11,7 @@ import {
   InputLeftAddon,
   Stack,
 } from "@chakra-ui/react";
+import SpeedViewer from "../components/speedComponents/SpeedViewer";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -33,18 +34,33 @@ function ZoneViewer() {
   const [dnsData, setDnsData] = useState();
   const [sslTlsData, setSslTlsData] = useState();
   const [firewallData, setFirewallData] = useState();
+  const [speedData, setSpeedData] = useState();
 
   const search = async () => {
     const payload = {
       zoneId: zoneId,
       apiToken: `Bearer ${apiToken}`,
     };
+    /*
     const dnsResults = await getZoneSetting(payload, "/dns");
     setDnsData(dnsResults);
     const sslTlsResults = await getZoneSetting(payload, "/ssl_tls");
     setSslTlsData(sslTlsResults);
     const firewallResults = await getZoneSetting(payload, "/firewall");
     setFirewallData(firewallResults);
+    */
+    const [dnsResults, sslTlsResults, firewallResults, speedResults] =
+      await Promise.all([
+        getZoneSetting(payload, "/dns"),
+        getZoneSetting(payload, "/ssl_tls"),
+        getZoneSetting(payload, "/firewall"),
+        getZoneSetting(payload, "/speed"),
+      ]);
+
+    setDnsData(dnsResults);
+    setSslTlsData(sslTlsResults);
+    setFirewallData(firewallResults);
+    setSpeedData(speedResults);
   };
 
   return (
@@ -80,7 +96,8 @@ function ZoneViewer() {
       </Stack>
       {dnsData ? <DNSViewer data={dnsData} /> : null}
       {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
-      {firewallData ? <FirewallViewer data={firewallData} /> : null}
+      {/*firewallData ? <FirewallViewer data={firewallData} /> : null*/}
+      {speedData ? <SpeedViewer data={speedData} /> : null}
     </Container>
   );
 }
