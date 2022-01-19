@@ -343,7 +343,7 @@ router.post('/firewall', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/mobile_redirect
   */
 
-router.post('/firewall', async request => {
+router.post('/speed', async request => {
   const { query } = await request.json()
 
   try {
