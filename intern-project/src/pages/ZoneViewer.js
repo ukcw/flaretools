@@ -30,9 +30,9 @@ function ZoneViewer() {
   const [apiToken, setApiToken] = useState(
     "HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
   );
-  const [dnsData, setDnsData] = useState({});
-  const [sslTlsData, setSslTlsData] = useState({});
-  const [firewallData, setFirewallData] = useState({});
+  const [dnsData, setDnsData] = useState();
+  const [sslTlsData, setSslTlsData] = useState();
+  const [firewallData, setFirewallData] = useState();
 
   const search = async () => {
     const payload = {
@@ -78,9 +78,9 @@ function ZoneViewer() {
         </InputGroup>
         <Button onClick={search}>Search</Button>
       </Stack>
-      {dnsData && <DNSViewer data={dnsData} />}
-      {sslTlsData && <SSLTLSViewer data={sslTlsData} />}
-      {firewallData && <FirewallViewer data={firewallData} />}
+      {dnsData ? <DNSViewer data={dnsData} /> : null}
+      {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
+      {firewallData ? <FirewallViewer data={firewallData} /> : null}
     </Container>
   );
 }

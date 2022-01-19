@@ -126,6 +126,7 @@ router.post('/dns', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/ssl/recommendation
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/ssl/certificate_packs
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/always_use_https
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/security_header
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/min_tls_version
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/opportunistic_encryption
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/tls_1_3
@@ -145,6 +146,7 @@ router.post('/ssl_tls', async request => {
       ssl_recommendation,
       ssl_certificate_packs,
       always_use_https,
+      security_header,
       min_tls_version,
       opportunistic_encryption,
       tls_1_3,
@@ -161,6 +163,7 @@ router.post('/ssl_tls', async request => {
         query.apiToken,
         '/settings/always_use_https',
       ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/security_header'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/min_tls_version'),
       getZoneSetting(
         query.zoneId,
@@ -184,6 +187,7 @@ router.post('/ssl_tls', async request => {
         ssl_recommendation,
         ssl_certificate_packs,
         always_use_https,
+        security_header,
         min_tls_version,
         opportunistic_encryption,
         tls_1_3,
