@@ -534,7 +534,7 @@ router.post('/caching', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/workers/routes
   */
 
-router.post('/caching', async request => {
+router.post('/workers', async request => {
   const { query } = await request.json()
 
   try {

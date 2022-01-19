@@ -38,6 +38,8 @@ function ZoneViewer() {
   const [sslTlsData, setSslTlsData] = useState();
   const [firewallData, setFirewallData] = useState();
   const [speedData, setSpeedData] = useState();
+  const [cachingData, setCachingData] = useState();
+  const [workersData, setWorkersData] = useState();
 
   const search = async () => {
     const payload = {
@@ -58,12 +60,16 @@ function ZoneViewer() {
       sslTlsResults,
       firewallResults,
       speedResults,
+      cachingResults,
+      workersResults,
     ] = await Promise.all([
       getZoneSetting(payload, "/zone_details"),
       getZoneSetting(payload, "/dns"),
       getZoneSetting(payload, "/ssl_tls"),
       getZoneSetting(payload, "/firewall"),
       getZoneSetting(payload, "/speed"),
+      getZoneSetting(payload, "/caching"),
+      getZoneSetting(payload, "/workers"),
     ]);
 
     if (zoneDetailsResults.zone_details) {
@@ -73,6 +79,8 @@ function ZoneViewer() {
     setSslTlsData(sslTlsResults);
     setFirewallData(firewallResults);
     setSpeedData(speedResults);
+    setCachingData(cachingResults);
+    setWorkersData(workersResults);
   };
 
   return (
