@@ -88,6 +88,37 @@ router.options('*', () => {
   return new Response('OK', { headers: corsHeaders })
 })
 
+/**
+ * Basic Zone Details for a Zone
+ */
+
+router.post('/zone_details', async request => {
+  const { query } = await request.json()
+
+  try {
+    const zone_details = await getZoneSetting(query.zoneId, query.apiToken, '/')
+
+    return new Response(
+      JSON.stringify({
+        zone_details,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
+
 /* DNS */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/dns_records

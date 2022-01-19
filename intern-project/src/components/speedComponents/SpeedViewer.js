@@ -2,6 +2,9 @@ import React from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import SpeedSubcategories from "./SpeedSubcategories";
 import AutomaticPlatformOptimization from "./AutomaticPlatformOptimization";
+import MobileRedirect from "./MobileRedirect";
+import Minify from "./Minify";
+import Railgun from "./Railgun";
 
 /**
  *
@@ -40,6 +43,9 @@ const SpeedViewer = (props) => {
         <AutomaticPlatformOptimization
           data={props.data.automatic_platform_optimization}
         />
+        <MobileRedirect data={props.data.mobile_redirect} />
+        <Minify data={props.data.minify} />
+        <Railgun data={props.data.railguns} />
       </Stack>
     </Container>
   );

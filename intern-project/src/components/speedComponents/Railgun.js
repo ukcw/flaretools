@@ -1,87 +1,45 @@
-import { WarningTwoIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
   Table,
-  Text,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
-  Tag,
   HStack,
   Switch,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
 
-const CustomHostnames = (props) => {
+const Railgun = (props) => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Custom Hostname",
-        accessor: "hostname",
+        Header: "Name",
+        accessor: "name",
       },
       {
-        Header: "SSL/TLS Certification Status",
-        accessor: (row, _) => {
-          if (row.ssl === null) {
-            return "SSL Not Requested";
-          } else if (row.ssl.status === "active") {
-            return <Tag colorScheme={"green"}>Active</Tag>;
-          } else if (row.ssl.status === "pending_validation") {
-            return (
-              <Tag colorScheme={"blue"}>
-                <Text>{`Pending Validation (${row.ssl.method.toUpperCase()})`}</Text>
-              </Tag>
-            );
-          } else if (row.ssl.status === "expired") {
-            return (
-              <Tag colorScheme={"red"}>
-                <HStack>
-                  <WarningTwoIcon />
-                  <Text>Expired (Error)</Text>
-                </HStack>
-              </Tag>
-            );
-          } else if (row.ssl.status === "validation_timed_out") {
-            return (
-              <Tag colorScheme={"red"}>
-                <HStack>
-                  <Text>{`Timed Out Validation (${row.ssl.method.toUpperCase()})`}</Text>
-                </HStack>
-              </Tag>
-            );
-          }
-        },
+        Header: "Railgun State",
+        accessor: "enabled",
+        Cell: (props) =>
+          props.value ? (
+            <CheckIcon color={"green"} />
+          ) : (
+            <CloseIcon color={"red"} />
+          ),
       },
       {
-        Header: "Expires On",
-        accessor: (row, _) => {
-          if (row.ssl === null) {
-            return null;
-          } else if (row.ssl?.certificates !== undefined) {
-            return row.ssl.certificates[0].expires_on.substring(0, 10);
-          } else {
-            return "Cloudflare";
-          }
-        },
-      },
-      {
-        Header: "Hostname Status",
-        accessor: (row, _) => "Provisioned",
-        Cell: (props) => <Tag colorScheme={"green"}>{props.value}</Tag>,
-      },
-      {
-        Header: "Origin Server",
-        accessor: (row, _) => {
-          if ("custom_origin_server" in row) {
-            return row.custom_origin_server;
-          } else {
-            return "Default";
-          }
-        },
+        Header: "Connected to Website",
+        accessor: "connected",
+        Cell: (props) =>
+          props.value ? (
+            <CheckIcon color={"green"} />
+          ) : (
+            <CloseIcon color={"red"} />
+          ),
       },
     ],
     []
@@ -95,7 +53,7 @@ const CustomHostnames = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Custom Hostnames</Heading>
+        <Heading size="md">Railgun</Heading>
         {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
       </HStack>
       {props.data.result.length && (
@@ -156,4 +114,4 @@ const CustomHostnames = (props) => {
   );
 };
 
-export default CustomHostnames;
+export default Railgun;

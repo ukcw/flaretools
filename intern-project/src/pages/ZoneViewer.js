@@ -12,6 +12,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import SpeedViewer from "../components/speedComponents/SpeedViewer";
+import { ZoneContext } from "../lib/contextLib";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -28,9 +29,11 @@ const getZoneSetting = async (query, endpoint) => {
 
 function ZoneViewer() {
   const [zoneId, setZoneId] = useState("e6bf1f06148cb143e391370e9edf3aef");
+  const [zoneDetails, setZoneDetails] = useState();
   const [apiToken, setApiToken] = useState(
     "HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
   );
+
   const [dnsData, setDnsData] = useState();
   const [sslTlsData, setSslTlsData] = useState();
   const [firewallData, setFirewallData] = useState();
@@ -49,14 +52,23 @@ function ZoneViewer() {
     const firewallResults = await getZoneSetting(payload, "/firewall");
     setFirewallData(firewallResults);
     */
-    const [dnsResults, sslTlsResults, firewallResults, speedResults] =
-      await Promise.all([
-        getZoneSetting(payload, "/dns"),
-        getZoneSetting(payload, "/ssl_tls"),
-        getZoneSetting(payload, "/firewall"),
-        getZoneSetting(payload, "/speed"),
-      ]);
+    const [
+      zoneDetailsResults,
+      dnsResults,
+      sslTlsResults,
+      firewallResults,
+      speedResults,
+    ] = await Promise.all([
+      getZoneSetting(payload, "/zone_details"),
+      getZoneSetting(payload, "/dns"),
+      getZoneSetting(payload, "/ssl_tls"),
+      getZoneSetting(payload, "/firewall"),
+      getZoneSetting(payload, "/speed"),
+    ]);
 
+    if (zoneDetailsResults.zone_details) {
+      setZoneDetails(zoneDetailsResults.zone_details.result);
+    }
     setDnsData(dnsResults);
     setSslTlsData(sslTlsResults);
     setFirewallData(firewallResults);
@@ -94,10 +106,14 @@ function ZoneViewer() {
         </InputGroup>
         <Button onClick={search}>Search</Button>
       </Stack>
-      {dnsData ? <DNSViewer data={dnsData} /> : null}
-      {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
-      {/*firewallData ? <FirewallViewer data={firewallData} /> : null*/}
-      {speedData ? <SpeedViewer data={speedData} /> : null}
+      {zoneDetails ? (
+        <ZoneContext.Provider value={{ zoneDetails }}>
+          {dnsData ? <DNSViewer data={dnsData} /> : null}
+          {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
+          {/*firewallData ? <FirewallViewer data={firewallData} /> : null*/}
+          {speedData ? <SpeedViewer data={speedData} /> : null}
+        </ZoneContext.Provider>
+      ) : null}
     </Container>
   );
 }
