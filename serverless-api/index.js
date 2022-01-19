@@ -343,6 +343,81 @@ router.post('/firewall', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/mobile_redirect
   */
 
+router.post('/firewall', async request => {
+  const { query } = await request.json()
+
+  try {
+    const [
+      mirage,
+      image_resizing,
+      polish,
+      minify,
+      brotli,
+      early_hints,
+      automatic_platform_optimization,
+      h2_prioritization,
+      rocket_loader,
+      railguns,
+      prefetch_preload,
+      mobile_redirect,
+    ] = await Promise.all([
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/mirage'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/image_resizing'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/polish'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/minify'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/brotli'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/early_hints'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/automatic_platform_optimization',
+      ),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/h2_prioritization',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/rocket_loader'),
+      getZoneSetting(query.zoneId, query.apiToken, '/railguns'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/prefetch_preload',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/mobile_redirect'),
+    ])
+
+    return new Response(
+      JSON.stringify({
+        mirage,
+        image_resizing,
+        polish,
+        minify,
+        brotli,
+        early_hints,
+        automatic_platform_optimization,
+        h2_prioritization,
+        rocket_loader,
+        railguns,
+        prefetch_preload,
+        mobile_redirect,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
 /* Caching */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}//argo/tiered_caching
