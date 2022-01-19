@@ -52,7 +52,7 @@ const DnsRecordsRT = (props) => {
     <Stack w="100%" spacing={4}>
       <Heading size="md">DNS Management</Heading>
       {props.data.result && (
-        <Table {...getTableProps}>
+        <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
           <Thead>
             {
               // Loop over the header rows

@@ -55,7 +55,30 @@ async function getZoneSetting(zoneId, apiToken, endpoint) {
     requestOptions,
   )
   const data = await resp.json()
+
   return data
+}
+
+async function getPaginatedZoneSetting(zoneId, apiToken, endpoint) {
+  const firstRequest = await getZoneSetting(zoneId, apiToken, endpoint)
+
+  if (
+    firstRequest.result_info !== undefined &&
+    firstRequest.result_info.total_pages !== undefined &&
+    firstRequest.result_info.total_pages > 1
+  ) {
+    for (let i = 2; i <= firstRequest.result_info.total_pages; i++) {
+      const pageNumber = `${endpoint}?page=${i}`
+      const subsequentRequest = await getZoneSetting(
+        zoneId,
+        apiToken,
+        pageNumber,
+      )
+      firstRequest.result.push(...subsequentRequest.result)
+    }
+  }
+
+  return firstRequest
 }
 
 /**
@@ -84,7 +107,7 @@ router.post('/dns', async request => {
       dnssec,
       cname_flattening,
     ] = await Promise.all([
-      getZoneSetting(query.zoneId, query.apiToken, '/dns_records'),
+      getPaginatedZoneSetting(query.zoneId, query.apiToken, '/dns_records'),
       getZoneSetting(query.zoneId, query.apiToken, '/'),
       getZoneSetting(query.zoneId, query.apiToken, '/'),
       getZoneSetting(query.zoneId, query.apiToken, '/dnssec'),
@@ -157,7 +180,11 @@ router.post('/ssl_tls', async request => {
     ] = await Promise.all([
       getZoneSetting(query.zoneId, query.apiToken, '/settings/ssl'),
       getZoneSetting(query.zoneId, query.apiToken, '/ssl/recommendation'),
-      getZoneSetting(query.zoneId, query.apiToken, '/ssl/certificate_packs'),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/ssl/certificate_packs',
+      ),
       getZoneSetting(
         query.zoneId,
         query.apiToken,
@@ -178,7 +205,11 @@ router.post('/ssl_tls', async request => {
       ),
       getZoneSetting(query.zoneId, query.apiToken, '/ssl/universal/settings'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/tls_client_auth'),
-      getZoneSetting(query.zoneId, query.apiToken, '/custom_hostnames'),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/custom_hostnames',
+      ),
     ])
 
     return new Response(
