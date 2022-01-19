@@ -27,7 +27,6 @@ const SpeedViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Speed</Heading>
-        {console.log(props.data)}
         <SpeedSubcategories
           data={{
             mirage: props.data.mirage,

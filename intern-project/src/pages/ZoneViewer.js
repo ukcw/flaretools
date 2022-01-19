@@ -13,6 +13,8 @@ import {
 } from "@chakra-ui/react";
 import SpeedViewer from "../components/speedComponents/SpeedViewer";
 import { ZoneContext } from "../lib/contextLib";
+import CachingViewer from "../components/cachingComponents/CachingViewer";
+import WorkersViewer from "../components/workersComponents/WorkersViewer";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -120,6 +122,8 @@ function ZoneViewer() {
           {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
           {/*firewallData ? <FirewallViewer data={firewallData} /> : null*/}
           {speedData ? <SpeedViewer data={speedData} /> : null}
+          {cachingData ? <CachingViewer data={cachingData} /> : null}
+          {workersData ? <WorkersViewer data={workersData} /> : null}
         </ZoneContext.Provider>
       ) : null}
     </Container>

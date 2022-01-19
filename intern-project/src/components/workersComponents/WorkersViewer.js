@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
-import CachingSubcategories from "./CachingSubcategories";
+import HttpRoutes from "./HttpRoutes";
 
 /**
  *
@@ -8,7 +8,7 @@ import CachingSubcategories from "./CachingSubcategories";
  * @returns
  */
 
-const CachingViewer = (props) => {
+const WorkersViewer = (props) => {
   //const titles = Object.keys(props.data);
 
   return (
@@ -22,11 +22,12 @@ const CachingViewer = (props) => {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        <Heading size="xl">Caching</Heading>
-        <CachingSubcategories data={props.data} />
+        <Heading size="xl">Workers</Heading>
+        {console.log(props.data)}
+        <HttpRoutes data={props.data.workers_routes} />
       </Stack>
     </Container>
   );
 };
 
-export default CachingViewer;
+export default WorkersViewer;
