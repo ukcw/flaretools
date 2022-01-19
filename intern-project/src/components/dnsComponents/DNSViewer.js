@@ -6,7 +6,7 @@ import Dnssec from "./Dnssec";
 import CNAMEFlattening from "./CNAMEFlattening";
 import DnsRecordsRT from "./DnsRecordsRT";
 import NameServersRT from "./NameServersRT";
-import { Container, Stack } from "@chakra-ui/react";
+import { Container, Heading, Stack } from "@chakra-ui/react";
 import CustomNsRT from "./CustomNsRT";
 
 const DNSViewer = (props) => {
@@ -23,6 +23,7 @@ const DNSViewer = (props) => {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
+        <Heading size="xl">DNS</Heading>
         {titles.map((title) => {
           switch (title) {
             case "dns_records":

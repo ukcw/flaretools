@@ -1,4 +1,4 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
@@ -10,10 +10,11 @@ import {
   Thead,
   Tr,
   Tag,
+  HStack,
+  Switch,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
-import { Humanize } from "../../utils/utils";
 
 const CustomHostnames = (props) => {
   const columns = React.useMemo(
@@ -28,11 +29,30 @@ const CustomHostnames = (props) => {
           if (row.ssl === null) {
             return "SSL Not Requested";
           } else if (row.ssl.status === "active") {
-            return "Active";
+            return <Tag colorScheme={"green"}>Active</Tag>;
           } else if (row.ssl.status === "pending_validation") {
-            return `Pending Validation (${row.ssl.method.toUpperCase()})`;
-          } else {
-            return "lalala";
+            return (
+              <Tag colorScheme={"blue"}>
+                <Text>{`Pending Validation (${row.ssl.method.toUpperCase()})`}</Text>
+              </Tag>
+            );
+          } else if (row.ssl.status === "expired") {
+            return (
+              <Tag colorScheme={"red"}>
+                <HStack>
+                  <WarningTwoIcon />
+                  <Text>Expired (Error)</Text>
+                </HStack>
+              </Tag>
+            );
+          } else if (row.ssl.status === "validation_timed_out") {
+            return (
+              <Tag colorScheme={"red"}>
+                <HStack>
+                  <Text>{`Timed Out Validation (${row.ssl.method.toUpperCase()})`}</Text>
+                </HStack>
+              </Tag>
+            );
           }
         },
       },
@@ -67,19 +87,6 @@ const CustomHostnames = (props) => {
     []
   );
 
-  const makeData = (data) => {
-    return data.map((row) => {
-      const dataObj = {
-        hostname: row.hostname,
-        status: row.status,
-        expires_on: "",
-        hostname_status: row.certificates[0].expires_on,
-        custom_origin_server: "",
-      };
-      return dataObj;
-    });
-  };
-
   const data = React.useMemo(() => props.data.result, [props.data.result]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -87,8 +94,12 @@ const CustomHostnames = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Custom Hostnames</Heading>
-      {props.data.result && (
+      <HStack w="100%" spacing={4}>
+        {console.log(props.data.result)}
+        <Heading size="md">Custom Hostnames</Heading>
+        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+      </HStack>
+      {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>
             {
