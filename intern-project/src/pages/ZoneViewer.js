@@ -15,6 +15,8 @@ import SpeedViewer from "../components/speedComponents/SpeedViewer";
 import { ZoneContext } from "../lib/contextLib";
 import CachingViewer from "../components/cachingComponents/CachingViewer";
 import WorkersViewer from "../components/workersComponents/WorkersViewer";
+import NetworkViewer from "../components/networkComponents/NetworkViewer";
+import RulesViewer from "../components/rulesComponents/RulesViewer";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -42,6 +44,8 @@ function ZoneViewer() {
   const [speedData, setSpeedData] = useState();
   const [cachingData, setCachingData] = useState();
   const [workersData, setWorkersData] = useState();
+  const [rulesData, setRulesData] = useState();
+  const [networkData, setNetworkData] = useState();
 
   const search = async () => {
     const payload = {
@@ -64,6 +68,8 @@ function ZoneViewer() {
       speedResults,
       cachingResults,
       workersResults,
+      rulesResults,
+      networkResults,
     ] = await Promise.all([
       getZoneSetting(payload, "/zone_details"),
       getZoneSetting(payload, "/dns"),
@@ -72,6 +78,8 @@ function ZoneViewer() {
       getZoneSetting(payload, "/speed"),
       getZoneSetting(payload, "/caching"),
       getZoneSetting(payload, "/workers"),
+      getZoneSetting(payload, "/rules"),
+      getZoneSetting(payload, "/network"),
     ]);
 
     if (zoneDetailsResults.zone_details) {
@@ -83,6 +91,8 @@ function ZoneViewer() {
     setSpeedData(speedResults);
     setCachingData(cachingResults);
     setWorkersData(workersResults);
+    setRulesData(rulesResults);
+    setNetworkData(networkResults);
   };
 
   return (
@@ -124,6 +134,8 @@ function ZoneViewer() {
           {speedData ? <SpeedViewer data={speedData} /> : null}
           {cachingData ? <CachingViewer data={cachingData} /> : null}
           {workersData ? <WorkersViewer data={workersData} /> : null}
+          {rulesData ? <RulesViewer data={rulesData} /> : null}
+          {networkData ? <NetworkViewer data={networkData} /> : null}
         </ZoneContext.Provider>
       ) : null}
     </Container>

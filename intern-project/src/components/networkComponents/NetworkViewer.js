@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
-import HttpRoutes from "./HttpRoutes";
+import NetworkSubcategories from "./NetworkSubcategories";
 
 /**
  *
@@ -8,7 +8,7 @@ import HttpRoutes from "./HttpRoutes";
  * @returns
  */
 
-const WorkersViewer = (props) => {
+const NetworkViewer = (props) => {
   //const titles = Object.keys(props.data);
 
   return (
@@ -22,11 +22,11 @@ const WorkersViewer = (props) => {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        <Heading size="xl">Workers</Heading>
-        <HttpRoutes data={props.data.workers_routes} />
+        <Heading size="xl">Network</Heading>
+        <NetworkSubcategories data={props.data} />
       </Stack>
     </Container>
   );
 };
 
-export default WorkersViewer;
+export default NetworkViewer;

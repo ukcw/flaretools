@@ -309,7 +309,7 @@ router.post('/firewall', async request => {
       browser_check,
       privacy_pass,
     ] = await Promise.all([
-      getZoneSetting(query.zoneId, query.apiToken, '/firewall/rules'),
+      getPaginatedZoneSetting(query.zoneId, query.apiToken, '/firewall/rules'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/waf'),
       getZoneSetting(query.zoneId, query.apiToken, '/rulesets'),
       getZoneSetting(
@@ -538,7 +538,7 @@ router.post('/workers', async request => {
   const { query } = await request.json()
 
   try {
-    const workers_routes = await getZoneSetting(
+    const workers_routes = await getPaginatedZoneSetting(
       query.zoneId,
       query.apiToken,
       '/workers/routes',
@@ -574,6 +574,80 @@ router.post('/workers', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets ":id"
   */
 
+router.post('/rules', async request => {
+  const { query } = await request.json()
+
+  const getNormalizationSettingsId = resultArray => {
+    for (let i = 0; i < resultArray.length; i++) {
+      const current = resultArray[i]
+      if (current.name === 'Cloudflare Normalization Ruleset') {
+        return current.id
+      }
+    }
+  }
+
+  try {
+    const [
+      pagerules,
+      url_rewrite,
+      http_request_late_modification,
+      http_response_headers_modification,
+    ] = await Promise.all([
+      getPaginatedZoneSetting(query.zoneId, query.apiToken, '/pagerules'),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/rulesets/phases/http_request_transform/entrypoint',
+      ),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/rulesets/phases/http_request_late_transform/entrypoint',
+      ),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/rulesets/phases/http_response_headers_transform/entrypoint',
+      ),
+    ])
+
+    const { result: ruleSets } = await getZoneSetting(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets',
+    )
+    const normalizationSettingsId = await getNormalizationSettingsId(ruleSets)
+
+    const normalization_settings = await getZoneSetting(
+      query.zoneId,
+      query.apiToken,
+      `/rulesets/${normalizationSettingsId}`,
+    )
+
+    return new Response(
+      JSON.stringify({
+        pagerules,
+        url_rewrite,
+        http_request_late_modification,
+        http_response_headers_modification,
+        normalization_settings,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
 /* Network */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/http2
@@ -589,6 +663,82 @@ router.post('/workers', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/response_buffering
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/true_client_ip_header
   */
+
+router.post('/network', async request => {
+  const { query } = await request.json()
+
+  try {
+    const [
+      http2,
+      http3,
+      zero_rtt,
+      ipv6,
+      grpc,
+      websockets,
+      opportunistic_onion,
+      pseudo_ipv4,
+      ip_geolocation,
+      max_upload,
+      response_buffering,
+      true_client_ip_header,
+    ] = await Promise.all([
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/http2'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/http3'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/0rtt'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/ipv6'),
+      getZoneSetting(query.zoneId, query.apiToken, '/flags'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/websockets'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/opportunistic_onion',
+      ),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/pseudo_ipv4'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/ip_geolocation'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/max_upload'),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/response_buffering',
+      ),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/true_client_ip_header',
+      ),
+    ])
+
+    return new Response(
+      JSON.stringify({
+        http2,
+        http3,
+        zero_rtt,
+        ipv6,
+        grpc,
+        websockets,
+        opportunistic_onion,
+        pseudo_ipv4,
+        ip_geolocation,
+        max_upload,
+        response_buffering,
+        true_client_ip_header,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
 
 /* Traffic */
 /*
