@@ -32,10 +32,10 @@ const getZoneSetting = async (query, endpoint) => {
 };
 
 function ZoneViewer() {
-  const [zoneId, setZoneId] = useState("e6bf1f06148cb143e391370e9edf3aef");
+  const [zoneId, setZoneId] = useState("4e6d50a41172bca54f222576aec3fc2b");
   const [zoneDetails, setZoneDetails] = useState();
   const [apiToken, setApiToken] = useState(
-    "HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
+    "0lQJ62XyKHdIrIaNvOp1rl8D0FBaDpXPSo7phced"
   );
 
   const [dnsData, setDnsData] = useState();
@@ -130,7 +130,7 @@ function ZoneViewer() {
         <ZoneContext.Provider value={{ zoneDetails }}>
           {dnsData ? <DNSViewer data={dnsData} /> : null}
           {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
-          {/*firewallData ? <FirewallViewer data={firewallData} /> : null*/}
+          {firewallData ? <FirewallViewer data={firewallData} /> : null}
           {speedData ? <SpeedViewer data={speedData} /> : null}
           {cachingData ? <CachingViewer data={cachingData} /> : null}
           {workersData ? <WorkersViewer data={workersData} /> : null}

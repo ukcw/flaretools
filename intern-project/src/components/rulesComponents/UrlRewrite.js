@@ -114,7 +114,6 @@ const UrlRewrite = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        {console.log(data)}
         <Heading size="md">URL Rewrite</Heading>
         {props.data.result?.rules === undefined && (
           <Switch isReadOnly isChecked={false} />

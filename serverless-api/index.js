@@ -294,11 +294,38 @@ router.post('/ssl_tls', async request => {
 router.post('/firewall', async request => {
   const { query } = await request.json()
 
+  // get WebApplicationFirewall rules id
+  const getWebApplicationFirewallId = resultArray => {
+    for (let i = 0; i < resultArray.length; i++) {
+      const current = resultArray[i]
+      if (
+        'source' in current &&
+        current.source === 'firewall_managed' &&
+        current.name === 'zone'
+      ) {
+        return current.id
+      }
+    }
+    return null
+  }
+
+  const getManagedRulesetsResult = async resultArray => {
+    for (let i = 0; i < resultArray.length; i++) {
+      const current = resultArray[i]
+      const currentResult = await getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        `/rulesets/${current.id}`,
+      )
+      resultArray[i].result = currentResult
+    }
+    return resultArray
+  }
+
   try {
     const [
       firewall_rules,
       waf_setting,
-      firewall_waf_packages,
       rulesets,
       firewall_access_rules,
       rate_limits,
@@ -326,11 +353,26 @@ router.post('/firewall', async request => {
       getZoneSetting(query.zoneId, query.apiToken, '/settings/privacy_pass'),
     ])
 
+    const { result: resultSet } = rulesets
+    /*
+    const WebApplicationFirewallRulesId = getWebApplicationFirewallId(resultSet)
+    let web_application_firewall_rules = { result: null }
+    if (WebApplicationFirewallRulesId) {
+      web_application_firewall_rules = getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        `/rulesets/${WebApplicationFirewallRulesId}`,
+      )
+    }
+    */
+
+    const managed_rulesets_results = await getManagedRulesetsResult(resultSet)
+
     return new Response(
       JSON.stringify({
         firewall_rules,
         waf_setting,
-        firewall_waf_packages,
+        managed_rulesets_results,
         rulesets,
         firewall_access_rules,
         rate_limits,

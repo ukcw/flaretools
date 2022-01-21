@@ -27,7 +27,6 @@ const RulesViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Rules</Heading>
-        {console.log(props.data)}
         <PageRules data={props.data.pagerules} />
         <UrlRewrite data={props.data.url_rewrite} />
         <HttpRequestHeaderMod
