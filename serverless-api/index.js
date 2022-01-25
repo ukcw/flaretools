@@ -81,6 +81,63 @@ async function getPaginatedZoneSetting(zoneId, apiToken, endpoint) {
   return firstRequest
 }
 
+async function getPerPageSpecifiedZoneSetting(
+  zoneId,
+  apiToken,
+  endpoint,
+  perPage,
+) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow',
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/zones/${zoneId}${endpoint}?per_page=${perPage}`,
+    requestOptions,
+  )
+  const data = await resp.json()
+
+  return data
+}
+
+async function getPageSpecifiedPaginatedZoneSetting(
+  zoneId,
+  apiToken,
+  endpoint,
+  perPage,
+) {
+  const firstRequest = await getPerPageSpecifiedZoneSetting(
+    zoneId,
+    apiToken,
+    endpoint,
+    100,
+  )
+
+  if (
+    firstRequest.result_info !== undefined &&
+    firstRequest.result_info.total_pages !== undefined &&
+    firstRequest.result_info.total_pages > 1
+  ) {
+    for (let i = 2; i <= firstRequest.result_info.total_pages; i++) {
+      const pageNumber = `${endpoint}?page=${i}&per_page=${perPage}`
+      const subsequentRequest = await getZoneSetting(
+        zoneId,
+        apiToken,
+        pageNumber,
+      )
+      firstRequest.result.push(...subsequentRequest.result)
+    }
+  }
+
+  return firstRequest
+}
+
 /**
  * To enable preflight requests to succeed.
  */
@@ -289,25 +346,12 @@ router.post('/ssl_tls', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/challenge_ttl
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/browser_check
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/privacy_pass
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets/phases/http_request_firewall_custom/entrypoint
+  https://api.cloudflare.com/client/v4/zones/${query.zoneId}/rulesets/phases/http_ratelimit/entrypoint
   */
 
 router.post('/firewall', async request => {
   const { query } = await request.json()
-
-  // get WebApplicationFirewall rules id
-  const getWebApplicationFirewallId = resultArray => {
-    for (let i = 0; i < resultArray.length; i++) {
-      const current = resultArray[i]
-      if (
-        'source' in current &&
-        current.source === 'firewall_managed' &&
-        current.name === 'zone'
-      ) {
-        return current.id
-      }
-    }
-    return null
-  }
 
   const getManagedRulesetsResult = async resultArray => {
     for (let i = 0; i < resultArray.length; i++) {
@@ -335,6 +379,10 @@ router.post('/firewall', async request => {
       challenge_ttl,
       browser_check,
       privacy_pass,
+      custom_rules_firewall,
+      custom_rules_ratelimit,
+      page_shield,
+      ddos_l7,
     ] = await Promise.all([
       getPaginatedZoneSetting(query.zoneId, query.apiToken, '/firewall/rules'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/waf'),
@@ -344,28 +392,36 @@ router.post('/firewall', async request => {
         query.apiToken,
         '/firewall/access_rules/rules',
       ),
-      getZoneSetting(query.zoneId, query.apiToken, '/rate_limits'),
+      getPaginatedZoneSetting(query.zoneId, query.apiToken, '/rate_limits'),
       getZoneSetting(query.zoneId, query.apiToken, '/firewall/ua_rules'),
       getZoneSetting(query.zoneId, query.apiToken, '/firewall/lockdowns'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/security_level'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/challenge_ttl'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/browser_check'),
       getZoneSetting(query.zoneId, query.apiToken, '/settings/privacy_pass'),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/rulesets/phases/http_request_firewall_custom/entrypoint',
+      ),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/rulesets/phases/http_ratelimit/entrypoint',
+      ),
+      getPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/script_monitor/scripts',
+      ),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/rulesets/phases/ddos_l7/entrypoint',
+      ),
     ])
 
     const { result: resultSet } = rulesets
-    /*
-    const WebApplicationFirewallRulesId = getWebApplicationFirewallId(resultSet)
-    let web_application_firewall_rules = { result: null }
-    if (WebApplicationFirewallRulesId) {
-      web_application_firewall_rules = getZoneSetting(
-        query.zoneId,
-        query.apiToken,
-        `/rulesets/${WebApplicationFirewallRulesId}`,
-      )
-    }
-    */
-
     const managed_rulesets_results = await getManagedRulesetsResult(resultSet)
 
     return new Response(
@@ -382,6 +438,70 @@ router.post('/firewall', async request => {
         challenge_ttl,
         browser_check,
         privacy_pass,
+        custom_rules_firewall,
+        custom_rules_ratelimit,
+        page_shield,
+        ddos_l7,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
+
+router.post('/firewall/deprecated', async request => {
+  const { query } = await request.json()
+
+  const getFirewallRules = async resultArray => {
+    for (let i = 0; i < resultArray.length; i++) {
+      const current = resultArray[i]
+
+      const detailedList = await getPageSpecifiedPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        `/firewall/waf/packages/${current.id}/rules`,
+        100,
+      )
+      const dashList = await getPageSpecifiedPaginatedZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        `/firewall/waf/packages/${current.id}/groups`,
+        100,
+      )
+      resultArray[i].dash = dashList
+      resultArray[i].detailed = detailedList
+    }
+    return resultArray
+  }
+
+  try {
+    let deprecatedFirewallRules = false
+
+    const firewall_waf_packages = await getZoneSetting(
+      query.zoneId,
+      query.apiToken,
+      '/firewall/waf/packages',
+    )
+
+    if (firewall_waf_packages.success === true) {
+      const { result } = firewall_waf_packages
+      deprecatedFirewallRules = await getFirewallRules(result)
+    }
+
+    return new Response(
+      JSON.stringify({
+        deprecatedFirewallRules,
       }),
       {
         headers: {

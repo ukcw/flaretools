@@ -10,7 +10,6 @@ import {
   Tr,
   HStack,
   Switch,
-  Tag,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
@@ -80,7 +79,6 @@ const WithTable = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Web Application Firewall</Heading>
-        {console.log("JK", props.data.tableData.result)}
         {props.data.waf_setting.result.value === "off" && (
           <Switch isReadOnly isChecked={false} />
         )}
@@ -155,12 +153,144 @@ const WithoutTable = (props) => {
           <Switch colorScheme={"green"} isReadOnly isChecked={true} />
         )}
       </HStack>
+      <DeprecatedPage data={props.data.deprecated_firewall_rules} />
+    </Stack>
+  );
+};
+
+const DeprecatedPage = (props) => {
+  console.log("deprecated", props.data);
+  if (props.data !== undefined) {
+    return (
+      <Stack w="100%" spacing={8}>
+        {props.data.map((group) => {
+          if (group.name !== "USER") {
+            return <DashView data={group} />;
+          } else {
+            return null;
+          }
+        })}
+      </Stack>
+    );
+  } else {
+    return null;
+  }
+};
+
+const DashView = (props) => {
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "Group",
+        accessor: "name",
+      },
+      {
+        Header: "Description",
+        accessor: "description",
+      },
+      {
+        Header: "Mode",
+        accessor: "mode",
+        Cell: (props) =>
+          props.value === "on" ? (
+            <CheckIcon color={"green"} />
+          ) : (
+            <CloseIcon color={"red"} />
+          ),
+      },
+    ],
+    []
+  );
+
+  const makeData = (data) => {
+    if (data.dash.result.length < 1) {
+      return [];
+    }
+    return data.dash.result;
+  };
+
+  const data = React.useMemo(() => makeData(props.data), [props.data]);
+
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable({ columns, data });
+
+  const TableTitle = (name) => {
+    if (name === "OWASP ModSecurity Core Rule Set") {
+      return `Package: ${name}`;
+    } else if (name === "CloudFlare") {
+      return "Cloudflare Managed Ruleset";
+    } else {
+      return "Customer Requested Rules";
+    }
+  };
+
+  return (
+    <Stack w="100%" spacing={4}>
+      <HStack w="100%" spacing={4}>
+        <Heading size="md">{TableTitle(props.data.name)}</Heading>
+        {props.data.dash.result.length < 1 && (
+          <Switch isReadOnly isChecked={false} />
+        )}
+      </HStack>
+      {props.data.dash.result.length > 0 && (
+        <Table {...getTableProps}>
+          <Thead>
+            {
+              // Loop over the header rows
+              headerGroups.map((headerGroup) => (
+                <Tr {...headerGroup.getHeaderGroupProps()}>
+                  {
+                    // Loop over the headers in each row
+                    headerGroup.headers.map((column) => (
+                      // Apply the header cell props
+                      <Th {...column.getHeaderProps()}>
+                        {
+                          // Render the header
+                          column.render("Header")
+                        }
+                      </Th>
+                    ))
+                  }
+                </Tr>
+              ))
+            }
+          </Thead>
+          {/* Apply the table body props */}
+          <Tbody {...getTableBodyProps()}>
+            {
+              // Loop over the table rows
+              rows.map((row) => {
+                // Prepare the row for display
+                prepareRow(row);
+                return (
+                  // Apply the row props
+                  <Tr {...row.getRowProps()}>
+                    {
+                      // Loop over the rows cells
+                      row.cells.map((cell) => {
+                        // Apply the cell props
+                        return (
+                          <Td {...cell.getCellProps()}>
+                            {
+                              // Render the cell contents
+                              cell.render("Cell")
+                            }
+                          </Td>
+                        );
+                      })
+                    }
+                  </Tr>
+                );
+              })
+            }
+          </Tbody>
+        </Table>
+      )}
     </Stack>
   );
 };
 
 const WebAppFirewall = (props) => {
-  console.log("managed", props.data.managed_rulesets_results);
   const getWafTableRender = (resultArray) => {
     for (let i = 0; i < resultArray.length; i++) {
       const current = resultArray[i];
@@ -188,7 +318,12 @@ const WebAppFirewall = (props) => {
       }}
     />
   ) : (
-    <WithoutTable data={{ waf_setting: props.data.waf_setting }} />
+    <WithoutTable
+      data={{
+        waf_setting: props.data.waf_setting,
+        deprecated_firewall_rules: props.data.deprecated_firewall_rules,
+      }}
+    />
   );
 };
 

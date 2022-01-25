@@ -3,7 +3,7 @@ import React from "react";
 
 const RulesSubcategories = (props) => {
   return (
-    <Stack w="100%" spacing={4}>
+    <Stack w="100%" spacing={8}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Normalize incoming URLs</Heading>
         {

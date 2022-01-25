@@ -52,14 +52,41 @@ function ZoneViewer() {
       zoneId: zoneId,
       apiToken: `Bearer ${apiToken}`,
     };
-    /*
+
+    const zoneDetailsResults = await getZoneSetting(payload, "/zone_details");
+    if (zoneDetailsResults.zone_details) {
+      setZoneDetails(zoneDetailsResults.zone_details.result);
+    }
     const dnsResults = await getZoneSetting(payload, "/dns");
     setDnsData(dnsResults);
     const sslTlsResults = await getZoneSetting(payload, "/ssl_tls");
     setSslTlsData(sslTlsResults);
     const firewallResults = await getZoneSetting(payload, "/firewall");
-    setFirewallData(firewallResults);
-    */
+    setFirewallData((prevState) => ({
+      ...prevState,
+      ...firewallResults,
+    }));
+    // check deprecated firewall rules
+    const deprecatedFirewall = await getZoneSetting(
+      payload,
+      "/firewall/deprecated"
+    );
+    setFirewallData((prevState) => ({
+      ...prevState,
+      ...deprecatedFirewall,
+    }));
+    const speedResults = await getZoneSetting(payload, "/speed");
+    setSpeedData(speedResults);
+    const cachingResults = await getZoneSetting(payload, "/caching");
+    setCachingData(cachingResults);
+    const workersResults = await getZoneSetting(payload, "/workers");
+    setWorkersData(workersResults);
+    const rulesResults = await getZoneSetting(payload, "/rules");
+    setRulesData(rulesResults);
+    const networkResults = await getZoneSetting(payload, "/network");
+    setNetworkData(networkResults);
+  };
+  /*
     const [
       zoneDetailsResults,
       dnsResults,
@@ -94,6 +121,7 @@ function ZoneViewer() {
     setRulesData(rulesResults);
     setNetworkData(networkResults);
   };
+  */
 
   return (
     <Container maxW="container.xl">
