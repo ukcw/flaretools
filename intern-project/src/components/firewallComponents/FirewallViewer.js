@@ -12,7 +12,6 @@ import WebAppFirewall from "./WebAppFirewall";
 import ZoneLockdown from "./ZoneLockdown";
 
 const FirewallViewer = (props) => {
-  const titles = Object.keys(props.data);
   const getRulesetId = (name, resultArray) => {
     for (let i = 0; i < resultArray.length; i++) {
       if (resultArray[i].name === name) {
@@ -37,7 +36,6 @@ const FirewallViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Firewall</Heading>
-        {console.log(props.data)}
         <WebAppFirewall
           data={{
             waf_setting: props.data.waf_setting,
@@ -58,7 +56,7 @@ const FirewallViewer = (props) => {
           />
         )}
         <FirewallRules data={props.data.firewall_rules} />
-        <PageShield data={props.data.page_shield} />
+        {/*<PageShield data={props.data.page_shield} />*/}
         <DdosProtection
           data={{
             ddos_l7: props.data.ddos_l7,

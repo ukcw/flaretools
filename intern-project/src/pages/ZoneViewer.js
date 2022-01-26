@@ -17,6 +17,7 @@ import CachingViewer from "../components/cachingComponents/CachingViewer";
 import WorkersViewer from "../components/workersComponents/WorkersViewer";
 import NetworkViewer from "../components/networkComponents/NetworkViewer";
 import RulesViewer from "../components/rulesComponents/RulesViewer";
+import TrafficViewer from "../components/trafficComponents/TrafficViewer";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -46,6 +47,7 @@ function ZoneViewer() {
   const [workersData, setWorkersData] = useState();
   const [rulesData, setRulesData] = useState();
   const [networkData, setNetworkData] = useState();
+  const [trafficData, setTrafficData] = useState();
 
   const search = async () => {
     const payload = {
@@ -85,6 +87,11 @@ function ZoneViewer() {
     setRulesData(rulesResults);
     const networkResults = await getZoneSetting(payload, "/network");
     setNetworkData(networkResults);
+    const trafficResults = await getZoneSetting(
+      payload,
+      "/traffic/load_balancers"
+    );
+    setTrafficData(trafficResults);
   };
   /*
     const [
@@ -155,7 +162,7 @@ function ZoneViewer() {
         <Button onClick={search}>Search</Button>
       </Stack>
       {zoneDetails ? (
-        <ZoneContext.Provider value={{ zoneDetails }}>
+        <ZoneContext.Provider value={{ zoneDetails, zoneId, apiToken }}>
           {dnsData ? <DNSViewer data={dnsData} /> : null}
           {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
           {firewallData ? <FirewallViewer data={firewallData} /> : null}
@@ -164,6 +171,7 @@ function ZoneViewer() {
           {workersData ? <WorkersViewer data={workersData} /> : null}
           {rulesData ? <RulesViewer data={rulesData} /> : null}
           {networkData ? <NetworkViewer data={networkData} /> : null}
+          {trafficData ? <TrafficViewer data={trafficData} /> : null}
         </ZoneContext.Provider>
       ) : null}
     </Container>

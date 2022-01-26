@@ -159,13 +159,12 @@ const WithoutTable = (props) => {
 };
 
 const DeprecatedPage = (props) => {
-  console.log("deprecated", props.data);
   if (props.data !== undefined) {
     return (
       <Stack w="100%" spacing={8}>
         {props.data.map((group) => {
           if (group.name !== "USER") {
-            return <DashView data={group} />;
+            return <DashView key={group.name} data={group} />;
           } else {
             return null;
           }

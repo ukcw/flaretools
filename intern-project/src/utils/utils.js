@@ -365,3 +365,16 @@ export const TimeToText = (value) => {
     return "1 year";
   }
 };
+
+export const getZoneSetting = async (query, endpoint) => {
+  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  return resp.json();
+};

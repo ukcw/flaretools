@@ -138,6 +138,26 @@ async function getPageSpecifiedPaginatedZoneSetting(
   return firstRequest
 }
 
+async function getAccountSetting(accountId, apiToken, endpoint) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow',
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}${endpoint}`,
+    requestOptions,
+  )
+  const data = await resp.json()
+
+  return data
+}
+
 /**
  * To enable preflight requests to succeed.
  */
@@ -907,10 +927,125 @@ router.post('/network', async request => {
   to be added
   */
 
+router.post('/traffic/load_balancers', async request => {
+  const { query } = await request.json()
+
+  try {
+    const load_balancers = await getZoneSetting(
+      query.zoneId,
+      query.apiToken,
+      '/load_balancers',
+    )
+
+    return new Response(
+      JSON.stringify({
+        load_balancers,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
+
+router.post('/traffic/load_balancers/pools', async request => {
+  const { query } = await request.json()
+
+  try {
+    const load_balancers_pools = await getAccountSetting(
+      query.accountId,
+      query.apiToken,
+      '/load_balancers/pools',
+    )
+
+    return new Response(
+      JSON.stringify({
+        load_balancers_pools,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
+
 /* Custom Pages */
 /*
   to be added
   */
+
+/**
+ * Scrape Shield
+ */
+
+router.post('/scrape_shield', async request => {
+  const { query } = await request.json()
+
+  try {
+    const [
+      email_obfuscation,
+      server_side_exclude,
+      hotlink_protection,
+    ] = await Promise.all([
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/email_obfuscation',
+      ),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/server_side_exclude',
+      ),
+      getZoneSetting(
+        query.zoneId,
+        query.apiToken,
+        '/settings/hotlink_protection',
+      ),
+    ])
+
+    return new Response(
+      JSON.stringify({
+        email_obfuscation,
+        server_side_exclude,
+        hotlink_protection,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
 
 /**
  * Respond with hello worker text
