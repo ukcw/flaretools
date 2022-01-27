@@ -2,7 +2,6 @@ import {
   Heading,
   HStack,
   Stack,
-  Switch,
   Table,
   Tbody,
   Td,
@@ -13,7 +12,7 @@ import {
 import React from "react";
 import { Humanize } from "../../utils/utils";
 
-const CNAMEFlattening = (props) => {
+const CnameFlattening = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
@@ -37,4 +36,4 @@ const CNAMEFlattening = (props) => {
   );
 };
 
-export default CNAMEFlattening;
+export default CnameFlattening;

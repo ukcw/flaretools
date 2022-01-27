@@ -9,74 +9,78 @@ import {
   Thead,
   Tr,
   HStack,
-  VStack,
-  Text,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
-import { Humanize, TimeToText } from "../../utils/utils";
+import { Humanize } from "../../utils/utils";
 import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
-const ModeOutput = (actionObj) => {
-  if (actionObj.mode === "ban") {
-    return `Block for ${TimeToText(actionObj.timeout)}`;
-  } else if (actionObj.mode === "js_challenge") {
-    return "JS Challenge";
-  } else if (actionObj.mode === "simulate") {
-    return `${Humanize(actionObj.mode)} for ${TimeToText(actionObj.timeout)}`;
-  } else {
-    return Humanize(actionObj.mode);
-  }
-};
+const SpecApplications = (props) => {
+  const OriginOutput = (data) => {
+    if (data.origin_dns !== undefined) {
+      return data.origin_dns.name;
+    } else if (data.origin_direct !== undefined) {
+      return data.origin_direct;
+    } else {
+      return "functionality to be added";
+    }
+  };
 
-const MethodsOutput = (methods) => {
-  const outputArr = methods.filter((method) =>
-    method !== "_ALL_" ? true : false
-  );
-  if (outputArr.length) {
-    return `, Methods: ${outputArr.join(", ")}`;
-  }
-  return "";
-};
-
-const StatusCodeOutput = (response) => {
-  if (response?.status !== undefined) {
-    return `, Response code: ${response.status[0]}`;
-  }
-  return "";
-};
-
-const RateLimiting = (props) => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Rule URL/Description",
-        accessor: (row) => {
-          return (
-            <VStack w="100%" p={0} align={"flex-start"}>
-              <Text>
-                {row?.description !== undefined
-                  ? row.description
-                  : row.match.request.url}
-              </Text>
-              <Text color={"grey"}>{`${row.threshold} requests per ${TimeToText(
-                row.period
-              )}, ${ModeOutput(row.action)}${MethodsOutput(
-                row.match.request.methods
-              )}${StatusCodeOutput(row.match.response)}`}</Text>
-            </VStack>
-          );
-        },
+        Header: "Edge Port",
+        accessor: "protocol",
       },
       {
-        Header: "Enabled",
-        accessor: "disabled",
+        Header: "Origin",
+        accessor: (row) => {
+          return OriginOutput(row);
+        },
+        maxWidth: 150,
+      },
+      {
+        Header: "Domain",
+        accessor: (row) => {
+          return row.dns.name;
+        },
+        maxWidth: 150,
+      },
+      {
+        Header: "Edge IP Connectivity",
+        accessor: (row) => row.edge_ips.connectivity,
+        Cell: (props) =>
+          props.value === "all" ? "IPv4 + IPv6" : `${Humanize(props.value)}`,
+      },
+      {
+        Header: "TLS",
+        accessor: "tls",
+        Cell: (props) => Humanize(props.value),
+      },
+      {
+        Header: "Argo Smart Routing",
+        accessor: (row) =>
+          row?.argo_smart_routing === undefined ? (
+            <CloseIcon color={"red"} />
+          ) : (
+            <CheckIcon color={"green"} />
+          ),
+        maxWidth: 120,
+      },
+      {
+        Header: "IP Access Rules",
+        accessor: "ip_firewall",
         Cell: (props) =>
           props.value ? (
             <CheckIcon color={"green"} />
           ) : (
             <CloseIcon color={"red"} />
           ),
+      },
+      {
+        Header: "Proxy Protocols",
+        accessor: "proxy_protocol",
+        Cell: (props) => Humanize(props.value),
       },
     ],
     []
@@ -90,14 +94,14 @@ const RateLimiting = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Rate Limiting</Heading>
+        <Heading size="md">Spectrum Applications</Heading>
         {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!props.data.result.length && (
-        <UnsuccessfulDefault setting="Rate Limits" />
+        <UnsuccessfulDefault setting="Spectrum Applications" />
       )}
       {props.data.result.length && (
-        <Table {...getTableProps}>
+        <Table style={{ tableLayout: "auto" }} {...getTableProps}>
           <Thead>
             {
               // Loop over the header rows
@@ -107,7 +111,14 @@ const RateLimiting = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
+                      <Th
+                        {...column.getHeaderProps({
+                          style: {
+                            maxWidth: column.maxWidth,
+                          },
+                        })}
+                      >
+                        {console.log("www", column.maxWidth)}
                         {
                           // Render the header
                           column.render("Header")
@@ -134,7 +145,13 @@ const RateLimiting = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td {...cell.getCellProps()}>
+                          <Td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                              },
+                            })}
+                          >
                             {
                               // Render the cell contents
                               cell.render("Cell")
@@ -154,4 +171,4 @@ const RateLimiting = (props) => {
   );
 };
 
-export default RateLimiting;
+export default SpecApplications;

@@ -38,6 +38,10 @@ export const Humanize = (str) => {
       frags[i] = "Maximum Upload Size";
     } else if (frags[i] === "true_client_ip_header") {
       frags[i] = "True-Client-IP-Header";
+    } else if (frags[i] === "ipv4") {
+      frags[i] = "IPv4";
+    } else if (frags[i] === "ipv6") {
+      frags[i] = "IPv6";
     } else {
       frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
     }

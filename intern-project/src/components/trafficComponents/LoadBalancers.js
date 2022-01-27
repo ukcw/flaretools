@@ -9,14 +9,13 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
   VStack,
   Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTable } from "react-table";
-import { useZoneContext } from "../../lib/contextLib";
-import { getZoneSetting, Humanize, TimeToText } from "../../utils/utils";
+import { TimeToText } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const LoadBalancers = (props) => {
   const columns = React.useMemo(
@@ -94,8 +93,11 @@ const LoadBalancers = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Load Balancers</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="Load Balancers" />
+      )}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

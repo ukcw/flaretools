@@ -18,6 +18,8 @@ import WorkersViewer from "../components/workersComponents/WorkersViewer";
 import NetworkViewer from "../components/networkComponents/NetworkViewer";
 import RulesViewer from "../components/rulesComponents/RulesViewer";
 import TrafficViewer from "../components/trafficComponents/TrafficViewer";
+import ScrapeShieldViewer from "../components/scrapeShieldComponents/ScrapeShieldViewer";
+import SpectrumViewer from "../components/spectrumComponents/SpectrumViewer";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -172,6 +174,8 @@ function ZoneViewer() {
           {rulesData ? <RulesViewer data={rulesData} /> : null}
           {networkData ? <NetworkViewer data={networkData} /> : null}
           {trafficData ? <TrafficViewer data={trafficData} /> : null}
+          <ScrapeShieldViewer />
+          <SpectrumViewer />
         </ZoneContext.Provider>
       ) : null}
     </Container>

@@ -14,6 +14,8 @@ import {
 import React from "react";
 import { useTable } from "react-table";
 import { Humanize } from "../../utils/utils";
+import SuccessfulDefault from "../SuccessfulDefault";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const WithTable = (props) => {
   const getDescription = (checkId, resultArray) => {
@@ -79,10 +81,13 @@ const WithTable = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Web Application Firewall</Heading>
-        {props.data.waf_setting.result.value === "off" && (
+        {/*props.data.waf_setting.result.value === "off" && (
           <Switch isReadOnly isChecked={false} />
-        )}
+        )*/}
       </HStack>
+      {!props.data.waf_setting.result.value === "off" && (
+        <UnsuccessfulDefault setting="Web Application Firewall" />
+      )}
       {props.data.tableData.result.result?.rules !== undefined &&
         props.data.tableData.result.result.rules.length > 0 && (
           <Table {...getTableProps}>
@@ -147,12 +152,17 @@ const WithoutTable = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Web Application Firewall</Heading>
-        {props.data.waf_setting.result.value === "off" ? (
+        {/*props.data.waf_setting.result.value === "off" ? (
           <Switch isReadOnly isChecked={false} />
         ) : (
           <Switch colorScheme={"green"} isReadOnly isChecked={true} />
-        )}
+        )*/}
       </HStack>
+      {props.data.waf_setting.result.value === "off" ? (
+        <UnsuccessfulDefault setting="Web Application Firewall" />
+      ) : (
+        <SuccessfulDefault setting="Web Application Firewall" />
+      )}
       <DeprecatedPage data={props.data.deprecated_firewall_rules} />
     </Stack>
   );

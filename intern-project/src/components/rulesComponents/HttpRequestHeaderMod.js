@@ -9,10 +9,10 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const HttpRequestHeaderMod = (props) => {
   const GetExpressionOutput = (expr) => {
@@ -115,10 +115,13 @@ const HttpRequestHeaderMod = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">HTTP Request Header Modification</Heading>
-        {props.data.result?.rules === undefined && (
+        {/*props.data.result?.rules === undefined && (
           <Switch isReadOnly isChecked={false} />
-        )}
+        )*/}
       </HStack>
+      {props.data.result?.rules === undefined && (
+        <UnsuccessfulDefault setting="HTTP Request Header Modification" />
+      )}
       {props.data.result?.rules !== undefined && (
         <Table {...getTableProps}>
           <Thead>

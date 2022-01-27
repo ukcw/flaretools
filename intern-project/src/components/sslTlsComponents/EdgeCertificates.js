@@ -1,9 +1,7 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
   Table,
-  Text,
   Tbody,
   Td,
   Th,
@@ -14,6 +12,7 @@ import {
 import React from "react";
 import { useTable } from "react-table";
 import { Humanize } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const EdgeCertificates = (props) => {
   const columns = React.useMemo(
@@ -69,6 +68,9 @@ const EdgeCertificates = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <Heading size="md">Edge Certificates</Heading>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="Edge Certificates" />
+      )}
       {props.data.result && (
         <Table {...getTableProps}>
           <Thead>

@@ -1048,6 +1048,41 @@ router.post('/scrape_shield', async request => {
 })
 
 /**
+ * Spectrum
+ */
+
+router.post('/spectrum/applications', async request => {
+  const { query } = await request.json()
+
+  try {
+    const spectrum_applications = await getZoneSetting(
+      query.zoneId,
+      query.apiToken,
+      '/spectrum/apps',
+    )
+
+    return new Response(
+      JSON.stringify({
+        spectrum_applications,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+})
+
+/**
  * Respond with hello worker text
  * @param {Request} request
  */

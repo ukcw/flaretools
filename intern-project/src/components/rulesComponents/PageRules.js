@@ -9,13 +9,13 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
   VStack,
   Text,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
 import { Humanize } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 function isObject(obj) {
   return obj === Object(obj);
@@ -103,8 +103,11 @@ const PageRules = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Page Rules</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="Page Rules" />
+      )}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

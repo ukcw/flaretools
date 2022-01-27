@@ -9,11 +9,11 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
 import { Humanize } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const CustomRules = (props) => {
   const columns = React.useMemo(
@@ -53,10 +53,13 @@ const CustomRules = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">{props.title}</Heading>
-        {!props.data.result.rules.length && (
+        {/*!props.data.result.rules.length && (
           <Switch isReadOnly isChecked={false} />
-        )}
+        )*/}
       </HStack>
+      {!props.data.result.rules.length && (
+        <UnsuccessfulDefault setting="Custom Rules" />
+      )}
       {props.data.result.rules.length && (
         <Table {...getTableProps}>
           <Thead>

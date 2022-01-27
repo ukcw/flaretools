@@ -1,4 +1,3 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
@@ -9,11 +8,11 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
   Tag,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const HttpRoutes = (props) => {
   const columns = React.useMemo(
@@ -49,8 +48,11 @@ const HttpRoutes = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">HTTP Routes</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="HTTP Routes" />
+      )}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

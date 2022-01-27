@@ -2,7 +2,6 @@ import {
   Heading,
   HStack,
   Stack,
-  Switch,
   Table,
   Tbody,
   Td,
@@ -11,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useZoneContext } from "../../lib/contextLib";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const MobileRedirect = (props) => {
   const { zoneDetails } = useZoneContext();
@@ -18,10 +18,13 @@ const MobileRedirect = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Mobile Redirect</Heading>
-        {props.data.result.value === "off" && (
+        {/*props.data.result.value === "off" && (
           <Switch isReadOnly isChecked={false} />
-        )}
+        )*/}
       </HStack>
+      {props.data.result.value === "off" && (
+        <UnsuccessfulDefault setting="Mobile Redirect" />
+      )}
       {props.data.result.value !== "off" && (
         <Table>
           <Tbody>

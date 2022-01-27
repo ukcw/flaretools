@@ -1,4 +1,3 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
@@ -9,13 +8,13 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
   VStack,
   Text,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
 import { CountryCodeLookup, Humanize } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const IpAccessRules = (props) => {
   const ActionName = (action) => {
@@ -79,8 +78,11 @@ const IpAccessRules = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">IP Access Rules</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="IP Access Rules" />
+      )}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

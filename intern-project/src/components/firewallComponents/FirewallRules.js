@@ -16,6 +16,7 @@ import {
 import React from "react";
 import { useTable } from "react-table";
 import { GetExpressionOutput, Humanize } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const FirewallRules = (props) => {
   const ConcatenateExpressions = (expr) => {
@@ -73,6 +74,9 @@ const FirewallRules = (props) => {
         <Heading size="md">Firewall Rules</Heading>
         {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
       </HStack>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="Firewall Rules" />
+      )}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

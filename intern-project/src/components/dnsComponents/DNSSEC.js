@@ -2,7 +2,6 @@ import {
   Heading,
   HStack,
   Stack,
-  Switch,
   Table,
   Tbody,
   Td,
@@ -21,10 +20,13 @@ const Dnssec = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">DNSSEC</Heading>
-        {props.data.result.status === "disabled" && (
+        {/*props.data.result.status === "disabled" && (
           <Switch isReadOnly isChecked={false} />
-        )}
+        )*/}
       </HStack>
+      {props.data.result.status === "disabled" && (
+        <UnsuccessfulDefault setting="Custom Nameservers" />
+      )}
       {props.success ? null : <UnsuccessfulDefault errors={props.errors} />}
       {props.data.result.status !== "disabled" && (
         <Table>

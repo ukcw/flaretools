@@ -9,13 +9,12 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
   VStack,
   Text,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
-import { Humanize } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const ZoneLockdown = (props) => {
   const SubDescription = (result) => {
@@ -80,8 +79,11 @@ const ZoneLockdown = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Zone Lockdown</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="Zone Lockdown" />
+      )}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

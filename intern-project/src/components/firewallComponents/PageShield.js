@@ -8,10 +8,10 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const PageShield = (props) => {
   const columns = React.useMemo(
@@ -48,8 +48,11 @@ const PageShield = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Page Shield</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="Page Shield" />
+      )}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

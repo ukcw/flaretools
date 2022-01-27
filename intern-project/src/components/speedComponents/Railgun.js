@@ -9,10 +9,10 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const Railgun = (props) => {
   const columns = React.useMemo(
@@ -54,8 +54,9 @@ const Railgun = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Railgun</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
+      {!props.data.result.length && <UnsuccessfulDefault setting="Railgun" />}
       {props.data.result.length && (
         <Table {...getTableProps}>
           <Thead>

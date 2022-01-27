@@ -2,7 +2,6 @@ import {
   Heading,
   HStack,
   Stack,
-  Switch,
   Table,
   Tbody,
   Td,
@@ -12,6 +11,7 @@ import {
 import React from "react";
 import { Humanize } from "../../utils/utils";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const AutomaticPlatformOptimization = (props) => {
   return (
@@ -20,10 +20,13 @@ const AutomaticPlatformOptimization = (props) => {
         <Heading size="md">
           Automatic Platform Optimization for WordPress
         </Heading>
-        {props.data.result.value === "off" && (
+        {/*props.data.result.value === "off" && (
           <Switch isReadOnly isChecked={false} />
-        )}
+        )*/}
       </HStack>
+      {props.data.result.value === "off" && (
+        <UnsuccessfulDefault setting="Automatic Platform Optimization for WordPress" />
+      )}
       {props.data.result.value !== "off" && (
         <Table>
           <Tbody>

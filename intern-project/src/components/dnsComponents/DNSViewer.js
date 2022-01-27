@@ -1,13 +1,10 @@
 import React from "react";
-import DNSRecords from "./DNSRecords";
-import NameServers from "./NameServers";
-import CustomNS from "./CustomNS";
 import Dnssec from "./Dnssec";
-import CNAMEFlattening from "./CNAMEFlattening";
-import DnsRecordsRT from "./DnsRecordsRT";
-import NameServersRT from "./NameServersRT";
+import DnsRecords from "./DnsRecords";
+import NameServers from "./NameServers";
 import { Container, Heading, Stack } from "@chakra-ui/react";
-import CustomNsRT from "./CustomNsRT";
+import CustomNs from "./CustomNs";
+import CnameFlattening from "./CnameFlattening";
 
 const DNSViewer = (props) => {
   const titles = Object.keys(props.data);
@@ -28,7 +25,7 @@ const DNSViewer = (props) => {
           switch (title) {
             case "dns_records":
               return (
-                <DnsRecordsRT
+                <DnsRecords
                   data={props.data[title]}
                   errors={props.data[title].errors}
                   success={props.data[title].success}
@@ -37,7 +34,7 @@ const DNSViewer = (props) => {
               );
             case "name_servers":
               return (
-                <NameServersRT
+                <NameServers
                   data={props.data[title]}
                   errors={props.data[title].errors}
                   success={props.data[title].success}
@@ -46,7 +43,7 @@ const DNSViewer = (props) => {
               );
             case "custom_ns":
               return (
-                <CustomNsRT
+                <CustomNs
                   data={props.data[title]}
                   errors={props.data[title].errors}
                   success={props.data[title].success}
@@ -64,7 +61,7 @@ const DNSViewer = (props) => {
               );
             case "cname_flattening":
               return (
-                <CNAMEFlattening
+                <CnameFlattening
                   data={props.data[title]}
                   errors={props.data[title].errors}
                   success={props.data[title].success}

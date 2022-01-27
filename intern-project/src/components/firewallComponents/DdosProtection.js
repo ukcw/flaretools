@@ -8,12 +8,12 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
   Tag,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 import { useTable } from "react-table";
 import { Humanize } from "../../utils/utils";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const DdosProtection = (props) => {
   let ddosOverride = false;
@@ -83,10 +83,13 @@ const DdosProtection = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">{props.title}</Heading>
-        {!props.data.ddos_ruleset.result.result.rules.length && (
+        {/*!props.data.ddos_ruleset.result.result.rules.length && (
           <Switch isReadOnly isChecked={false} />
-        )}
+        )*/}
       </HStack>
+      {!props.data.ddos_ruleset.result.result.rules.length && (
+        <UnsuccessfulDefault setting={props.title} />
+      )}
       {props.data.ddos_ruleset.result.result.rules.length && (
         <Table {...getTableProps}>
           <Thead>

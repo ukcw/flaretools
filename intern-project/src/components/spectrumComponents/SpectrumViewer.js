@@ -1,26 +1,26 @@
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import LoadBalancers from "./LoadBalancers";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import SpecApplications from "./SpecApplications";
 
-const TrafficViewer = (props) => {
-  const { zoneDetails, apiToken } = useZoneContext();
-  const [pools, setPools] = useState();
+const SpectrumViewer = (props) => {
+  const { zoneId, apiToken } = useZoneContext();
+  const [specApplications, setSpecApplications] = useState();
 
   useEffect(() => {
-    async function getPools() {
+    async function getData() {
       const resp = await getZoneSetting(
         {
-          accountId: zoneDetails.account.id,
+          zoneId: zoneId,
           apiToken: `Bearer ${apiToken}`,
         },
-        "/traffic/load_balancers/pools"
+        "/spectrum/applications"
       );
-      setPools(resp.load_balancers_pools);
+      setSpecApplications(resp.spectrum_applications);
     }
-    getPools();
-  }, [apiToken, zoneDetails.account.id]);
+    getData();
+  }, [apiToken, zoneId]);
 
   return (
     <Container maxW="container.xl">
@@ -33,13 +33,11 @@ const TrafficViewer = (props) => {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        <Heading size="xl">Traffic</Heading>={" "}
-        {pools && (
-          <LoadBalancers data={props.data.load_balancers} pools={pools} />
-        )}
+        <Heading size="xl">Spectrum</Heading>
+        {specApplications && <SpecApplications data={specApplications} />}
       </Stack>
     </Container>
   );
 };
 
-export default TrafficViewer;
+export default SpectrumViewer;

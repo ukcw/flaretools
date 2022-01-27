@@ -2,7 +2,6 @@ import {
   Heading,
   HStack,
   Stack,
-  Switch,
   Table,
   Tbody,
   Td,
@@ -12,6 +11,7 @@ import {
 import React from "react";
 import { Humanize } from "../../utils/utils";
 import { CloseIcon } from "@chakra-ui/icons";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const SettingValue = (value) => {
   if (value === false) {
@@ -30,12 +30,15 @@ const HttpStrictTransportSecurity = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">HTTP Strict Transport Security (HSTS)</Heading>
-        {props.data.result.value.strict_transport_security.enabled === false ? (
+        {/*props.data.result.value.strict_transport_security.enabled === false ? (
           <Switch isReadOnly isChecked={false} />
         ) : (
           <Switch isReadOnly colorScheme={"green"} isChecked={true} />
-        )}
+        )*/}
       </HStack>
+      {props.data.result.value.strict_transport_security.enabled === false && (
+        <UnsuccessfulDefault setting="HTTP Strict Transport Security" />
+      )}
       {props.data.result.value.strict_transport_security.enabled !== false && (
         <Table>
           <Tbody>

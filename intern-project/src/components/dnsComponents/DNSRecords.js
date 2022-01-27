@@ -1,71 +1,116 @@
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import {
+  Heading,
+  Stack,
+  Table,
+  Text,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import React from "react";
+import { useTable } from "react-table";
+import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
-function humanize(str) {
-  var i,
-    frags = str.split("_");
-  for (i = 0; i < frags.length; i++) {
-    frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
-  }
-  return frags.join(" ");
-}
+const DnsRecordsRT = (props) => {
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "Type",
+        accessor: "type",
+      },
+      {
+        Header: "Name",
+        accessor: "name",
+      },
+      {
+        Header: "Content",
+        accessor: "content",
+      },
+      {
+        Header: "Proxied",
+        accessor: "proxied",
+        Cell: (props) =>
+          props.value ? <CheckIcon color="green" /> : <CloseIcon color="red" />,
+      },
+      {
+        Header: "TTL",
+        accessor: "ttl",
+        Cell: (props) => (props.value === 1 ? <Text>Auto</Text> : props.value),
+      },
+    ],
+    []
+  );
 
-/**
- *
- * @param {*} props
- * @returns
- */
+  const data = React.useMemo(() => props.data.result, [props.data.result]);
 
-const DNSRecords = (props) => {
-  const keys = Object.keys(props.data.result[0]);
-  const metaKeys = Object.keys(props.data.result[0].meta);
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable({ columns, data });
 
   return (
-    <div>
-      <h2>DNS Records</h2>
-      <table>
-        <thead>
-          <tr>
-            {keys.map((key) => {
-              return key !== "meta" ? (
-                <th rowSpan={2} key={key}>
-                  {humanize(key)}
-                </th>
-              ) : (
-                <th colSpan={4} key={key}>
-                  {humanize(key)}
-                </th>
-              );
-            })}
-          </tr>
-          <tr>
-            {metaKeys.map((key) => (
-              <th key={key}>{humanize(key)}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {props.data.result.map((record) => (
-            <tr key={record.id}>
-              {keys.map((key) => {
-                if (key !== "meta") {
-                  return <td key={key}>{record[key].toString()}</td>;
-                } else {
-                  const metaColumnData = record[key];
-                  return metaKeys.map((metaKey) => {
-                    return (
-                      <td key={metaKey}>
-                        {metaColumnData[metaKey].toString()}
-                      </td>
-                    );
-                  });
-                }
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Stack w="100%" spacing={4}>
+      <Heading size="md">DNS Management</Heading>
+      {!props.data.result.length && (
+        <UnsuccessfulDefault setting="DNS Management" />
+      )}
+      {props.data.result && (
+        <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
+          <Thead>
+            {
+              // Loop over the header rows
+              headerGroups.map((headerGroup) => (
+                <Tr {...headerGroup.getHeaderGroupProps()}>
+                  {
+                    // Loop over the headers in each row
+                    headerGroup.headers.map((column) => (
+                      // Apply the header cell props
+                      <Th {...column.getHeaderProps()}>
+                        {
+                          // Render the header
+                          column.render("Header")
+                        }
+                      </Th>
+                    ))
+                  }
+                </Tr>
+              ))
+            }
+          </Thead>
+          {/* Apply the table body props */}
+          <Tbody {...getTableBodyProps()}>
+            {
+              // Loop over the table rows
+              rows.map((row) => {
+                // Prepare the row for display
+                prepareRow(row);
+                return (
+                  // Apply the row props
+                  <Tr {...row.getRowProps()}>
+                    {
+                      // Loop over the rows cells
+                      row.cells.map((cell) => {
+                        // Apply the cell props
+                        return (
+                          <Td {...cell.getCellProps()}>
+                            {
+                              // Render the cell contents
+                              cell.render("Cell")
+                            }
+                          </Td>
+                        );
+                      })
+                    }
+                  </Tr>
+                );
+              })
+            }
+          </Tbody>
+        </Table>
+      )}
+    </Stack>
   );
 };
 
-export default DNSRecords;
+export default DnsRecordsRT;
