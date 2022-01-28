@@ -82,8 +82,8 @@ function ZoneViewer() {
       ...prevState,
       ...deprecatedFirewall,
     }));
-    const speedResults = await getZoneSetting(payload, "/speed");
-    setSpeedData(speedResults);
+    //const speedResults = await getZoneSetting(payload, "/speed");
+    //setSpeedData(speedResults);
     const cachingResults = await getZoneSetting(payload, "/caching");
     setCachingData(cachingResults);
     const workersResults = await getZoneSetting(payload, "/workers");
@@ -169,7 +169,8 @@ function ZoneViewer() {
           {dnsData ? <DNSViewer data={dnsData} /> : null}
           {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
           {firewallData ? <FirewallViewer data={firewallData} /> : null}
-          {speedData ? <SpeedViewer data={speedData} /> : null}
+          {/*speedData ? <SpeedViewer data={speedData} /> : null*/}
+          <SpeedViewer />
           {cachingData ? <CachingViewer data={cachingData} /> : null}
           {workersData ? <WorkersViewer data={workersData} /> : null}
           {rulesData ? <RulesViewer data={rulesData} /> : null}
