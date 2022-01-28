@@ -21,7 +21,7 @@ const CachingViewer = (props) => {
           zoneId: zoneId,
           apiToken: `Bearer ${apiToken}`,
         },
-        "/network"
+        "/caching"
       );
       setCachingData(resp);
     }
