@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import "./App.css";
 import DNSViewer from "./components/dnsComponents/DNSViewer";
-import SSLTLSViewer from "./components/sslTlsComponents/SSLTLSViewer";
 import FirewallViewer from "./components/firewallComponents/FirewallViewer";
 
 const getZoneSetting = async (query, endpoint) => {
@@ -58,7 +57,7 @@ function App() {
         <button onClick={search}>Search</button>
       </div>
       {dnsData ? <DNSViewer data={dnsData} /> : null}
-      {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
+      {/*sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null*/}
       {firewallData ? <FirewallViewer data={firewallData} /> : null}
     </div>
   );

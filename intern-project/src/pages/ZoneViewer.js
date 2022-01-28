@@ -1,7 +1,6 @@
 //import logo from "./logo.svg";
 import React, { useState } from "react";
 import DNSViewer from "../components/dnsComponents/DNSViewer";
-import SSLTLSViewer from "../components/sslTlsComponents/SSLTLSViewer";
 import FirewallViewer from "../components/firewallComponents/FirewallViewer";
 import {
   Button,
@@ -20,6 +19,7 @@ import RulesViewer from "../components/rulesComponents/RulesViewer";
 import TrafficViewer from "../components/trafficComponents/TrafficViewer";
 import ScrapeShieldViewer from "../components/scrapeShieldComponents/ScrapeShieldViewer";
 import SpectrumViewer from "../components/spectrumComponents/SpectrumViewer";
+import SslTlsViewer from "../components/sslTlsComponents/SslTlsViewer";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
@@ -40,7 +40,6 @@ function ZoneViewer() {
   const [apiToken, setApiToken] = useState("");
 
   const [dnsData, setDnsData] = useState();
-  const [sslTlsData, setSslTlsData] = useState();
   const [firewallData, setFirewallData] = useState();
 
   const search = async () => {
@@ -60,8 +59,6 @@ function ZoneViewer() {
     }
     const dnsResults = await getZoneSetting(payload, "/dns");
     setDnsData(dnsResults);
-    const sslTlsResults = await getZoneSetting(payload, "/ssl_tls");
-    setSslTlsData(sslTlsResults);
     const firewallResults = await getZoneSetting(payload, "/firewall");
     setFirewallData((prevState) => ({
       ...prevState,
@@ -110,7 +107,7 @@ function ZoneViewer() {
       {zoneDetails ? (
         <ZoneContext.Provider value={{ zoneDetails, zoneId, apiToken }}>
           {dnsData ? <DNSViewer data={dnsData} /> : null}
-          {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
+          <SslTlsViewer />
           {firewallData ? <FirewallViewer data={firewallData} /> : null}
           <SpeedViewer />
           <CachingViewer />
