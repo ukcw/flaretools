@@ -42,12 +42,9 @@ function ZoneViewer() {
   const [dnsData, setDnsData] = useState();
   const [sslTlsData, setSslTlsData] = useState();
   const [firewallData, setFirewallData] = useState();
-  const [speedData, setSpeedData] = useState();
   const [cachingData, setCachingData] = useState();
   const [workersData, setWorkersData] = useState();
   const [rulesData, setRulesData] = useState();
-  const [networkData, setNetworkData] = useState();
-  const [trafficData, setTrafficData] = useState();
 
   const search = async () => {
     const payload = {
@@ -82,58 +79,13 @@ function ZoneViewer() {
       ...prevState,
       ...deprecatedFirewall,
     }));
-    //const speedResults = await getZoneSetting(payload, "/speed");
-    //setSpeedData(speedResults);
     const cachingResults = await getZoneSetting(payload, "/caching");
     setCachingData(cachingResults);
     const workersResults = await getZoneSetting(payload, "/workers");
     setWorkersData(workersResults);
     const rulesResults = await getZoneSetting(payload, "/rules");
     setRulesData(rulesResults);
-    //const networkResults = await getZoneSetting(payload, "/network");
-    //setNetworkData(networkResults);
-    const trafficResults = await getZoneSetting(
-      payload,
-      "/traffic/load_balancers"
-    );
-    setTrafficData(trafficResults);
   };
-  /*
-    const [
-      zoneDetailsResults,
-      dnsResults,
-      sslTlsResults,
-      firewallResults,
-      speedResults,
-      cachingResults,
-      workersResults,
-      rulesResults,
-      networkResults,
-    ] = await Promise.all([
-      getZoneSetting(payload, "/zone_details"),
-      getZoneSetting(payload, "/dns"),
-      getZoneSetting(payload, "/ssl_tls"),
-      getZoneSetting(payload, "/firewall"),
-      getZoneSetting(payload, "/speed"),
-      getZoneSetting(payload, "/caching"),
-      getZoneSetting(payload, "/workers"),
-      getZoneSetting(payload, "/rules"),
-      getZoneSetting(payload, "/network"),
-    ]);
-
-    if (zoneDetailsResults.zone_details) {
-      setZoneDetails(zoneDetailsResults.zone_details.result);
-    }
-    setDnsData(dnsResults);
-    setSslTlsData(sslTlsResults);
-    setFirewallData(firewallResults);
-    setSpeedData(speedResults);
-    setCachingData(cachingResults);
-    setWorkersData(workersResults);
-    setRulesData(rulesResults);
-    setNetworkData(networkResults);
-  };
-  */
 
   return (
     <Container maxW="container.xl">
@@ -169,14 +121,12 @@ function ZoneViewer() {
           {dnsData ? <DNSViewer data={dnsData} /> : null}
           {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
           {firewallData ? <FirewallViewer data={firewallData} /> : null}
-          {/*speedData ? <SpeedViewer data={speedData} /> : null*/}
           <SpeedViewer />
           {cachingData ? <CachingViewer data={cachingData} /> : null}
           {workersData ? <WorkersViewer data={workersData} /> : null}
           {rulesData ? <RulesViewer data={rulesData} /> : null}
-          {/*networkData ? <NetworkViewer data={networkData} /> : null*/}
           <NetworkViewer />
-          {trafficData ? <TrafficViewer data={trafficData} /> : null}
+          <TrafficViewer />
           <ScrapeShieldViewer />
           <SpectrumViewer />
         </ZoneContext.Provider>

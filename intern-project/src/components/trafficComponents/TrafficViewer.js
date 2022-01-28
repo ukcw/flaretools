@@ -5,22 +5,30 @@ import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
 
 const TrafficViewer = (props) => {
-  const { zoneDetails, apiToken } = useZoneContext();
-  const [pools, setPools] = useState();
+  const { zoneDetails, zoneId, apiToken } = useZoneContext();
+  const [trafficData, setTrafficData] = useState();
 
   useEffect(() => {
-    async function getPools() {
-      const resp = await getZoneSetting(
+    async function getTrafficData() {
+      const { load_balancers } = await getZoneSetting(
+        {
+          zoneId: zoneId,
+          apiToken: `Bearer ${apiToken}`,
+        },
+        "/traffic/load_balancers"
+      );
+      setTrafficData((prevState) => ({ ...prevState, load_balancers }));
+      const { load_balancers_pools } = await getZoneSetting(
         {
           accountId: zoneDetails.account.id,
           apiToken: `Bearer ${apiToken}`,
         },
         "/traffic/load_balancers/pools"
       );
-      setPools(resp.load_balancers_pools);
+      setTrafficData((prevState) => ({ ...prevState, load_balancers_pools }));
     }
-    getPools();
-  }, [apiToken, zoneDetails.account.id]);
+    getTrafficData();
+  }, [apiToken, zoneDetails.account.id, zoneId]);
 
   return (
     <Container maxW="container.xl">
@@ -33,9 +41,12 @@ const TrafficViewer = (props) => {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        <Heading size="xl">Traffic</Heading>={" "}
-        {pools && (
-          <LoadBalancers data={props.data.load_balancers} pools={pools} />
+        <Heading size="xl">Traffic</Heading>
+        {trafficData?.load_balancers && trafficData?.load_balancers_pools && (
+          <LoadBalancers
+            data={trafficData.load_balancers}
+            pools={trafficData.load_balancers_pools}
+          />
         )}
       </Stack>
     </Container>
