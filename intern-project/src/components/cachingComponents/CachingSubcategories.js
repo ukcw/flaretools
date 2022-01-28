@@ -91,6 +91,19 @@ const CachingSubcategories = (props) => {
                   <Td>{BrowserCacheOutput(props.data[key].result.value)}</Td>
                 </Tr>
               );
+            } else if (key === "grpc") {
+              return (
+                <Tr key={key}>
+                  <Th>{SettingName(key)}</Th>
+                  <Td>
+                    {props.data[key].result.protocols.gRPC ? (
+                      <CheckIcon color={"green"} />
+                    ) : (
+                      <CloseIcon color={"red"} />
+                    )}
+                  </Td>
+                </Tr>
+              );
             } else if (props.data[key].result.value === "on") {
               return (
                 <Tr key={key}>

@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import CachingSubcategories from "./CachingSubcategories";
+import { useZoneContext } from "../../lib/contextLib";
+import { getZoneSetting } from "../../utils/utils";
 
 /**
  *
@@ -9,7 +11,22 @@ import CachingSubcategories from "./CachingSubcategories";
  */
 
 const CachingViewer = (props) => {
-  //const titles = Object.keys(props.data);
+  const { zoneId, apiToken } = useZoneContext();
+  const [cachingData, setCachingData] = useState();
+
+  useEffect(() => {
+    async function getData() {
+      const resp = await getZoneSetting(
+        {
+          zoneId: zoneId,
+          apiToken: `Bearer ${apiToken}`,
+        },
+        "/network"
+      );
+      setCachingData(resp);
+    }
+    getData();
+  }, [apiToken, zoneId]);
 
   return (
     <Container maxW="container.xl">
@@ -23,7 +40,7 @@ const CachingViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Caching</Heading>
-        <CachingSubcategories data={props.data} />
+        {cachingData && <CachingSubcategories data={cachingData} />}
       </Stack>
     </Container>
   );

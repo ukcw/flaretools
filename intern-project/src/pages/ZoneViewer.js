@@ -42,7 +42,6 @@ function ZoneViewer() {
   const [dnsData, setDnsData] = useState();
   const [sslTlsData, setSslTlsData] = useState();
   const [firewallData, setFirewallData] = useState();
-  const [cachingData, setCachingData] = useState();
 
   const search = async () => {
     const payload = {
@@ -77,8 +76,6 @@ function ZoneViewer() {
       ...prevState,
       ...deprecatedFirewall,
     }));
-    const cachingResults = await getZoneSetting(payload, "/caching");
-    setCachingData(cachingResults);
   };
 
   return (
@@ -116,7 +113,7 @@ function ZoneViewer() {
           {sslTlsData ? <SSLTLSViewer data={sslTlsData} /> : null}
           {firewallData ? <FirewallViewer data={firewallData} /> : null}
           <SpeedViewer />
-          {cachingData ? <CachingViewer data={cachingData} /> : null}
+          <CachingViewer />
           <WorkersViewer />
           <RulesViewer />
           <NetworkViewer />
