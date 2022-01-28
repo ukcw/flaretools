@@ -1,13 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Dnssec from "./Dnssec";
 import DnsRecords from "./DnsRecords";
 import NameServers from "./NameServers";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import CustomNs from "./CustomNs";
 import CnameFlattening from "./CnameFlattening";
+import { useZoneContext } from "../../lib/contextLib";
+import { getZoneSetting } from "../../utils/utils";
 
-const DNSViewer = (props) => {
-  const titles = Object.keys(props.data);
+const DnsViewer = (props) => {
+  const { zoneId, apiToken } = useZoneContext();
+  const [dnsData, setDnsData] = useState();
+
+  useEffect(() => {
+    async function getData() {
+      const resp = await getZoneSetting(
+        {
+          zoneId: zoneId,
+          apiToken: `Bearer ${apiToken}`,
+        },
+        "/dns"
+      );
+      setDnsData(resp);
+    }
+    getData();
+  }, [apiToken, zoneId]);
 
   return (
     <Container maxW="container.xl">
@@ -21,59 +38,13 @@ const DNSViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">DNS</Heading>
-        {titles.map((title) => {
-          switch (title) {
-            case "dns_records":
-              return (
-                <DnsRecords
-                  data={props.data[title]}
-                  errors={props.data[title].errors}
-                  success={props.data[title].success}
-                  key={title}
-                />
-              );
-            case "name_servers":
-              return (
-                <NameServers
-                  data={props.data[title]}
-                  errors={props.data[title].errors}
-                  success={props.data[title].success}
-                  key={title}
-                />
-              );
-            case "custom_ns":
-              return (
-                <CustomNs
-                  data={props.data[title]}
-                  errors={props.data[title].errors}
-                  success={props.data[title].success}
-                  key={title}
-                />
-              );
-            case "dnssec":
-              return (
-                <Dnssec
-                  data={props.data[title]}
-                  errors={props.data[title].errors}
-                  success={props.data[title].success}
-                  key={title}
-                />
-              );
-            case "cname_flattening":
-              return (
-                <CnameFlattening
-                  data={props.data[title]}
-                  errors={props.data[title].errors}
-                  success={props.data[title].success}
-                  key={title}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
+        {dnsData && <DnsRecords data={dnsData.dns_records} />}
+        {dnsData && <NameServers data={dnsData.name_servers} />}
+        {dnsData && <CustomNs data={dnsData.custom_ns} />}
+        {dnsData && <Dnssec data={dnsData.dnssec} />}
+        {dnsData && <CnameFlattening data={dnsData.cname_flattening} />}
       </Stack>
     </Container>
   );
 };
-export default DNSViewer;
+export default DnsViewer;
