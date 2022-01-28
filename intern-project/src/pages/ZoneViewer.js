@@ -1,6 +1,5 @@
 //import logo from "./logo.svg";
 import React, { useState } from "react";
-import DNSViewer from "../components/dnsComponents/DnsViewer";
 import FirewallViewer from "../components/firewallComponents/FirewallViewer";
 import {
   Button,
@@ -47,7 +46,6 @@ function ZoneViewer() {
     };
 
     const zoneDetailsResults = await getZoneSetting(payload, "/zone_details");
-    console.log(zoneDetailsResults);
     if (zoneDetailsResults.zone_details.success === false) {
       return alert("You have submitted invalid credentials.");
     }
@@ -58,7 +56,7 @@ function ZoneViewer() {
   };
 
   return (
-    <Container maxW="container.xl">
+    <Container maxW="container.xl" p={8}>
       <Stack
         spacing={8}
         borderColor="#ccc"

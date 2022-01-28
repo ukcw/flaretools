@@ -7,11 +7,13 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import WireframeZoneViewer from "./pages/WireframeZoneViewer";
 import ZoneViewer from "./pages/ZoneViewer";
+import Navbar from "./components/Navbar";
 
 ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider>
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/zone-viewer" element={<ZoneViewer />} />
