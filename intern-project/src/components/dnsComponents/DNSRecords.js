@@ -20,14 +20,17 @@ const DnsRecordsRT = (props) => {
       {
         Header: "Type",
         accessor: "type",
+        maxWidth: 100,
       },
       {
         Header: "Name",
         accessor: "name",
+        maxWidth: 250,
       },
       {
         Header: "Content",
         accessor: "content",
+        maxWidth: 250,
       },
       {
         Header: "Proxied",
@@ -56,7 +59,7 @@ const DnsRecordsRT = (props) => {
         <UnsuccessfulDefault setting="DNS Management" />
       )}
       {props.data.result && (
-        <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
+        <Table {...getTableProps}>
           <Thead>
             {
               // Loop over the header rows
@@ -66,7 +69,13 @@ const DnsRecordsRT = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
+                      <Th
+                        {...column.getHeaderProps({
+                          style: {
+                            maxWidth: column.maxWidth,
+                          },
+                        })}
+                      >
                         {
                           // Render the header
                           column.render("Header")
@@ -93,7 +102,13 @@ const DnsRecordsRT = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td {...cell.getCellProps()}>
+                          <Td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                              },
+                            })}
+                          >
                             {
                               // Render the cell contents
                               cell.render("Cell")

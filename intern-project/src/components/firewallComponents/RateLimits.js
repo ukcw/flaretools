@@ -94,7 +94,7 @@ const RateLimiting = (props) => {
         {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!props.data.result.length && (
-        <UnsuccessfulDefault setting="Rate Limits" />
+        <UnsuccessfulDefault setting="Rate Limiting" />
       )}
       {props.data.result.length && (
         <Table {...getTableProps}>

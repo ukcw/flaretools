@@ -118,7 +118,6 @@ const SpecApplications = (props) => {
                           },
                         })}
                       >
-                        {console.log("www", column.maxWidth)}
                         {
                           // Render the header
                           column.render("Header")

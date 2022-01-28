@@ -32,6 +32,12 @@ const PageRules = (props) => {
           return `${Humanize(action.id)}: (Status Code: ${
             action.value.status_code
           }, URL: ${action.value.url})`;
+        } else if (action.id === "minify") {
+          return `${Humanize(action.id.toString())}: (HTML: ${Humanize(
+            action.value.html
+          )}, CSS: ${Humanize(action.value.css)}, JS: ${Humanize(
+            action.value.js
+          )} )`;
         }
       } else {
         if (
@@ -63,7 +69,7 @@ const PageRules = (props) => {
           return (
             <VStack w="100%" p={0} align={"flex-start"}>
               <Text>{row.targets[0].constraint.value}</Text>
-              <Text>{ActionsOutput(row.actions)}</Text>
+              <Text color="grey">{ActionsOutput(row.actions)}</Text>
             </VStack>
           );
         },

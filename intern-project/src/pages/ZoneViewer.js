@@ -35,11 +35,9 @@ const getZoneSetting = async (query, endpoint) => {
 };
 
 function ZoneViewer() {
-  const [zoneId, setZoneId] = useState("4e6d50a41172bca54f222576aec3fc2b");
+  const [zoneId, setZoneId] = useState("");
   const [zoneDetails, setZoneDetails] = useState();
-  const [apiToken, setApiToken] = useState(
-    "0lQJ62XyKHdIrIaNvOp1rl8D0FBaDpXPSo7phced"
-  );
+  const [apiToken, setApiToken] = useState("");
 
   const [dnsData, setDnsData] = useState();
   const [sslTlsData, setSslTlsData] = useState();
@@ -58,6 +56,11 @@ function ZoneViewer() {
     };
 
     const zoneDetailsResults = await getZoneSetting(payload, "/zone_details");
+    console.log(zoneDetailsResults);
+    if (zoneDetailsResults.zone_details.success === false) {
+      return alert("You have submitted invalid credentials.");
+    }
+
     if (zoneDetailsResults.zone_details) {
       setZoneDetails(zoneDetailsResults.zone_details.result);
     }
@@ -87,8 +90,8 @@ function ZoneViewer() {
     setWorkersData(workersResults);
     const rulesResults = await getZoneSetting(payload, "/rules");
     setRulesData(rulesResults);
-    const networkResults = await getZoneSetting(payload, "/network");
-    setNetworkData(networkResults);
+    //const networkResults = await getZoneSetting(payload, "/network");
+    //setNetworkData(networkResults);
     const trafficResults = await getZoneSetting(
       payload,
       "/traffic/load_balancers"
@@ -149,7 +152,6 @@ function ZoneViewer() {
             type="text"
             placeholder="Zone ID"
             onChange={(e) => setZoneId(e.target.value)}
-            //defaultValue="e6bf1f06148cb143e391370e9edf3aef"
           />
         </InputGroup>
         <InputGroup>
@@ -158,7 +160,6 @@ function ZoneViewer() {
             type="text"
             placeholder="API Token"
             onChange={(e) => setApiToken(e.target.value)}
-            //defaultValue="HsCys9ldf0ScxEDcza0Sq0dtkQ3wEbTw97RyAmR3"
           />
         </InputGroup>
         <Button onClick={search}>Search</Button>
@@ -172,7 +173,8 @@ function ZoneViewer() {
           {cachingData ? <CachingViewer data={cachingData} /> : null}
           {workersData ? <WorkersViewer data={workersData} /> : null}
           {rulesData ? <RulesViewer data={rulesData} /> : null}
-          {networkData ? <NetworkViewer data={networkData} /> : null}
+          {/*networkData ? <NetworkViewer data={networkData} /> : null*/}
+          <NetworkViewer />
           {trafficData ? <TrafficViewer data={trafficData} /> : null}
           <ScrapeShieldViewer />
           <SpectrumViewer />

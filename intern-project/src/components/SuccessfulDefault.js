@@ -15,7 +15,7 @@ const SuccessfulDefault = (props) => {
         <Tbody>
           <Tr>
             <Td>{props.setting}</Td>
-            <Td>{<CheckIcon color={"red"} />}</Td>
+            <Td>{<CheckIcon color={"green"} />}</Td>
           </Tr>
         </Tbody>
       </Table>

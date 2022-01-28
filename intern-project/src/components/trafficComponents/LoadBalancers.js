@@ -84,6 +84,26 @@ const LoadBalancers = (props) => {
     [props.pools]
   );
 
+  /*
+  const makeData = (data) => {
+    return data.map((row) => {
+      return row.default_pools.map((poolId) => {
+        if (props.pools) {
+          for (let i = 0; i < props.pools.result.length; i++) {
+            if (poolId === props.pools.result[i].id) {
+              return {
+                id: poolId,
+                name: props.pools.result[i].name,
+                address: props.pools.result[i].origins[0].address,
+                weight: props.pools.result[i].origins[0].weight,
+              };
+            }
+          }
+        }
+      });
+    });
+  };*/
+
   const data = React.useMemo(() => props.data.result, [props.data.result]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =

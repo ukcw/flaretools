@@ -28,6 +28,10 @@ const CustomRules = (props) => {
         accessor: "description",
       },
       {
+        Header: "Expression",
+        accessor: "expression",
+      },
+      {
         Header: "Enabled",
         accessor: "enabled",
         Cell: (props) =>

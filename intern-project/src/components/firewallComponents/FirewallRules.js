@@ -9,7 +9,6 @@ import {
   Thead,
   Tr,
   HStack,
-  Switch,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -42,12 +41,19 @@ const FirewallRules = (props) => {
           return (
             <VStack w="100%" p={0} align={"flex-start"}>
               <Text>{row.description}</Text>
-              <Text color="grey">
+              {/*<Text color="grey">
                 {ConcatenateExpressions(row.filter.expression)}
-              </Text>
+          </Text>*/}
             </VStack>
           );
         },
+        maxWidth: 350,
+      },
+      {
+        Header: "Expression",
+        accessor: (row) => row.filter.expression,
+        Cell: (props) => <Text>{props.value}</Text>,
+        maxWidth: 380,
       },
       {
         Header: "Enabled",
@@ -72,7 +78,7 @@ const FirewallRules = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Firewall Rules</Heading>
-        {!props.data.result.length && <Switch isReadOnly isChecked={false} />}
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!props.data.result.length && (
         <UnsuccessfulDefault setting="Firewall Rules" />
@@ -88,7 +94,13 @@ const FirewallRules = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
+                      <Th
+                        {...column.getHeaderProps({
+                          style: {
+                            maxWidth: column.maxWidth,
+                          },
+                        })}
+                      >
                         {
                           // Render the header
                           column.render("Header")
@@ -115,7 +127,13 @@ const FirewallRules = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td {...cell.getCellProps()}>
+                          <Td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                              },
+                            })}
+                          >
                             {
                               // Render the cell contents
                               cell.render("Cell")

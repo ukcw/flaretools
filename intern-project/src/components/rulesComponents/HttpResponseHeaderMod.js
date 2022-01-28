@@ -9,6 +9,8 @@ import {
   Thead,
   Tr,
   HStack,
+  VStack,
+  Text,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
@@ -65,16 +67,20 @@ const HttpResponseHeaderMod = (props) => {
       },
       {
         Header: "Description",
-        accessor: "description",
+        accessor: (row) => {
+          const exprs = row.expression.split(/\band\b|\bor\b/);
+          const output = exprs.map((expr) => GetExpressionOutput(expr));
+          return (
+            <VStack w="100%" p={0} align={"flex-start"}>
+              <Text>{row.description}</Text>
+              <Text color="grey">{output.join(", ")}</Text>
+            </VStack>
+          );
+        },
       },
       {
-        Header: "Target",
+        Header: "Expression",
         accessor: "expression",
-        Cell: (props) => {
-          const exprs = props.value.split(/\band\b|\bor\b/);
-          const output = exprs.map((expr) => GetExpressionOutput(expr));
-          return output.join(", ");
-        },
       },
       {
         Header: "Status",
