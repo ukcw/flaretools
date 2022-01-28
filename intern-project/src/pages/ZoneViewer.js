@@ -44,7 +44,6 @@ function ZoneViewer() {
   const [firewallData, setFirewallData] = useState();
   const [cachingData, setCachingData] = useState();
   const [workersData, setWorkersData] = useState();
-  const [rulesData, setRulesData] = useState();
 
   const search = async () => {
     const payload = {
@@ -83,8 +82,6 @@ function ZoneViewer() {
     setCachingData(cachingResults);
     const workersResults = await getZoneSetting(payload, "/workers");
     setWorkersData(workersResults);
-    const rulesResults = await getZoneSetting(payload, "/rules");
-    setRulesData(rulesResults);
   };
 
   return (
@@ -124,7 +121,7 @@ function ZoneViewer() {
           <SpeedViewer />
           {cachingData ? <CachingViewer data={cachingData} /> : null}
           {workersData ? <WorkersViewer data={workersData} /> : null}
-          {rulesData ? <RulesViewer data={rulesData} /> : null}
+          <RulesViewer />
           <NetworkViewer />
           <TrafficViewer />
           <ScrapeShieldViewer />

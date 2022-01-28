@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Heading, Stack, useProps } from "@chakra-ui/react";
 import PageRules from "./PageRules";
 import UrlRewrite from "./UrlRewrite";
 import HttpRequestHeaderMod from "./HttpRequestHeaderMod";
 import HttpResponseHeaderMod from "./HttpResponseHeaderMod";
 import RulesSubcategories from "./RulesSubcategories";
+import { useZoneContext } from "../../lib/contextLib";
+import { getZoneSetting } from "../../utils/utils";
 
 /**
  *
@@ -13,7 +15,22 @@ import RulesSubcategories from "./RulesSubcategories";
  */
 
 const RulesViewer = (props) => {
-  //const titles = Object.keys(props.data);
+  const { zoneId, apiToken } = useZoneContext();
+  const [rulesData, setRulesData] = useState();
+
+  useEffect(() => {
+    async function getData() {
+      const resp = await getZoneSetting(
+        {
+          zoneId: zoneId,
+          apiToken: `Bearer ${apiToken}`,
+        },
+        "/rules"
+      );
+      setRulesData(resp);
+    }
+    getData();
+  }, [apiToken, zoneId]);
 
   return (
     <Container maxW="container.xl">
@@ -27,15 +44,21 @@ const RulesViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Rules</Heading>
-        <PageRules data={props.data.pagerules} />
-        <UrlRewrite data={props.data.url_rewrite} />
-        <HttpRequestHeaderMod
-          data={props.data.http_request_late_modification}
-        />
-        <HttpResponseHeaderMod
-          data={props.data.http_response_headers_modification}
-        />
-        <RulesSubcategories data={props.data.normalization_settings} />
+        {rulesData && <PageRules data={rulesData.pagerules} />}
+        {rulesData && <UrlRewrite data={rulesData.url_rewrite} />}
+        {rulesData && (
+          <HttpRequestHeaderMod
+            data={rulesData.http_request_late_modification}
+          />
+        )}
+        {rulesData && (
+          <HttpResponseHeaderMod
+            data={rulesData.http_response_headers_modification}
+          />
+        )}
+        {rulesData && (
+          <RulesSubcategories data={rulesData.normalization_settings} />
+        )}
       </Stack>
     </Container>
   );
