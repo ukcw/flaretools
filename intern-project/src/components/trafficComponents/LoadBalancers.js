@@ -26,6 +26,7 @@ const LoadBalancers = (props) => {
           const output = /(\w+).+/.exec(row.name)[0];
           return output;
         },
+        maxWidth: 250,
       },
       {
         Header: "Pools",
@@ -50,6 +51,8 @@ const LoadBalancers = (props) => {
             </VStack>
           );
         },
+        maxWidth: 400,
+        wordWrap: "break-all",
       },
       {
         Header: "TTL",
@@ -129,7 +132,13 @@ const LoadBalancers = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
+                      <Th
+                        {...column.getHeaderProps({
+                          style: {
+                            maxWidth: column.maxWidth,
+                          },
+                        })}
+                      >
                         {
                           // Render the header
                           column.render("Header")
@@ -156,7 +165,14 @@ const LoadBalancers = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td {...cell.getCellProps()}>
+                          <Td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                                wordBreak: cell.column.wordWrap,
+                              },
+                            })}
+                          >
                             {
                               // Render the cell contents
                               cell.render("Cell")
