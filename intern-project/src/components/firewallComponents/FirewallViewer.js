@@ -1,4 +1,4 @@
-import { Container, Heading, Stack } from "@chakra-ui/react";
+import { Container, Heading, SkeletonText, Stack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
