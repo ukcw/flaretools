@@ -43,7 +43,6 @@ function ZoneViewer() {
   const [sslTlsData, setSslTlsData] = useState();
   const [firewallData, setFirewallData] = useState();
   const [cachingData, setCachingData] = useState();
-  const [workersData, setWorkersData] = useState();
 
   const search = async () => {
     const payload = {
@@ -80,8 +79,6 @@ function ZoneViewer() {
     }));
     const cachingResults = await getZoneSetting(payload, "/caching");
     setCachingData(cachingResults);
-    const workersResults = await getZoneSetting(payload, "/workers");
-    setWorkersData(workersResults);
   };
 
   return (
@@ -120,7 +117,7 @@ function ZoneViewer() {
           {firewallData ? <FirewallViewer data={firewallData} /> : null}
           <SpeedViewer />
           {cachingData ? <CachingViewer data={cachingData} /> : null}
-          {workersData ? <WorkersViewer data={workersData} /> : null}
+          <WorkersViewer />
           <RulesViewer />
           <NetworkViewer />
           <TrafficViewer />

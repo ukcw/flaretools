@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import HttpRoutes from "./HttpRoutes";
+import { useZoneContext } from "../../lib/contextLib";
+import { getZoneSetting } from "../../utils/utils";
 
 /**
  *
@@ -9,7 +11,22 @@ import HttpRoutes from "./HttpRoutes";
  */
 
 const WorkersViewer = (props) => {
-  //const titles = Object.keys(props.data);
+  const { zoneId, apiToken } = useZoneContext();
+  const [workersData, setWorkersData] = useState();
+
+  useEffect(() => {
+    async function getData() {
+      const resp = await getZoneSetting(
+        {
+          zoneId: zoneId,
+          apiToken: `Bearer ${apiToken}`,
+        },
+        "/workers"
+      );
+      setWorkersData(resp);
+    }
+    getData();
+  }, [apiToken, zoneId]);
 
   return (
     <Container maxW="container.xl">
@@ -23,7 +40,7 @@ const WorkersViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Workers</Heading>
-        <HttpRoutes data={props.data.workers_routes} />
+        {workersData && <HttpRoutes data={workersData.workers_routes} />}
       </Stack>
     </Container>
   );
