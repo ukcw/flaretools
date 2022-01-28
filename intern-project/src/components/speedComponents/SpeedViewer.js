@@ -45,18 +45,20 @@ const SpeedViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Speed</Heading>
-        {/*<SpeedSubcategories
-          data={{
-            mirage: props.data.mirage,
-            image_resizing: props.data.image_resizing,
-            polish: props.data.polish,
-            brotli: props.data.brotli,
-            early_hints: props.data.early_hints,
-            h2_prioritization: props.data.h2_prioritization,
-            rocket_loader: props.data.rocket_loader,
-            prefetch_preload: props.data.prefetch_preload,
-          }}
-        />*/}
+        {speedData && (
+          <SpeedSubcategories
+            data={{
+              mirage: speedData.mirage,
+              image_resizing: speedData.image_resizing,
+              polish: speedData.polish,
+              brotli: speedData.brotli,
+              early_hints: speedData.early_hints,
+              h2_prioritization: speedData.h2_prioritization,
+              rocket_loader: speedData.rocket_loader,
+              prefetch_preload: speedData.prefetch_preload,
+            }}
+          />
+        )}
         {speedData && (
           <AutomaticPlatformOptimization
             data={speedData.automatic_platform_optimization}
