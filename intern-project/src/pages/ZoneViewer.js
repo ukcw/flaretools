@@ -40,8 +40,6 @@ function ZoneViewer() {
   const [zoneDetails, setZoneDetails] = useState();
   const [apiToken, setApiToken] = useState("");
 
-  const [firewallData, setFirewallData] = useState();
-
   const search = async () => {
     const payload = {
       zoneId: zoneId,
@@ -57,20 +55,6 @@ function ZoneViewer() {
     if (zoneDetailsResults.zone_details) {
       setZoneDetails(zoneDetailsResults.zone_details.result);
     }
-    const firewallResults = await getZoneSetting(payload, "/firewall");
-    setFirewallData((prevState) => ({
-      ...prevState,
-      ...firewallResults,
-    }));
-    // check deprecated firewall rules
-    const deprecatedFirewall = await getZoneSetting(
-      payload,
-      "/firewall/deprecated"
-    );
-    setFirewallData((prevState) => ({
-      ...prevState,
-      ...deprecatedFirewall,
-    }));
   };
 
   return (
@@ -106,7 +90,7 @@ function ZoneViewer() {
         <ZoneContext.Provider value={{ zoneDetails, zoneId, apiToken }}>
           <DnsViewer />
           <SslTlsViewer />
-          {firewallData ? <FirewallViewer data={firewallData} /> : null}
+          <FirewallViewer />
           <SpeedViewer />
           <CachingViewer />
           <WorkersViewer />

@@ -1,5 +1,7 @@
 import { Container, Heading, Stack } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useZoneContext } from "../../lib/contextLib";
+import { getZoneSetting } from "../../utils/utils";
 import CustomRules from "./CustomRules";
 import DdosProtection from "./DdosProtection";
 import FirewallRules from "./FirewallRules";
@@ -12,6 +14,10 @@ import WebAppFirewall from "./WebAppFirewall";
 import ZoneLockdown from "./ZoneLockdown";
 
 const FirewallViewer = (props) => {
+  const { zoneId, apiToken } = useZoneContext();
+  const [firewallData, setFirewallData] = useState();
+  const [ddosId, setDdosId] = useState();
+
   const getRulesetId = (name, resultArray) => {
     for (let i = 0; i < resultArray.length; i++) {
       if (resultArray[i].name === name) {
@@ -20,10 +26,45 @@ const FirewallViewer = (props) => {
     }
     return -1;
   };
-  const ddosId = getRulesetId(
-    "DDoS L7 ruleset",
-    props.data.managed_rulesets_results
-  );
+
+  useEffect(() => {
+    async function getFirewallData() {
+      const firewallResults = await getZoneSetting(
+        {
+          zoneId: zoneId,
+          apiToken: `Bearer ${apiToken}`,
+        },
+        "/firewall"
+      );
+      setFirewallData((prevState) => ({
+        ...prevState,
+        ...firewallResults,
+      }));
+
+      // check deprecated firewall rules
+      const deprecatedFirewall = await getZoneSetting(
+        {
+          zoneId: zoneId,
+          apiToken: `Bearer ${apiToken}`,
+        },
+        "/firewall/deprecated"
+      );
+      setFirewallData((prevState) => ({
+        ...prevState,
+        ...deprecatedFirewall,
+      }));
+
+      return firewallResults;
+    }
+    getFirewallData().then((data) => {
+      const tempDdosId = getRulesetId(
+        "DDoS L7 ruleset",
+        data.managed_rulesets_results
+      );
+      setDdosId(tempDdosId);
+    });
+  }, [apiToken, zoneId]);
+
   return (
     <Container maxW="container.xl">
       <Stack
@@ -36,46 +77,68 @@ const FirewallViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Firewall</Heading>
-        <WebAppFirewall
-          data={{
-            waf_setting: props.data.waf_setting,
-            managed_rulesets_results: props.data.managed_rulesets_results,
-            deprecated_firewall_rules: props.data.deprecatedFirewallRules,
-          }}
-        />
-        {props.data.custom_rules_firewall.success && (
-          <CustomRules
-            data={props.data.custom_rules_firewall}
-            title="Custom Rules Firewall"
+        {firewallData?.waf_setting && firewallData?.deprecatedFirewallRules && (
+          <WebAppFirewall
+            data={{
+              waf_setting: firewallData.waf_setting,
+              managed_rulesets_results: firewallData.managed_rulesets_results,
+              deprecated_firewall_rules: firewallData.deprecatedFirewallRules,
+            }}
           />
         )}
-        {props.data.custom_rules_ratelimit.success && (
-          <CustomRules
-            data={props.data.custom_rules_ratelimit}
-            title="Custom Rules Rate Limit"
-          />
+        {firewallData?.custom_rules_firewall &&
+          firewallData.custom_rules_firewall.success && (
+            <CustomRules
+              data={firewallData.custom_rules_firewall}
+              title="Custom Rules Firewall"
+            />
+          )}
+        {firewallData?.custom_rules_ratelimit &&
+          firewallData.custom_rules_ratelimit.success && (
+            <CustomRules
+              data={firewallData.custom_rules_ratelimit}
+              title="Custom Rules Rate Limit"
+            />
+          )}
+        {firewallData?.firewall_rules && (
+          <FirewallRules data={firewallData.firewall_rules} />
         )}
-        <FirewallRules data={props.data.firewall_rules} />
         {/*<PageShield data={props.data.page_shield} />*/}
-        <DdosProtection
-          data={{
-            ddos_l7: props.data.ddos_l7,
-            ddos_ruleset: props.data.managed_rulesets_results[ddosId],
-          }}
-          title="HTTP DDoS attack protection"
-        />
-        <IpAccessRules data={props.data.firewall_access_rules} />
-        <RateLimiting data={props.data.rate_limits} />
-        <UserAgentBlocking data={props.data.firewall_ua_rules} />
-        <ZoneLockdown data={props.data.firewall_lockdowns} />
-        <FirewallSubcategories
-          data={{
-            security_level: props.data.security_level,
-            challenge_passage: props.data.challenge_ttl,
-            browser_integrity_check: props.data.browser_check,
-            privacy_pass_support: props.data.privacy_pass,
-          }}
-        />
+        {firewallData?.ddos_l7 &&
+          firewallData?.managed_rulesets_results[ddosId] && (
+            <DdosProtection
+              data={{
+                ddos_l7: firewallData.ddos_l7,
+                ddos_ruleset: firewallData.managed_rulesets_results[ddosId],
+              }}
+              title="HTTP DDoS attack protection"
+            />
+          )}
+        {firewallData?.firewall_access_rules && (
+          <IpAccessRules data={firewallData.firewall_access_rules} />
+        )}
+        {firewallData?.rate_limits && (
+          <RateLimiting data={firewallData.rate_limits} />
+        )}
+        {firewallData?.firewall_ua_rules && (
+          <UserAgentBlocking data={firewallData.firewall_ua_rules} />
+        )}
+        {firewallData?.firewall_lockdowns && (
+          <ZoneLockdown data={firewallData.firewall_lockdowns} />
+        )}
+        {firewallData?.security_level &&
+          firewallData?.challenge_ttl &&
+          firewallData?.browser_check &&
+          firewallData?.privacy_pass && (
+            <FirewallSubcategories
+              data={{
+                security_level: firewallData.security_level,
+                challenge_passage: firewallData.challenge_ttl,
+                browser_integrity_check: firewallData.browser_check,
+                privacy_pass_support: firewallData.privacy_pass,
+              }}
+            />
+          )}
       </Stack>
     </Container>
   );
