@@ -37,10 +37,12 @@ const DdosProtection = (props) => {
       {
         Header: "Rule ID",
         accessor: "id",
+        maxWidth: 200,
       },
       {
         Header: "Description",
         accessor: "description",
+        maxWidth: 300,
       },
       {
         Header: "Tags",
@@ -50,11 +52,13 @@ const DdosProtection = (props) => {
               {category}
             </Tag>
           )),
+        maxWidth: 120,
       },
       {
         Header: "Action",
         accessor: "action",
         Cell: (props) => Humanize(props.value),
+        maxWidth: 120,
       },
       {
         Header: "Sensitivity",
@@ -66,6 +70,7 @@ const DdosProtection = (props) => {
             return "High";
           }
         },
+        maxWidth: 120,
       },
     ],
     []
@@ -101,7 +106,13 @@ const DdosProtection = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
+                      <Th
+                        {...column.getHeaderProps({
+                          style: {
+                            maxWidth: column.maxWidth,
+                          },
+                        })}
+                      >
                         {
                           // Render the header
                           column.render("Header")
@@ -128,7 +139,13 @@ const DdosProtection = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td {...cell.getCellProps()}>
+                          <Td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                              },
+                            })}
+                          >
                             {
                               // Render the cell contents
                               cell.render("Cell")

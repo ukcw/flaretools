@@ -3,6 +3,7 @@ import { Container, Heading, Stack } from "@chakra-ui/react";
 import CachingSubcategories from "./CachingSubcategories";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 
 /**
  *
@@ -40,7 +41,11 @@ const CachingViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Caching</Heading>
-        {cachingData && <CachingSubcategories data={cachingData} />}
+        {cachingData ? (
+          <CachingSubcategories data={cachingData} />
+        ) : (
+          <LoadingBox />
+        )}
       </Stack>
     </Container>
   );

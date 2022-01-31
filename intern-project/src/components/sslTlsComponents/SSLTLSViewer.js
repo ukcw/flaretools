@@ -7,6 +7,7 @@ import HttpStrictTransportSecurity from "./HttpStrictTransportSecurity";
 import CustomHostnames from "./CustomHostnames";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 
 /**
  *
@@ -43,15 +44,27 @@ const SslTlsViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">SSL</Heading>
-        {sslTlsData && <SslSetting data={sslTlsData.ssl_setting} />}
-        {sslTlsData && (
+        {sslTlsData ? (
+          <SslSetting data={sslTlsData.ssl_setting} />
+        ) : (
+          <LoadingBox />
+        )}
+        {sslTlsData ? (
           <EdgeCertificates data={sslTlsData.ssl_certificate_packs} />
+        ) : (
+          <LoadingBox />
         )}
-        {sslTlsData && (
+        {sslTlsData ? (
           <HttpStrictTransportSecurity data={sslTlsData.security_header} />
+        ) : (
+          <LoadingBox />
         )}
-        {sslTlsData && <CustomHostnames data={sslTlsData.custom_hostnames} />}
-        {sslTlsData && (
+        {sslTlsData ? (
+          <CustomHostnames data={sslTlsData.custom_hostnames} />
+        ) : (
+          <LoadingBox />
+        )}
+        {sslTlsData ? (
           <SslSubcategories
             data={{
               ssl_recommendation: sslTlsData.ssl_recommendation,
@@ -64,6 +77,8 @@ const SslTlsViewer = (props) => {
               tls_client_auth: sslTlsData.tls_client_auth,
             }}
           />
+        ) : (
+          <LoadingBox />
         )}
       </Stack>
     </Container>

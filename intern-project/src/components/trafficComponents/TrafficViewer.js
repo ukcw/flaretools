@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import LoadBalancers from "./LoadBalancers";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 
 const TrafficViewer = (props) => {
   const { zoneDetails, zoneId, apiToken } = useZoneContext();
@@ -42,11 +43,13 @@ const TrafficViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Traffic</Heading>
-        {trafficData?.load_balancers && trafficData?.load_balancers_pools && (
+        {trafficData?.load_balancers && trafficData?.load_balancers_pools ? (
           <LoadBalancers
             data={trafficData.load_balancers}
             pools={trafficData.load_balancers_pools}
           />
+        ) : (
+          <LoadingBox />
         )}
       </Stack>
     </Container>

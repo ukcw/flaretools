@@ -3,6 +3,7 @@ import { Container, Heading, Stack } from "@chakra-ui/react";
 import NetworkSubcategories from "./NetworkSubcategories";
 import { getZoneSetting } from "../../utils/utils";
 import { useZoneContext } from "../../lib/contextLib";
+import LoadingBox from "../LoadingBox";
 
 /**
  *
@@ -41,7 +42,11 @@ const NetworkViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Network</Heading>
-        {networkData && <NetworkSubcategories data={networkData} />}
+        {networkData ? (
+          <NetworkSubcategories data={networkData} />
+        ) : (
+          <LoadingBox />
+        )}
       </Stack>
     </Container>
   );

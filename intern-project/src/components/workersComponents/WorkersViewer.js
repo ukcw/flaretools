@@ -3,6 +3,7 @@ import { Container, Heading, Stack } from "@chakra-ui/react";
 import HttpRoutes from "./HttpRoutes";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 
 /**
  *
@@ -40,7 +41,11 @@ const WorkersViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Workers</Heading>
-        {workersData && <HttpRoutes data={workersData.workers_routes} />}
+        {workersData ? (
+          <HttpRoutes data={workersData.workers_routes} />
+        ) : (
+          <LoadingBox />
+        )}
       </Stack>
     </Container>
   );

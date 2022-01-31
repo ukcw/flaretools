@@ -3,6 +3,7 @@ import { Container, Heading, Skeleton, Stack } from "@chakra-ui/react";
 import ScrapeShieldSubcategories from "./ScrapeShieldSubcategories";
 import { getZoneSetting } from "../../utils/utils";
 import { useZoneContext } from "../../lib/contextLib";
+import LoadingBox from "../LoadingBox";
 
 /**
  *
@@ -41,7 +42,7 @@ const ScrapeShieldViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Scrape Shield</Heading>
-        {data && <ScrapeShieldSubcategories data={data} />}
+        {data ? <ScrapeShieldSubcategories data={data} /> : <LoadingBox />}
       </Stack>
     </Container>
   );

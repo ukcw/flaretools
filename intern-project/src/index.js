@@ -3,11 +3,43 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { ChakraProvider } from "@chakra-ui/react";
+import {
+  Box,
+  ChakraProvider,
+  Container,
+  Heading,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import WireframeZoneViewer from "./pages/WireframeZoneViewer";
 import ZoneViewer from "./pages/ZoneViewer";
 import Navbar from "./components/Navbar";
+
+const Welcome = () => {
+  return (
+    <Container maxW={"container.xl"}>
+      <Stack
+        as={Box}
+        textAlign={"center"}
+        spacing={{ base: 8, md: 14 }}
+        py={{ base: 20, md: 36 }}
+      >
+        <Heading
+          fontWeight={600}
+          fontSize={{ base: "2xl", sm: "4xl", md: "6xl" }}
+          lineHeight={"110%"}
+        >
+          Welcome!
+          <br />
+          <Text as={"span"} color={"green.400"}>
+            Click on Zone Viewer to get started.
+          </Text>
+        </Heading>
+      </Stack>
+    </Container>
+  );
+};
 
 ReactDOM.render(
   <React.StrictMode>
@@ -15,7 +47,7 @@ ReactDOM.render(
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<Welcome />} />
           <Route path="/zone-viewer" element={<ZoneViewer />} />
           <Route
             path="/zone-viewer-wireframe"

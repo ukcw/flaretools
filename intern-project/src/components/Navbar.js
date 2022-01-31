@@ -24,7 +24,6 @@ const Navbar = (props) => {
         borderStyle={"solid"}
         borderColor={useColorModeValue("gray.200", "gray.900")}
         top={"0"}
-        //width={"100%"}
       >
         <Popover trigger={"hover"} placement={"bottom-start"}>
           <PopoverTrigger>

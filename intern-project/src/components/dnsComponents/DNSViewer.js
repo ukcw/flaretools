@@ -7,6 +7,7 @@ import CustomNs from "./CustomNs";
 import CnameFlattening from "./CnameFlattening";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 
 const DnsViewer = (props) => {
   const { zoneId, apiToken } = useZoneContext();
@@ -38,11 +39,15 @@ const DnsViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">DNS</Heading>
-        {dnsData && <DnsRecords data={dnsData.dns_records} />}
-        {dnsData && <NameServers data={dnsData.name_servers} />}
-        {dnsData && <CustomNs data={dnsData.custom_ns} />}
-        {dnsData && <Dnssec data={dnsData.dnssec} />}
-        {dnsData && <CnameFlattening data={dnsData.cname_flattening} />}
+        {dnsData ? <DnsRecords data={dnsData.dns_records} /> : <LoadingBox />}
+        {dnsData ? <NameServers data={dnsData.name_servers} /> : <LoadingBox />}
+        {dnsData ? <CustomNs data={dnsData.custom_ns} /> : <LoadingBox />}
+        {dnsData ? <Dnssec data={dnsData.dnssec} /> : <LoadingBox />}
+        {dnsData ? (
+          <CnameFlattening data={dnsData.cname_flattening} />
+        ) : (
+          <LoadingBox />
+        )}
       </Stack>
     </Container>
   );

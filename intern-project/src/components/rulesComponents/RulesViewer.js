@@ -7,6 +7,7 @@ import HttpResponseHeaderMod from "./HttpResponseHeaderMod";
 import RulesSubcategories from "./RulesSubcategories";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 
 /**
  *
@@ -44,20 +45,30 @@ const RulesViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Rules</Heading>
-        {rulesData && <PageRules data={rulesData.pagerules} />}
-        {rulesData && <UrlRewrite data={rulesData.url_rewrite} />}
-        {rulesData && (
+        {rulesData ? <PageRules data={rulesData.pagerules} /> : <LoadingBox />}
+        {rulesData ? (
+          <UrlRewrite data={rulesData.url_rewrite} />
+        ) : (
+          <LoadingBox />
+        )}
+        {rulesData ? (
           <HttpRequestHeaderMod
             data={rulesData.http_request_late_modification}
           />
+        ) : (
+          <LoadingBox />
         )}
-        {rulesData && (
+        {rulesData ? (
           <HttpResponseHeaderMod
             data={rulesData.http_response_headers_modification}
           />
+        ) : (
+          <LoadingBox />
         )}
-        {rulesData && (
+        {rulesData ? (
           <RulesSubcategories data={rulesData.normalization_settings} />
+        ) : (
+          <LoadingBox />
         )}
       </Stack>
     </Container>

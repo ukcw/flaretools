@@ -2,6 +2,7 @@ import { Container, Heading, Stack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 import SpecApplications from "./SpecApplications";
 
 const SpectrumViewer = (props) => {
@@ -34,7 +35,11 @@ const SpectrumViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Spectrum</Heading>
-        {specApplications && <SpecApplications data={specApplications} />}
+        {specApplications ? (
+          <SpecApplications data={specApplications} />
+        ) : (
+          <LoadingBox />
+        )}
       </Stack>
     </Container>
   );

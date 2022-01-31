@@ -7,6 +7,7 @@ import Minify from "./Minify";
 import Railgun from "./Railgun";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
+import LoadingBox from "../LoadingBox";
 
 /**
  *
@@ -45,7 +46,7 @@ const SpeedViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Speed</Heading>
-        {speedData && (
+        {speedData ? (
           <SpeedSubcategories
             data={{
               mirage: speedData.mirage,
@@ -58,15 +59,23 @@ const SpeedViewer = (props) => {
               prefetch_preload: speedData.prefetch_preload,
             }}
           />
+        ) : (
+          <LoadingBox />
         )}
-        {speedData && (
+        {speedData ? (
           <AutomaticPlatformOptimization
             data={speedData.automatic_platform_optimization}
           />
+        ) : (
+          <LoadingBox />
         )}
-        {speedData && <MobileRedirect data={speedData.mobile_redirect} />}
-        {speedData && <Minify data={speedData.minify} />}
-        {speedData && <Railgun data={speedData.railguns} />}
+        {speedData ? (
+          <MobileRedirect data={speedData.mobile_redirect} />
+        ) : (
+          <LoadingBox />
+        )}
+        {speedData ? <Minify data={speedData.minify} /> : <LoadingBox />}
+        {speedData ? <Railgun data={speedData.railguns} /> : <LoadingBox />}
       </Stack>
     </Container>
   );
