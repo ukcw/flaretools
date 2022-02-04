@@ -11,6 +11,7 @@ import {
   HStack,
   VStack,
   Text,
+  Divider,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
@@ -81,6 +82,51 @@ const HttpRequestHeaderMod = (props) => {
       {
         Header: "Expression",
         accessor: "expression",
+      },
+      {
+        Header: "Then...",
+        accessor: (row) => {
+          if (
+            row?.action !== undefined &&
+            row?.action_parameters !== undefined &&
+            row.action_parameters?.headers !== undefined
+          ) {
+            const headersKeys = Object.keys(row.action_parameters.headers);
+            const headersLength = headersKeys.length - 1;
+            return headersKeys.map((header, index) => {
+              console.log(index, headersLength);
+              const item = row.action_parameters.headers[header];
+              return item?.expression !== undefined &&
+                item?.operation !== undefined ? (
+                <VStack w="100%" p={0} align={"flex-start"} key={header}>
+                  <Text fontWeight={"bold"}>Operation: </Text>
+                  <Text>{item.operation}</Text>
+                  <Text fontWeight={"bold"}>Header name:</Text>
+                  <Text>{header}</Text>
+                  <Text fontWeight={"bold"}>Expression: </Text>
+                  <Text>{item.expression}</Text>
+                  {(index !== 0 && index !== headersLength) ||
+                  (headersLength !== 0 && index !== headersLength) ? (
+                    <Divider />
+                  ) : null}
+                </VStack>
+              ) : item?.value !== undefined && item?.operation !== undefined ? (
+                <VStack w="100%" p={0} align={"flex-start"} key={header}>
+                  <Text fontWeight={"bold"}>Operation: </Text>
+                  <Text>{item.operation}</Text>
+                  <Text fontWeight={"bold"}>Header name:</Text>
+                  <Text>{header}</Text>
+                  <Text fontWeight={"bold"}>Value: </Text>
+                  <Text>{item.value}</Text>
+                  {(index !== 0 && index !== headersLength) ||
+                  (headersLength !== 0 && index !== headersLength) ? (
+                    <Divider />
+                  ) : null}
+                </VStack>
+              ) : null;
+            });
+          }
+        },
       },
       {
         Header: "Status",

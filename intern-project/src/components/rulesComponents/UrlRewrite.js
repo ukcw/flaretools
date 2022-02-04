@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useTable } from "react-table";
+import { Humanize } from "../../utils/utils";
 import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const UrlRewrite = (props) => {
@@ -81,6 +82,39 @@ const UrlRewrite = (props) => {
       {
         Header: "Expression",
         accessor: "expression",
+      },
+      {
+        Header: "Then...",
+        accessor: (row) => {
+          if (
+            row?.action !== undefined &&
+            row?.action_parameters !== undefined &&
+            row.action_parameters?.uri !== undefined
+          ) {
+            return (
+              <VStack w="100%" p={0} align={"flex-start"}>
+                {row.action_parameters.uri?.path !== undefined ? (
+                  <>
+                    <Text fontWeight={"bold"}>{`${Humanize(
+                      row.action
+                    )} Path: `}</Text>
+                    <Text>{`${row.action_parameters.uri.path.value}`}</Text>
+                  </>
+                ) : null}
+                {row.action_parameters.uri?.query !== undefined ? (
+                  <>
+                    <Text fontWeight={"bold"}>{`${Humanize(
+                      row.action
+                    )} Query: `}</Text>
+                    <Text>{`${row.action_parameters.uri.query.value}`}</Text>
+                  </>
+                ) : null}
+              </VStack>
+            );
+          } else {
+            return null;
+          }
+        },
       },
       {
         Header: "Status",

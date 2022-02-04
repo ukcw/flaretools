@@ -48,7 +48,9 @@ const PageRules = (props) => {
             action?.value !== undefined ? action.value.toString() : ""
           }`;
         } else {
-          return `${Humanize(action.id.toString())}: ${
+          return `${Humanize(action.id.toString())}${
+            action?.value !== undefined ? ": " : ""
+          }${
             action?.value !== undefined ? Humanize(action.value.toString()) : ""
           }`;
         }
@@ -107,6 +109,7 @@ const PageRules = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
+      {console.log(props.data)}
       <HStack w="100%" spacing={4}>
         <Heading size="md">Page Rules</Heading>
         {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
