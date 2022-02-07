@@ -44,8 +44,6 @@ function ZoneViewer() {
   const searchZoneId = useRef("");
 
   const search = async () => {
-    console.log(searchZoneId.current);
-    console.log(searchApiToken.current);
     const payload = {
       zoneId: searchZoneId.current,
       apiToken: `Bearer ${searchApiToken.current}`,
