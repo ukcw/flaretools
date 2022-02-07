@@ -17,7 +17,6 @@ import { useTable } from "react-table";
 import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const CustomHostnames = (props) => {
-  console.log(props.data);
   const columns = React.useMemo(
     () => [
       {
