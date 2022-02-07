@@ -44,26 +44,22 @@ const SslTlsViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">SSL</Heading>
-        {sslTlsData?.ssl_setting !== undefined &&
-        sslTlsData.ssl_setting.success ? (
+        {sslTlsData?.ssl_setting !== undefined ? (
           <SslSetting data={sslTlsData.ssl_setting} />
         ) : (
           <LoadingBox />
         )}
-        {sslTlsData?.ssl_certificate_packs !== undefined &&
-        sslTlsData.ssl_certificate_packs.success ? (
+        {sslTlsData?.ssl_certificate_packs !== undefined ? (
           <EdgeCertificates data={sslTlsData.ssl_certificate_packs} />
         ) : (
           <LoadingBox />
         )}
-        {sslTlsData?.security_header !== undefined &&
-        sslTlsData.security_header.success ? (
+        {sslTlsData?.security_header !== undefined ? (
           <HttpStrictTransportSecurity data={sslTlsData.security_header} />
         ) : (
           <LoadingBox />
         )}
-        {sslTlsData?.custom_hostnames !== undefined &&
-        sslTlsData.custom_hostnames.success ? (
+        {sslTlsData?.custom_hostnames !== undefined ? (
           <CustomHostnames data={sslTlsData.custom_hostnames} />
         ) : (
           <LoadingBox />

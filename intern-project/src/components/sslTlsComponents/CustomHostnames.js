@@ -17,6 +17,7 @@ import { useTable } from "react-table";
 import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
 const CustomHostnames = (props) => {
+  console.log(props.data);
   const columns = React.useMemo(
     () => [
       {
@@ -87,7 +88,10 @@ const CustomHostnames = (props) => {
     []
   );
 
-  const data = React.useMemo(() => props.data.result, [props.data.result]);
+  const data = React.useMemo(
+    () => (props.data.success ? props.data.result : []),
+    [props.data.result, props.data.success]
+  );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
