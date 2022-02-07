@@ -81,4 +81,4 @@ const SpeedViewer = (props) => {
   );
 };
 
-export default SpeedViewer;
+export default React.memo(SpeedViewer);

@@ -52,4 +52,4 @@ const NetworkViewer = (props) => {
   );
 };
 
-export default NetworkViewer;
+export default React.memo(NetworkViewer);

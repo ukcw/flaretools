@@ -56,4 +56,4 @@ const TrafficViewer = (props) => {
   );
 };
 
-export default TrafficViewer;
+export default React.memo(TrafficViewer);

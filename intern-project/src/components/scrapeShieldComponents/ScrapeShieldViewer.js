@@ -48,4 +48,4 @@ const ScrapeShieldViewer = (props) => {
   );
 };
 
-export default ScrapeShieldViewer;
+export default React.memo(ScrapeShieldViewer);

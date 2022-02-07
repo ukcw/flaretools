@@ -51,4 +51,4 @@ const CachingViewer = (props) => {
   );
 };
 
-export default CachingViewer;
+export default React.memo(CachingViewer);

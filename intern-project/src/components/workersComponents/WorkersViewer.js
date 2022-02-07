@@ -51,4 +51,4 @@ const WorkersViewer = (props) => {
   );
 };
 
-export default WorkersViewer;
+export default React.memo(WorkersViewer);

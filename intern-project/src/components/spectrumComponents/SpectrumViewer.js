@@ -45,4 +45,4 @@ const SpectrumViewer = (props) => {
   );
 };
 
-export default SpectrumViewer;
+export default React.memo(SpectrumViewer);

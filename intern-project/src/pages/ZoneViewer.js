@@ -1,5 +1,5 @@
 //import logo from "./logo.svg";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FirewallViewer from "../components/firewallComponents/FirewallViewer";
 import {
   Button,
@@ -38,13 +38,21 @@ function ZoneViewer() {
   const [zoneId, setZoneId] = useState("");
   const [zoneDetails, setZoneDetails] = useState();
   const [apiToken, setApiToken] = useState("");
+  //const [searchApiToken, setSearchApiToken] = useState("");
+  //const [searchZoneId, setSearchZoneId] = useState("");
+  const searchApiToken = useRef("");
+  const searchZoneId = useRef("");
 
   const search = async () => {
+    console.log(searchZoneId.current);
+    console.log(searchApiToken.current);
     const payload = {
-      zoneId: zoneId,
-      apiToken: `Bearer ${apiToken}`,
+      zoneId: searchZoneId.current,
+      apiToken: `Bearer ${searchApiToken.current}`,
     };
 
+    setZoneId(searchZoneId.current);
+    setApiToken(searchApiToken.current);
     const zoneDetailsResults = await getZoneSetting(payload, "/zone_details");
     if (zoneDetailsResults.zone_details.success === false) {
       return alert("You have submitted invalid credentials.");
@@ -54,6 +62,10 @@ function ZoneViewer() {
       setZoneDetails(zoneDetailsResults.zone_details.result);
     }
   };
+
+  /*const handleChange = (name, text) => {
+    name === "zone_id" ? (searchZoneId = text) : (searchApiToken = text);
+  };*/
 
   return (
     <Container maxW="container.xl" p={8}>
@@ -71,7 +83,7 @@ function ZoneViewer() {
           <Input
             type="text"
             placeholder="Zone ID"
-            onChange={(e) => setZoneId(e.target.value)}
+            onChange={(e) => (searchZoneId.current = e.target.value)}
           />
         </InputGroup>
         <InputGroup>
@@ -79,7 +91,7 @@ function ZoneViewer() {
           <Input
             type="text"
             placeholder="API Token"
-            onChange={(e) => setApiToken(e.target.value)}
+            onChange={(e) => (searchApiToken.current = e.target.value)}
           />
         </InputGroup>
         <Button onClick={search}>Search</Button>
@@ -103,4 +115,4 @@ function ZoneViewer() {
   );
 }
 
-export default ZoneViewer;
+export default React.memo(ZoneViewer);

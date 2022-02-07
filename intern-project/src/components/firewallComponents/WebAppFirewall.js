@@ -148,6 +148,10 @@ const WithTable = (props) => {
 };
 
 const WithoutTable = (props) => {
+  if (props.data.deprecated_firewall_rules === false) {
+    props.data.deprecated_firewall_rules = [];
+  }
+
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>

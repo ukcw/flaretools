@@ -44,22 +44,26 @@ const SslTlsViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">SSL</Heading>
-        {sslTlsData ? (
+        {sslTlsData?.ssl_setting !== undefined &&
+        sslTlsData.ssl_setting.success ? (
           <SslSetting data={sslTlsData.ssl_setting} />
         ) : (
           <LoadingBox />
         )}
-        {sslTlsData ? (
+        {sslTlsData?.ssl_certificate_packs !== undefined &&
+        sslTlsData.ssl_certificate_packs.success ? (
           <EdgeCertificates data={sslTlsData.ssl_certificate_packs} />
         ) : (
           <LoadingBox />
         )}
-        {sslTlsData ? (
+        {sslTlsData?.security_header !== undefined &&
+        sslTlsData.security_header.success ? (
           <HttpStrictTransportSecurity data={sslTlsData.security_header} />
         ) : (
           <LoadingBox />
         )}
-        {sslTlsData ? (
+        {sslTlsData?.custom_hostnames !== undefined &&
+        sslTlsData.custom_hostnames.success ? (
           <CustomHostnames data={sslTlsData.custom_hostnames} />
         ) : (
           <LoadingBox />
@@ -85,4 +89,4 @@ const SslTlsViewer = (props) => {
   );
 };
 
-export default SslTlsViewer;
+export default React.memo(SslTlsViewer);

@@ -94,7 +94,6 @@ const HttpResponseHeaderMod = (props) => {
             const headersKeys = Object.keys(row.action_parameters.headers);
             const headersLength = headersKeys.length - 1;
             return headersKeys.map((header, index) => {
-              console.log(index, headersLength);
               const item = row.action_parameters.headers[header];
               return item?.expression !== undefined &&
                 item?.operation !== undefined ? (

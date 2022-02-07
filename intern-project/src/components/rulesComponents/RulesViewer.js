@@ -75,4 +75,4 @@ const RulesViewer = (props) => {
   );
 };
 
-export default RulesViewer;
+export default React.memo(RulesViewer);

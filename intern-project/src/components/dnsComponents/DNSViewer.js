@@ -52,4 +52,4 @@ const DnsViewer = (props) => {
     </Container>
   );
 };
-export default DnsViewer;
+export default React.memo(DnsViewer);

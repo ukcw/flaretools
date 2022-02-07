@@ -34,7 +34,7 @@ const LoadBalancers = (props) => {
           return (
             <VStack w="100%" p={0} align={"flex-start"}>
               {row.default_pools.map((poolId) => {
-                if (props.pools) {
+                if (props.pools.success && props.pools) {
                   for (let i = 0; i < props.pools.result.length; i++) {
                     if (poolId === props.pools.result[i].id) {
                       return (
