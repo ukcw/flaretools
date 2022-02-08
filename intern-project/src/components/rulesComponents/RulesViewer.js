@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Heading, Stack, useProps } from "@chakra-ui/react";
+import { Container, Heading, Stack } from "@chakra-ui/react";
 import PageRules from "./PageRules";
 import UrlRewrite from "./UrlRewrite";
 import HttpRequestHeaderMod from "./HttpRequestHeaderMod";

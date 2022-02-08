@@ -39,7 +39,10 @@ const NameServers = (props) => {
   };
 
   const data = React.useMemo(
-    () => (props.data.success ? makeData(props.data.result.name_servers) : []),
+    () =>
+      props.data.success && props.data.result?.name_servers !== undefined
+        ? makeData(props.data.result.name_servers)
+        : [],
     [props.data.result.name_servers, props.data.success]
   );
 
@@ -49,10 +52,10 @@ const NameServers = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <Heading size="md">Cloudflare Nameservers</Heading>
-      {!props.data.result && (
+      {props.data.result?.name_servers === undefined && (
         <UnsuccessfulDefault setting="Cloudflare Nameservers" />
       )}
-      {props.data.result && (
+      {props.data.result?.name_servers !== undefined && (
         <Table {...getTableProps}>
           <Thead>
             {

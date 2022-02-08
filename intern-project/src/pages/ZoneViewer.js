@@ -35,9 +35,10 @@ const getZoneSetting = async (query, endpoint) => {
 };
 
 function ZoneViewer() {
-  const [zoneId, setZoneId] = useState("");
+  //const [zoneId, setZoneId] = useState("");
   const [zoneDetails, setZoneDetails] = useState();
-  const [apiToken, setApiToken] = useState("");
+  //const [apiToken, setApiToken] = useState("");
+  const [credentials, setCredentials] = useState({ zoneId: "", apiToken: "" });
   //const [searchApiToken, setSearchApiToken] = useState("");
   //const [searchZoneId, setSearchZoneId] = useState("");
   const searchApiToken = useRef("");
@@ -49,16 +50,22 @@ function ZoneViewer() {
       apiToken: `Bearer ${searchApiToken.current}`,
     };
 
-    setZoneId(searchZoneId.current);
-    setApiToken(searchApiToken.current);
     const zoneDetailsResults = await getZoneSetting(payload, "/zone_details");
     if (zoneDetailsResults.zone_details.success === false) {
       return alert("You have submitted invalid credentials.");
-    }
-
-    if (zoneDetailsResults.zone_details) {
+    } else {
+      //setZoneId(searchZoneId.current);
+      //setApiToken(searchApiToken.current);
+      setCredentials({
+        zoneId: searchZoneId.current,
+        apiToken: searchApiToken.current,
+      });
       setZoneDetails(zoneDetailsResults.zone_details.result);
     }
+
+    /*if (zoneDetailsResults.zone_details) {
+      setZoneDetails(zoneDetailsResults.zone_details.result);
+    }*/
   };
 
   /*const handleChange = (name, text) => {
@@ -95,7 +102,13 @@ function ZoneViewer() {
         <Button onClick={search}>Search</Button>
       </Stack>
       {zoneDetails ? (
-        <ZoneContext.Provider value={{ zoneDetails, zoneId, apiToken }}>
+        <ZoneContext.Provider
+          value={{
+            zoneDetails,
+            zoneId: credentials.zoneId,
+            apiToken: credentials.apiToken,
+          }}
+        >
           <DnsViewer />
           <SslTlsViewer />
           <FirewallViewer />

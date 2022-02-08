@@ -1,4 +1,4 @@
-import { Container, Heading, SkeletonText, Stack } from "@chakra-ui/react";
+import { Container, Heading, Stack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useZoneContext } from "../../lib/contextLib";
 import { getZoneSetting } from "../../utils/utils";
@@ -8,7 +8,7 @@ import DdosProtection from "./DdosProtection";
 import FirewallRules from "./FirewallRules";
 import FirewallSubcategories from "./FirewallSubcategories";
 import IpAccessRules from "./IpAccessRules";
-import PageShield from "./PageShield";
+//import PageShield from "./PageShield";
 import RateLimiting from "./RateLimits";
 import UserAgentBlocking from "./UserAgentBlocking";
 import WebAppFirewall from "./WebAppFirewall";

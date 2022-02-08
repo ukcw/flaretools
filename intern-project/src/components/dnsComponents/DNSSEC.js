@@ -27,7 +27,6 @@ const Dnssec = (props) => {
       {props.data.result.status === "disabled" && (
         <UnsuccessfulDefault setting="DNSSEC" />
       )}
-      {props.success ? null : <UnsuccessfulDefault errors={props.errors} />}
       {props.data.result.status !== "disabled" && (
         <Table>
           <Tbody>

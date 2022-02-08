@@ -51,7 +51,10 @@ const CustomNs = (props) => {
   };
 
   const data = React.useMemo(() => {
-    if (props.data.result.vanity_name_servers.length) {
+    if (
+      props.data.result?.vanity_name_servers !== undefined &&
+      props.data.result.vanity_name_servers.length
+    ) {
       return makeData(props.data.result);
     } else {
       return [];
@@ -69,63 +72,65 @@ const CustomNs = (props) => {
           <Switch isReadOnly isChecked={false} />
         )*/}
       </HStack>
-      {!props.data.result.vanity_name_servers.length && (
+      {(props.data.result?.vanity_name_servers === undefined ||
+        !props.data.result.vanity_name_servers.length) && (
         <UnsuccessfulDefault setting="Custom Nameservers" />
       )}
-      {props.data.result.vanity_name_servers.length !== 0 && (
-        <Table {...getTableProps}>
-          <Thead>
-            {
-              // Loop over the header rows
-              headerGroups.map((headerGroup) => (
-                <Tr {...headerGroup.getHeaderGroupProps()}>
-                  {
-                    // Loop over the headers in each row
-                    headerGroup.headers.map((column) => (
-                      // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
-                        {
-                          // Render the header
-                          column.render("Header")
-                        }
-                      </Th>
-                    ))
-                  }
-                </Tr>
-              ))
-            }
-          </Thead>
-          {/* Apply the table body props */}
-          <Tbody {...getTableBodyProps()}>
-            {
-              // Loop over the table rows
-              rows.map((row) => {
-                // Prepare the row for display
-                prepareRow(row);
-                return (
-                  // Apply the row props
-                  <Tr {...row.getRowProps()}>
+      {props.data.result?.vanity_name_servers !== undefined &&
+        props.data.result.vanity_name_servers.length !== 0 && (
+          <Table {...getTableProps}>
+            <Thead>
+              {
+                // Loop over the header rows
+                headerGroups.map((headerGroup) => (
+                  <Tr {...headerGroup.getHeaderGroupProps()}>
                     {
-                      // Loop over the rows cells
-                      row.cells.map((cell) => {
-                        // Apply the cell props
-                        return (
-                          <Td {...cell.getCellProps()}>
-                            {
-                              // Render the cell contents
-                              cell.render("Cell")
-                            }
-                          </Td>
-                        );
-                      })
+                      // Loop over the headers in each row
+                      headerGroup.headers.map((column) => (
+                        // Apply the header cell props
+                        <Th {...column.getHeaderProps()}>
+                          {
+                            // Render the header
+                            column.render("Header")
+                          }
+                        </Th>
+                      ))
                     }
                   </Tr>
-                );
-              })
-            }
-          </Tbody>
-        </Table>
-      )}
+                ))
+              }
+            </Thead>
+            {/* Apply the table body props */}
+            <Tbody {...getTableBodyProps()}>
+              {
+                // Loop over the table rows
+                rows.map((row) => {
+                  // Prepare the row for display
+                  prepareRow(row);
+                  return (
+                    // Apply the row props
+                    <Tr {...row.getRowProps()}>
+                      {
+                        // Loop over the rows cells
+                        row.cells.map((cell) => {
+                          // Apply the cell props
+                          return (
+                            <Td {...cell.getCellProps()}>
+                              {
+                                // Render the cell contents
+                                cell.render("Cell")
+                              }
+                            </Td>
+                          );
+                        })
+                      }
+                    </Tr>
+                  );
+                })
+              }
+            </Tbody>
+          </Table>
+        )}
     </Stack>
   );
 };

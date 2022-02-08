@@ -58,7 +58,7 @@ const DnsRecords = (props) => {
       {!props.data.result.length && (
         <UnsuccessfulDefault setting="DNS Management" />
       )}
-      {props.data.result && (
+      {props.data.result.length && (
         <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
           <Thead>
             {

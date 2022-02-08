@@ -155,7 +155,7 @@ const HttpRequestHeaderMod = (props) => {
   };
 
   const data = React.useMemo(
-    () => makeData(props.data.result.rules),
+    () => (props.data.result ? makeData(props.data.result.rules) : []),
     [props.data.result]
   );
 
