@@ -14,23 +14,20 @@ import React from "react";
 import { useTable } from "react-table";
 import UnsuccessfulDefault from "../UnsuccessfulDefault";
 
-const DnsRecordsRT = (props) => {
+const DnsRecords = (props) => {
   const columns = React.useMemo(
     () => [
       {
         Header: "Type",
         accessor: "type",
-        maxWidth: 100,
       },
       {
         Header: "Name",
         accessor: "name",
-        maxWidth: 250,
       },
       {
         Header: "Content",
         accessor: "content",
-        maxWidth: 250,
       },
       {
         Header: "Proxied",
@@ -47,7 +44,10 @@ const DnsRecordsRT = (props) => {
     []
   );
 
-  const data = React.useMemo(() => props.data.result, [props.data.result]);
+  const data = React.useMemo(
+    () => (props.data.success ? props.data.result : []),
+    [props.data.result, props.data.success]
+  );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
@@ -59,7 +59,7 @@ const DnsRecordsRT = (props) => {
         <UnsuccessfulDefault setting="DNS Management" />
       )}
       {props.data.result && (
-        <Table {...getTableProps}>
+        <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
           <Thead>
             {
               // Loop over the header rows
@@ -69,13 +69,7 @@ const DnsRecordsRT = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th
-                        {...column.getHeaderProps({
-                          style: {
-                            maxWidth: column.maxWidth,
-                          },
-                        })}
-                      >
+                      <Th {...column.getHeaderProps()}>
                         {
                           // Render the header
                           column.render("Header")
@@ -102,13 +96,7 @@ const DnsRecordsRT = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td
-                            {...cell.getCellProps({
-                              style: {
-                                maxWidth: cell.column.maxWidth,
-                              },
-                            })}
-                          >
+                          <Td {...cell.getCellProps()}>
                             {
                               // Render the cell contents
                               cell.render("Cell")
@@ -128,4 +116,4 @@ const DnsRecordsRT = (props) => {
   );
 };
 
-export default DnsRecordsRT;
+export default DnsRecords;
