@@ -46,8 +46,8 @@ const CustomRules = (props) => {
   );
 
   const data = React.useMemo(
-    () => props.data.result.rules,
-    [props.data.result.rules]
+    () => (props.data.success ? props.data.result.rules : []),
+    [props.data.result.rules, props.data.success]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =

@@ -39,7 +39,10 @@ const PageShield = (props) => {
     []
   );
 
-  const data = React.useMemo(() => props.data.result, [props.data.result]);
+  const data = React.useMemo(
+    () => (props.data.success ? props.data.result : []),
+    [props.data.result, props.data.success]
+  );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
