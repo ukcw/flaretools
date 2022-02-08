@@ -39,8 +39,8 @@ const NameServers = (props) => {
   };
 
   const data = React.useMemo(
-    () => makeData(props.data.result.name_servers),
-    [props.data.result]
+    () => (props.data.success ? makeData(props.data.result.name_servers) : []),
+    [props.data.result.name_servers, props.data.success]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
