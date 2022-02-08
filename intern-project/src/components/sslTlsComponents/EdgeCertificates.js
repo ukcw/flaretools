@@ -58,8 +58,8 @@ const EdgeCertificates = (props) => {
   };
 
   const data = React.useMemo(
-    () => makeData(props.data.result),
-    [props.data.result]
+    () => (props.data.success ? makeData(props.data.result) : []),
+    [props.data.result, props.data.success]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
