@@ -1,3 +1,27 @@
+# Getting Started with the Zone Viewer
+
+Head to https://intern-project.ulysseskee.software.\
+Enter your @cloudflare email in the input box and click 'Send me a code'.\
+Enter the code and you're into the site!\
+Go to the `Zone Viewer` by clicking `Zone Viewer` on the top left of the screen.\
+Enter your `Zone ID` and `API Token` in their respective fields.\
+If you have not obtained an API Token and/or Zone ID yet, the guides are below at `Getting your API Token` and `Getting your Zone ID`.\
+If you do face any bugs, or have any suggestions for improvements and added functionality, please report them to ulysses@cloudflare.com.\
+Thank you and happy viewing!
+
+## Getting your API Token
+
+Login to the Cloudflare Dashboard at https://dash.cloudflare.com and go to `User Profile` -> `API Tokens` or click this link https://dash.cloudflare.com/profile/api-tokens.\
+Click `Create Token`.\
+Use the `Read all resources` template by clicking `Use template` on the right of `Read all resources`.\
+Adjust the duration of the token lifespan if required.\
+Click `Continue to summary` and `Create Token`. Save this API Token somewhere safe. You now have your API Token to use!
+
+## Getting your Zone ID
+
+Login to the Cloudflare Dashboard at https://dash.cloudflare.com and go to `Websites` and select the Zone you would like to inspect.
+Under `Overview`, scroll down on the page and you should see your `Zone ID` on the right hand side of the page.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

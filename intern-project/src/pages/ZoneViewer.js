@@ -84,7 +84,7 @@ function ZoneViewer() {
         boxShadow="0 0 3px #ccc"
       >
         <InputGroup>
-          <InputLeftAddon children="Zone ID" />
+          <InputLeftAddon children="Zone ID" minWidth={"90"} />
           <Input
             type="text"
             placeholder="Zone ID"
@@ -92,14 +92,16 @@ function ZoneViewer() {
           />
         </InputGroup>
         <InputGroup>
-          <InputLeftAddon children="Bearer" />
+          <InputLeftAddon children="Bearer" minWidth={"90"} />
           <Input
             type="text"
             placeholder="API Token"
             onChange={(e) => (searchApiToken.current = e.target.value)}
           />
         </InputGroup>
-        <Button onClick={search}>Search</Button>
+        <Button colorScheme={"blue"} onClick={search}>
+          Search
+        </Button>
       </Stack>
       {zoneDetails ? (
         <ZoneContext.Provider
