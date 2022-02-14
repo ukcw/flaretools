@@ -57,6 +57,8 @@ const FirewallViewer = (props) => {
 
       return firewallResults;
     }
+    setFirewallData();
+    setDdosId();
     getFirewallData().then((data) => {
       const tempDdosId = getRulesetId(
         "DDoS L7 ruleset",

@@ -26,6 +26,7 @@ const CachingViewer = (props) => {
       );
       setCachingData(resp);
     }
+    setCachingData();
     getData();
   }, [apiToken, zoneId]);
 

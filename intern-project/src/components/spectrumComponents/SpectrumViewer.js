@@ -20,6 +20,7 @@ const SpectrumViewer = (props) => {
       );
       setSpecApplications(resp.spectrum_applications);
     }
+    setSpecApplications();
     getData();
   }, [apiToken, zoneId]);
 

@@ -31,6 +31,7 @@ const SpeedViewer = (props) => {
       );
       setSpeedData(resp);
     }
+    setSpeedData();
     getData();
   }, [apiToken, zoneId]);
 

@@ -24,6 +24,7 @@ const DnsViewer = (props) => {
       );
       setDnsData(resp);
     }
+    setDnsData();
     getData();
   }, [apiToken, zoneId]);
 
@@ -38,7 +39,9 @@ const DnsViewer = (props) => {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        <Heading size="xl">DNS</Heading>
+        <Heading size="xl" id="DNS">
+          DNS
+        </Heading>
         {dnsData ? <DnsRecords data={dnsData.dns_records} /> : <LoadingBox />}
         {dnsData ? <NameServers data={dnsData.name_servers} /> : <LoadingBox />}
         {dnsData ? <CustomNs data={dnsData.custom_ns} /> : <LoadingBox />}

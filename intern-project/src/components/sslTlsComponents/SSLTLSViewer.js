@@ -29,6 +29,7 @@ const SslTlsViewer = (props) => {
       );
       setSslTlsData(resp);
     }
+    setSslTlsData();
     getData();
   }, [apiToken, zoneId]);
 

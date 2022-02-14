@@ -26,6 +26,7 @@ const WorkersViewer = (props) => {
       );
       setWorkersData(resp);
     }
+    setWorkersData();
     getData();
   }, [apiToken, zoneId]);
 

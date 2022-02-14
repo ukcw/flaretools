@@ -27,6 +27,7 @@ const ScrapeShieldViewer = (props) => {
       );
       setData(resp);
     }
+    setData();
     getData();
   }, [apiToken, zoneId]);
 

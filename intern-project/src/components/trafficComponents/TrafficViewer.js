@@ -28,6 +28,7 @@ const TrafficViewer = (props) => {
       );
       setTrafficData((prevState) => ({ ...prevState, load_balancers_pools }));
     }
+    setTrafficData();
     getTrafficData();
   }, [apiToken, zoneDetails.account.id, zoneId]);
 

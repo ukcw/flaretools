@@ -27,6 +27,7 @@ const NetworkViewer = (props) => {
       );
       setNetworkData(resp);
     }
+    setNetworkData();
     getData();
   }, [apiToken, zoneId]);
 

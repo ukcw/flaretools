@@ -30,6 +30,7 @@ const RulesViewer = (props) => {
       );
       setRulesData(resp);
     }
+    setRulesData();
     getData();
   }, [apiToken, zoneId]);
 
