@@ -35,12 +35,8 @@ const getZoneSetting = async (query, endpoint) => {
 };
 
 function ZoneViewer() {
-  //const [zoneId, setZoneId] = useState("");
   const [zoneDetails, setZoneDetails] = useState();
-  //const [apiToken, setApiToken] = useState("");
   const [credentials, setCredentials] = useState({ zoneId: "", apiToken: "" });
-  //const [searchApiToken, setSearchApiToken] = useState("");
-  //const [searchZoneId, setSearchZoneId] = useState("");
   const searchApiToken = useRef("");
   const searchZoneId = useRef("");
 
@@ -54,23 +50,13 @@ function ZoneViewer() {
     if (zoneDetailsResults.zone_details.success === false) {
       return alert("You have submitted invalid credentials.");
     } else {
-      //setZoneId(searchZoneId.current);
-      //setApiToken(searchApiToken.current);
       setCredentials({
         zoneId: searchZoneId.current,
         apiToken: searchApiToken.current,
       });
       setZoneDetails(zoneDetailsResults.zone_details.result);
     }
-
-    /*if (zoneDetailsResults.zone_details) {
-      setZoneDetails(zoneDetailsResults.zone_details.result);
-    }*/
   };
-
-  /*const handleChange = (name, text) => {
-    name === "zone_id" ? (searchZoneId = text) : (searchApiToken = text);
-  };*/
 
   return (
     <Container maxW="container.xl" p={8}>
