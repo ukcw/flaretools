@@ -1,6 +1,6 @@
 //import logo from "./logo.svg";
 import React, { useRef, useState } from "react";
-import FirewallViewer from "../components/firewallComponents/FirewallViewer";
+import FirewallViewer from "../components/zoneViewerComponents/firewallComponents/FirewallViewer";
 import {
   Button,
   Container,
@@ -9,17 +9,17 @@ import {
   InputLeftAddon,
   Stack,
 } from "@chakra-ui/react";
-import SpeedViewer from "../components/speedComponents/SpeedViewer";
+import SpeedViewer from "../components/zoneViewerComponents/speedComponents/SpeedViewer";
 import { ZoneContext } from "../lib/contextLib";
-import CachingViewer from "../components/cachingComponents/CachingViewer";
-import WorkersViewer from "../components/workersComponents/WorkersViewer";
-import NetworkViewer from "../components/networkComponents/NetworkViewer";
-import RulesViewer from "../components/rulesComponents/RulesViewer";
-import TrafficViewer from "../components/trafficComponents/TrafficViewer";
-import ScrapeShieldViewer from "../components/scrapeShieldComponents/ScrapeShieldViewer";
-import SpectrumViewer from "../components/spectrumComponents/SpectrumViewer";
-import SslTlsViewer from "../components/sslTlsComponents/SslTlsViewer";
-import DnsViewer from "../components/dnsComponents/DnsViewer";
+import CachingViewer from "../components/zoneViewerComponents/cachingComponents/CachingViewer";
+import WorkersViewer from "../components/zoneViewerComponents/workersComponents/WorkersViewer";
+import NetworkViewer from "../components/zoneViewerComponents/networkComponents/NetworkViewer";
+import RulesViewer from "../components/zoneViewerComponents/rulesComponents/RulesViewer";
+import TrafficViewer from "../components/zoneViewerComponents/trafficComponents/TrafficViewer";
+import ScrapeShieldViewer from "../components/zoneViewerComponents/scrapeShieldComponents/ScrapeShieldViewer";
+import SpectrumViewer from "../components/zoneViewerComponents/spectrumComponents/SpectrumViewer";
+import SslTlsViewer from "../components/zoneViewerComponents/sslTlsComponents/SslTlsViewer";
+import DnsViewer from "../components/zoneViewerComponents/dnsComponents/DnsViewer";
 
 const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
