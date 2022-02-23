@@ -382,3 +382,20 @@ export const getZoneSetting = async (query, endpoint) => {
 
   return resp.json();
 };
+
+export const getMultipleZoneSettings = async (
+  zoneKeys,
+  zoneDetailsObj,
+  endpoint
+) => {
+  const zoneDetails = await Promise.all(
+    zoneKeys.map((key) => {
+      const payload = {
+        zoneId: zoneDetailsObj[key].zoneId,
+        apiToken: `Bearer ${zoneDetailsObj[key].apiToken}`,
+      };
+      return getZoneSetting(payload, endpoint);
+    })
+  );
+  return zoneDetails;
+};

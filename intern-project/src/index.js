@@ -15,6 +15,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import WireframeZoneViewer from "./pages/WireframeZoneViewer";
 import ZoneViewer from "./pages/ZoneViewer";
 import Navbar from "./components/Navbar";
+import ZoneComparison from "./pages/ZoneComparison";
 
 const Welcome = () => {
   return (
@@ -49,6 +50,7 @@ ReactDOM.render(
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/zone-viewer" element={<ZoneViewer />} />
+          <Route path="/zone-comparison" element={<ZoneComparison />} />
           <Route
             path="/zone-viewer-wireframe"
             element={<WireframeZoneViewer />}
