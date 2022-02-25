@@ -431,3 +431,59 @@ export const HeaderFactory = (len) => {
   }
   return output;
 };
+
+/**
+ * Compares DNS Records for any given amount of zones provided in array format and returns an array
+ * @param {*} baseData
+ * @param {*} restData
+ * @returns
+ */
+export const CompareDnsRecords = (baseData, restData) => {
+  if (baseData.success === true && baseData.result.length) {
+    const baseZoneData = baseData.result;
+    return baseZoneData.map((baseObj) => {
+      for (let j = 0; j < restData.length; j++) {
+        if (restData[j].success === true) {
+          const currentCompareZoneData = restData[j].result;
+          let foundMatch = false;
+          currentCompareZoneData.forEach((compareObj) => {
+            if (
+              baseObj.type === compareObj.type &&
+              baseObj.name === compareObj.name &&
+              baseObj.content === compareObj.content &&
+              baseObj.proxied === compareObj.proxied
+            ) {
+              foundMatch = true;
+            }
+            foundMatch
+              ? (baseObj[`zone${j + 2}`] = true)
+              : (baseObj[`zone${j + 2}`] = false);
+          });
+        }
+      }
+      return baseObj;
+    });
+  } else {
+    // base zone is unsuccessful or has no entries
+    let newObj = {
+      setting: "DNS Management",
+      value: false,
+    };
+    for (let j = 0; j < restData.length; j++) {
+      restData[j].success === true && restData[j].result.length
+        ? (newObj[`zone${j + 2}`] = true)
+        : (newObj[`zone${j + 2}`] = false);
+    }
+    return [newObj];
+  }
+};
+
+/**
+ * Takes in a comparison function and data, and returns an array for React-Table
+ * @param {*} comp_fn
+ * @param {*} data
+ * @returns
+ */
+export const compareData = (comp_fn, data) => {
+  return comp_fn(data[0], data.slice(1));
+};

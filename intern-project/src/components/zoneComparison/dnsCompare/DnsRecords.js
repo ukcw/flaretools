@@ -13,49 +13,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
-import { getMultipleZoneSettings, HeaderFactory } from "../../../utils/utils";
+import {
+  compareData,
+  CompareDnsRecords,
+  getMultipleZoneSettings,
+  HeaderFactory,
+} from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
-
-const CompareDns = (baseData, restData) => {
-  if (baseData.success === true && baseData.result.length) {
-    const baseZoneData = baseData.result;
-    return baseZoneData.map((baseObj) => {
-      for (let j = 0; j < restData.length; j++) {
-        if (restData[j].success === true) {
-          const currentCompareZoneData = restData[j].result;
-          let foundMatch = false;
-          console.log(currentCompareZoneData);
-          currentCompareZoneData.forEach((compareObj) => {
-            if (
-              baseObj.type === compareObj.type &&
-              baseObj.name === compareObj.name &&
-              baseObj.content === compareObj.content &&
-              baseObj.proxied === compareObj.proxied
-            ) {
-              foundMatch = true;
-            }
-            foundMatch
-              ? (baseObj[`zone${j + 2}`] = true)
-              : (baseObj[`zone${j + 2}`] = false);
-          });
-        }
-      }
-      return baseObj;
-    });
-  } else {
-    // base zone is unsuccessful or has no entries
-    let newObj = {
-      setting: "DNS Management",
-      value: false,
-    };
-    for (let j = 0; j < restData.length; j++) {
-      restData[j].success === true && restData[j].result.length
-        ? (newObj[`zone${j + 2}`] = true)
-        : (newObj[`zone${j + 2}`] = false);
-    }
-    return [newObj];
-  }
-};
 
 const DnsRecords = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -127,12 +91,8 @@ const DnsRecords = (props) => {
       : unsuccessfulHeaders.concat(dynamicHeaders);
   }, [dnsRecords]);
 
-  const makeData = (comp_fn, data) => {
-    return comp_fn(data[0], data.slice(1));
-  };
-
   const data = React.useMemo(
-    () => (dnsRecords ? makeData(CompareDns, dnsRecords) : []),
+    () => (dnsRecords ? compareData(CompareDnsRecords, dnsRecords) : []),
     [dnsRecords]
   );
 
