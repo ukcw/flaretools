@@ -1,3 +1,5 @@
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+
 export const Humanize = (str) => {
   var i,
     frags = str.split("_");
@@ -383,12 +385,20 @@ export const getZoneSetting = async (query, endpoint) => {
   return resp.json();
 };
 
+/**
+ * Returns an array with the results of the same API call for different zones
+ *
+ * @param {*} zoneKeys
+ * @param {*} zoneDetailsObj
+ * @param {*} endpoint
+ * @returns
+ */
 export const getMultipleZoneSettings = async (
   zoneKeys,
   zoneDetailsObj,
   endpoint
 ) => {
-  const zoneDetails = await Promise.all(
+  const resp = await Promise.all(
     zoneKeys.map((key) => {
       const payload = {
         zoneId: zoneDetailsObj[key].zoneId,
@@ -397,5 +407,27 @@ export const getMultipleZoneSettings = async (
       return getZoneSetting(payload, endpoint);
     })
   );
-  return zoneDetails;
+  return resp;
+};
+
+/**
+ * Produces extension of headers for comparison zones
+ * @param {*} len
+ * @returns
+ */
+export const HeaderFactory = (len) => {
+  let output = [];
+  for (let i = 2; i <= len; i++) {
+    output.push({
+      Header: `Zone ${i}`,
+      accessor: `zone${i}`,
+      Cell: (props) =>
+        props.value ? (
+          <CheckIcon color={"green"} />
+        ) : (
+          <CloseIcon color={"red"} />
+        ),
+    });
+  }
+  return output;
 };

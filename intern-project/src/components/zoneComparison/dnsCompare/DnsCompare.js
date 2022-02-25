@@ -12,10 +12,19 @@ import LoadingBox from "../../LoadingBox";
 const DnsCompare = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
   const [dnsData, setDnsData] = useState();
+  const [dnsRecords, setDnsRecords] = useState();
 
   useEffect(() => {
+    // async function getData() {
+    //   const resp = await getMultipleZoneSettings(zoneKeys, credentials, "/dns");
+    //   setDnsData(resp);
+    // }
     async function getData() {
-      const resp = await getMultipleZoneSettings(zoneKeys, credentials, "/dns");
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/dns_records"
+      );
       setDnsData(resp);
     }
     setDnsData();
@@ -36,8 +45,7 @@ const DnsCompare = (props) => {
         <Heading size="xl" id="DNS">
           DNS
         </Heading>
-        {console.log(dnsData)}
-        {/* {dnsData ? <DnsRecords data={dnsData.dns_records} /> : <LoadingBox />} */}
+        <DnsRecords />
         {/* {dnsData ? <NameServers data={dnsData.name_servers} /> : <LoadingBox />}
         {dnsData ? <CustomNs data={dnsData.custom_ns} /> : <LoadingBox />}
         {dnsData ? <Dnssec data={dnsData.dnssec} /> : <LoadingBox />}

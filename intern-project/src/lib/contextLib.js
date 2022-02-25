@@ -11,5 +11,5 @@ export function useZoneContext() {
 export const CompareContext = createContext(null);
 
 export function useCompareContext() {
-  return useContext(ZoneContext);
+  return useContext(CompareContext);
 }

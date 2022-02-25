@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { getMultipleZoneSettings } from "../utils/utils";
 import { CompareContext } from "../lib/contextLib";
+import DnsCompare from "../components/zoneComparison/dnsCompare/DnsCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -19,12 +20,16 @@ function ZoneComparison() {
   const searchDetails = useRef({});
 
   const search = async () => {
-    const zoneKeys = Object.keys(searchDetails.current);
+    const zoneKeys = Object.keys(searchDetails.current).sort(
+      (a, b) => parseInt(/_(\d+)/.exec(a)[1]) - parseInt(/_(\d+)/.exec(b)[1])
+    );
 
     // check if at least details for two zones was entered
     if (zoneKeys.length < 2) {
       return alert("You need to input a minimum of two zones.");
     }
+
+    console.log(zoneKeys);
 
     // send zone_details API request for all zones provided
     const zoneDetailsResp = await getMultipleZoneSettings(
@@ -82,8 +87,6 @@ function ZoneComparison() {
         margin={8}
         boxShadow="0 0 3px #ccc"
       >
-        {console.log("credentials", credentials)}
-        {console.log("zoneDetails", zoneDetails)}
         <Stack spacing={4}>
           <Heading size={"md"}>Zone 1</Heading>
           <InputGroup>
@@ -91,7 +94,9 @@ function ZoneComparison() {
             <Input
               type="text"
               placeholder="Zone ID"
+              defaultValue={process.env.REACT_APP_PERSONAL_ZONE_ID}
               onChange={(e) => handleChange(e, "zone_1", "zoneId")}
+              onBlur={(e) => handleChange(e, "zone_1", "zoneId")} // for testing
             />
           </InputGroup>
           <InputGroup>
@@ -99,7 +104,9 @@ function ZoneComparison() {
             <Input
               type="text"
               placeholder="API Token"
+              defaultValue={process.env.REACT_APP_READ_ONLY_ALL_API_TOKEN}
               onChange={(e) => handleChange(e, "zone_1", "apiToken")}
+              onBlur={(e) => handleChange(e, "zone_1", "apiToken")} // for testing
             />
           </InputGroup>
         </Stack>
@@ -110,7 +117,9 @@ function ZoneComparison() {
             <Input
               type="text"
               placeholder="Zone ID"
+              defaultValue={process.env.REACT_APP_BURRITO_BOT_ZONE_ID}
               onChange={(e) => handleChange(e, "zone_2", "zoneId")}
+              onBlur={(e) => handleChange(e, "zone_2", "zoneId")} // for testing
             />
           </InputGroup>
           <InputGroup>
@@ -118,7 +127,11 @@ function ZoneComparison() {
             <Input
               type="text"
               placeholder="API Token"
+              defaultValue={
+                process.env.REACT_APP_BURRITO_BOT_READ_ONLY_API_TOKEN
+              }
               onChange={(e) => handleChange(e, "zone_2", "apiToken")}
+              onBlur={(e) => handleChange(e, "zone_2", "apiToken")} // for testing
             />
           </InputGroup>
         </Stack>
@@ -132,7 +145,9 @@ function ZoneComparison() {
             zoneKeys: keys,
             credentials: credentials,
           }}
-        ></CompareContext.Provider>
+        >
+          <DnsCompare />
+        </CompareContext.Provider>
       )}
     </Container>
   );

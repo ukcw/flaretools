@@ -106,6 +106,14 @@ async function getPerPageSpecifiedZoneSetting(
   return data
 }
 
+/**
+ * This is a helper function that makes a paginated Zone Setting API request that allows for a setting for the number of results returned per page.
+ * @param {*} zoneId
+ * @param {*} apiToken
+ * @param {*} endpoint
+ * @param {*} perPage
+ * @returns
+ */
 async function getPageSpecifiedPaginatedZoneSetting(
   zoneId,
   apiToken,
@@ -138,6 +146,13 @@ async function getPageSpecifiedPaginatedZoneSetting(
   return firstRequest
 }
 
+/**
+ * This is a helper function to make an Account Setting type request.
+ * @param {*} accountId
+ * @param {*} apiToken
+ * @param {*} endpoint
+ * @returns
+ */
 async function getAccountSetting(accountId, apiToken, endpoint) {
   var myHeaders = new Headers()
   myHeaders.append('Authorization', `${apiToken}`)
@@ -156,6 +171,38 @@ async function getAccountSetting(accountId, apiToken, endpoint) {
   const data = await resp.json()
 
   return data
+}
+
+/**
+ * This is a helper function to make a fetch request and paginate the request if there is more than one page.
+ * @param {*} zoneId
+ * @param {*} apiToken
+ * @param {*} endpoint
+ * @returns
+ */
+async function FetchRequest(zoneId, apiToken, endpoint) {
+  try {
+    const resp = await getPaginatedZoneSetting(zoneId, apiToken, endpoint)
+
+    return new Response(
+      JSON.stringify({
+        resp,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
 }
 
 /**
@@ -204,6 +251,7 @@ router.post('/zone_details', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/cname_flattening
   */
 
+// Bundler for DNS related API endpoints
 router.post('/dns', async request => {
   const { query } = await request.json()
 
@@ -251,6 +299,10 @@ router.post('/dns', async request => {
   }
 })
 
+router.post('/dns_records', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/dns_records')
+})
 /* SSL/TLS */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/ssl
