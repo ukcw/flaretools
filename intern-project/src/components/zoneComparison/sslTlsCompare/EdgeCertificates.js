@@ -1,6 +1,5 @@
 import {
   Heading,
-  HStack,
   Stack,
   Table,
   Tbody,
@@ -8,6 +7,7 @@ import {
   Th,
   Thead,
   Tr,
+  Tag,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
@@ -22,98 +22,101 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const ValueName = (name) => {
-  switch (name) {
-    case "off":
-      return "Off (not secure)";
-    case "flexible":
-      return "Flexible";
-    case "full":
-      return "Full";
-    case "strict":
-      return "Full (strict)";
-    case "origin_pull":
-      return "Strict (SSL-Only Origin Pull)";
-    default:
-      return null;
-  }
-};
-
 const conditionsToMatch = (base, toCompare) => {
-  return (
-    base.value === toCompare.value &&
-    base.certificate_status === toCompare.certificate_status
-  );
+  // to be implemented
 };
 
-const SslSetting = (props) => {
+const EdgeCertificates = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [sslSettingData, setSslSettingData] = useState();
+  const [edgeCertificatesData, setEdgeCertificatesData] = useState();
 
   useEffect(() => {
     async function getData() {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/settings/ssl"
+        "/ssl/certificate_packs"
       );
-      const processedResp = resp.map((zone) => {
-        const newObj = { ...zone.resp };
-        newObj["result"] = [newObj.result];
-        return newObj;
-      });
-      setSslSettingData(processedResp);
+      const processedResp = resp.map((zone) => zone.resp);
+      console.log(processedResp);
+      setEdgeCertificatesData(processedResp);
     }
-    setSslSettingData();
+    setEdgeCertificatesData();
     getData();
   }, [credentials, zoneKeys]);
 
   const columns = React.useMemo(() => {
     const baseHeaders = [
       {
-        Header: "Value",
-        accessor: "value",
-        Cell: (props) => ValueName(props.value),
+        Header: "Hosts",
+        accessor: "hosts",
+        Cell: (props) => {
+          return props.value.join(", ");
+        },
       },
       {
-        Header: "Certificate Status",
-        accessor: "certificate_status",
+        Header: "Type",
+        accessor: "type",
         Cell: (props) => Humanize(props.value),
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: (props) => (
+          <Tag colorScheme={"green"}>{Humanize(props.value)}</Tag>
+        ),
+      },
+      {
+        Header: "Expires On",
+        accessor: (row) => row.certificates[0].expires_on,
+        Cell: (props) => props.value.substring(0, 10),
       },
     ];
 
-    const dynamicHeaders = sslSettingData
-      ? HeaderFactory(sslSettingData.length)
+    const dynamicHeaders = edgeCertificatesData
+      ? HeaderFactory(edgeCertificatesData.length)
       : [];
 
-    return sslSettingData &&
-      sslSettingData[0].success &&
-      sslSettingData[0].result.length
+    return edgeCertificatesData &&
+      edgeCertificatesData[0].success &&
+      edgeCertificatesData[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
       : UnsuccessfulHeaders.concat(dynamicHeaders);
-  }, [sslSettingData]);
+  }, [edgeCertificatesData]);
 
-  const data = React.useMemo(() => {
-    return sslSettingData
-      ? CompareData(
-          CompareBaseToOthers,
-          sslSettingData,
-          conditionsToMatch,
-          "SSL Setting"
-        )
-      : [];
-  }, [sslSettingData]);
+  //   const makeData = (data) => {
+  //     return data.map((row) => {
+  //       const dataObj = {
+  //         hosts: row.hosts,
+  //         type: row.type,
+  //         status: row.status,
+  //         expires_on: row.certificates[0].expires_on,
+  //       };
+  //       return dataObj;
+  //     });
+  //   };
+
+  const data = React.useMemo(
+    () =>
+      edgeCertificatesData
+        ? CompareData(
+            CompareBaseToOthers,
+            edgeCertificatesData,
+            conditionsToMatch,
+            "Edge Certificates"
+          )
+        : [],
+    [edgeCertificatesData]
+  );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md">SSL Setting</Heading>
-      </HStack>
-      {!sslSettingData && <LoadingBox />}
-      {sslSettingData && (
+      <Heading size="md">Edge Certificates</Heading>
+      {!edgeCertificatesData && <LoadingBox />}
+      {edgeCertificatesData && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -171,4 +174,4 @@ const SslSetting = (props) => {
   );
 };
 
-export default SslSetting;
+export default EdgeCertificates;

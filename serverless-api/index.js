@@ -425,6 +425,18 @@ router.post('/settings/ssl', async request => {
   return FetchRequest(query.zoneId, query.apiToken, '/settings/ssl')
 })
 
+// Edge Certificates
+router.post('/ssl/certificate_packs', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/ssl/certificate_packs')
+})
+
+// Http Strict Transport Security (HSTS)
+router.post('/settings/security_header', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/security_header')
+})
+
 /* Firewall */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/rules
