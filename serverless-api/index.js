@@ -308,6 +308,15 @@ router.post('/dnssec', async request => {
   const { query } = await request.json()
   return FetchRequest(query.zoneId, query.apiToken, '/dnssec')
 })
+
+router.post('/cname_flattening', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/cname_flattening',
+  )
+})
 /* SSL/TLS */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/ssl
