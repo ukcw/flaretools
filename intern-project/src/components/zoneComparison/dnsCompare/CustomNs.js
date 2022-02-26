@@ -14,7 +14,7 @@ import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
   CompareBaseToOthers,
-  compareData,
+  CompareData,
   getMultipleZoneSettings,
   HeaderFactory,
   UnsuccessfulHeaders,
@@ -98,7 +98,7 @@ const CustomNs = (props) => {
 
   const data = React.useMemo(() => {
     return customNs
-      ? compareData(
+      ? CompareData(
           CompareBaseToOthers,
           customNs,
           conditionsToMatch,

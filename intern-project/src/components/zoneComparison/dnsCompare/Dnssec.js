@@ -1,5 +1,6 @@
 import {
   Heading,
+  HStack,
   Stack,
   Table,
   Tbody,
@@ -9,99 +10,76 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useTable } from "react-table";
-import { useCompareContext } from "../../../lib/contextLib";
 import {
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
   HeaderFactory,
+  Humanize,
   UnsuccessfulHeaders,
 } from "../../../utils/utils";
+import { useCompareContext } from "../../../lib/contextLib";
+import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
 
-// make data.result = newly formatted object
-const makeData = (data) => {
-  return data.map((nameServer) => {
-    const dataObj = {
-      type: "NS",
-      value: nameServer,
-    };
-    return dataObj;
-  });
-};
-
 const conditionsToMatch = (base, toCompare) => {
-  return base.value === toCompare.value;
+  return base.status === toCompare.status;
 };
 
-const NameServers = (props) => {
+const Dnssec = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [nameServers, setNameServers] = useState();
+  const [dnssec, setDnssec] = useState();
 
   useEffect(() => {
     async function getData() {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/zone_details"
+        "/dnssec"
       );
       const processedResp = resp.map((zone) => {
-        const newObj = { ...zone.zone_details };
-        if (zone.zone_details.result?.name_servers !== undefined) {
-          newObj["result"] = makeData(zone.zone_details.result.name_servers);
-        } else {
-          newObj["result"] = [];
-        }
+        const newObj = { ...zone.resp };
+        newObj["result"] = [newObj.result];
         return newObj;
       });
-      setNameServers(processedResp);
+      setDnssec(processedResp);
     }
-    setNameServers();
+    setDnssec();
     getData();
   }, [credentials, zoneKeys]);
 
   const columns = React.useMemo(() => {
     const baseHeaders = [
       {
-        Header: "Type",
-        accessor: "type",
-        Cell: (props) => "NS",
-      },
-      {
-        Header: "Value",
-        accessor: "value",
+        Header: "Status",
+        accessor: "status",
+        Cell: (props) => Humanize(props.value),
       },
     ];
 
-    const dynamicHeaders = nameServers ? HeaderFactory(nameServers.length) : [];
+    const dynamicHeaders = dnssec ? HeaderFactory(dnssec.length) : [];
 
-    return nameServers && nameServers[0].success && nameServers[0].result.length
+    return dnssec && dnssec[0].success && dnssec[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
       : UnsuccessfulHeaders.concat(dynamicHeaders);
-  }, [nameServers]);
+  }, [dnssec]);
 
-  const data = React.useMemo(
-    () =>
-      nameServers
-        ? CompareData(
-            CompareBaseToOthers,
-            nameServers,
-            conditionsToMatch,
-            "Cloudflare Nameservers"
-          )
-        : [],
-    [nameServers]
-  );
+  const data = React.useMemo(() => {
+    return dnssec
+      ? CompareData(CompareBaseToOthers, dnssec, conditionsToMatch, "DNSSEC")
+      : [];
+  }, [dnssec]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Cloudflare Nameservers</Heading>
-      {!nameServers && <LoadingBox />}
-      {nameServers && (
+      <HStack w="100%" spacing={4}>
+        <Heading size="md">DNSSEC</Heading>
+      </HStack>
+      {!dnssec && <LoadingBox />}
+      {dnssec && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -159,4 +137,4 @@ const NameServers = (props) => {
   );
 };
 
-export default NameServers;
+export default Dnssec;

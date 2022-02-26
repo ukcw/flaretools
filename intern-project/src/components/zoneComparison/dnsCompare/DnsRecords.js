@@ -15,7 +15,7 @@ import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
   CompareBaseToOthers,
-  compareData,
+  CompareData,
   getMultipleZoneSettings,
   HeaderFactory,
   UnsuccessfulHeaders,
@@ -73,23 +73,6 @@ const DnsRecords = (props) => {
       },
     ];
 
-    const unsuccessfulHeaders = [
-      {
-        Header: "Setting",
-        accessor: "setting",
-      },
-      {
-        Header: "Value",
-        accessor: "value",
-        Cell: (props) =>
-          props.value ? (
-            <CheckIcon color={"green"} />
-          ) : (
-            <CloseIcon color={"red"} />
-          ),
-      },
-    ];
-
     const dynamicHeaders =
       dnsRecords !== undefined ? HeaderFactory(dnsRecords.length) : [];
 
@@ -101,7 +84,7 @@ const DnsRecords = (props) => {
   const data = React.useMemo(
     () =>
       dnsRecords
-        ? compareData(
+        ? CompareData(
             CompareBaseToOthers,
             dnsRecords,
             conditionsToMatch,

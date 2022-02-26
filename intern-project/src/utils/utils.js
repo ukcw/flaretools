@@ -488,7 +488,7 @@ export const CompareBaseToOthers = (
  * @param {*} title - This is the title for the setting
  * @returns
  */
-export const compareData = (comp_fn, data, conditions, title) => {
+export const CompareData = (comp_fn, data, conditions, title) => {
   return comp_fn(data[0], data.slice(1), conditions, title);
 };
 

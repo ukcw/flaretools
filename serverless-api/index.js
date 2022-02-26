@@ -303,6 +303,11 @@ router.post('/dns_records', async request => {
   const { query } = await request.json()
   return FetchRequest(query.zoneId, query.apiToken, '/dns_records')
 })
+
+router.post('/dnssec', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/dnssec')
+})
 /* SSL/TLS */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/ssl
