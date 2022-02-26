@@ -55,7 +55,7 @@ const SslSetting = (props) => {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/cname_flattening"
+        "/settings/ssl"
       );
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.resp };
@@ -170,25 +170,6 @@ const SslSetting = (props) => {
       )}
     </Stack>
   );
-  // return (
-  //   <Stack w="100%" spacing={4}>
-  //     <HStack w="100%" spacing={4}>
-  //       <Heading size="md">SSL Setting</Heading>
-  //     </HStack>
-  //     <Table>
-  //       <Tbody>
-  //         <Tr>
-  //           <Th>Value</Th>
-  //           <Td>{ValueName(props.data.result.value)}</Td>
-  //         </Tr>
-  //         <Tr>
-  //           <Th>Certificate Status</Th>
-  //           <Td>{Humanize(props.data.result.certificate_status)}</Td>
-  //         </Tr>
-  //       </Tbody>
-  //     </Table>
-  //   </Stack>
-  // );
 };
 
 export default SslSetting;
