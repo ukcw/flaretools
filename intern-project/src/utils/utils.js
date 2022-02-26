@@ -1,56 +1,58 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 
 export const Humanize = (str) => {
-  var i,
-    frags = str.split("_");
-  for (i = 0; i < frags.length; i++) {
-    if (frags[i] === "https") {
-      frags[i] = "HTTPS";
-    } else if (frags[i] === "ttl") {
-      frags[i] = "TTL";
-    } else if (frags[i] === "url") {
-      frags[i] = "URL";
-    } else if (frags[i] === "ssl") {
-      frags[i] = "SSL";
-    } else if (frags[i] === "waf") {
-      frags[i] = "WAF";
-    } else if (frags[i] === "ddos") {
-      frags[i] = "DDoS";
-    } else if (frags[i] === "js_challenge") {
-      frags[i] = "JS Challenge";
-    } else if (frags[i] === "http2") {
-      frags[i] = "HTTP/2";
-    } else if (frags[i] === "http3") {
-      frags[i] = "HTTP/3 (with QUIC)";
-    } else if (frags[i] === "zero_rtt") {
-      frags[i] = "0-RTT Connection Resumption";
-    } else if (frags[i] === "ipv6") {
-      frags[i] = "IPv6 Compatibility";
-    } else if (frags[i] === "grpc") {
-      frags[i] = "gRPC";
-    } else if (frags[i] === "websockets") {
-      frags[i] = "WebSockets";
-    } else if (frags[i] === "opportunistic_onion") {
-      frags[i] = "Onion Routing";
-    } else if (frags[i] === "pseudo_ipv4") {
-      frags[i] = "Psuedo IPv4";
-    } else if (frags[i] === "ip_geolocation") {
-      frags[i] = "IP Geolocation";
-    } else if (frags[i] === "max_upload") {
-      frags[i] = "Maximum Upload Size";
-    } else if (frags[i] === "true_client_ip_header") {
-      frags[i] = "True-Client-IP-Header";
-    } else if (frags[i] === "ipv4") {
-      frags[i] = "IPv4";
-    } else if (frags[i] === "ipv6") {
-      frags[i] = "IPv6";
-    } else if (frags[i] === "cname") {
-      frags[i] = "CNAME";
-    } else {
-      frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
+  if (str === "js_challenge") {
+    return "JS Challenge";
+  } else if (str === "zero_rtt") {
+    return "0-RTT Connection Resumption";
+  } else if (str === "opportunistic_onion") {
+    return "Onion Routing";
+  } else if (str === "pseudo_ipv4") {
+    return "Psuedo IPv4";
+  } else if (str === "ip_geolocation") {
+    return "IP Geolocation";
+  } else if (str === "max_upload") {
+    return "Maximum Upload Size";
+  } else if (str === "true_client_ip_header") {
+    return "True-Client-IP-Header";
+  } else {
+    var i,
+      frags = str.split("_");
+    for (i = 0; i < frags.length; i++) {
+      if (frags[i] === "https") {
+        frags[i] = "HTTPS";
+      } else if (frags[i] === "ttl") {
+        frags[i] = "TTL";
+      } else if (frags[i] === "url") {
+        frags[i] = "URL";
+      } else if (frags[i] === "ssl") {
+        frags[i] = "SSL";
+      } else if (frags[i] === "waf") {
+        frags[i] = "WAF";
+      } else if (frags[i] === "ddos") {
+        frags[i] = "DDoS";
+      } else if (frags[i] === "http2") {
+        frags[i] = "HTTP/2";
+      } else if (frags[i] === "http3") {
+        frags[i] = "HTTP/3 (with QUIC)";
+      } else if (frags[i] === "ipv6") {
+        frags[i] = "IPv6 Compatibility";
+      } else if (frags[i] === "grpc") {
+        frags[i] = "gRPC";
+      } else if (frags[i] === "websockets") {
+        frags[i] = "WebSockets";
+      } else if (frags[i] === "ipv4") {
+        frags[i] = "IPv4";
+      } else if (frags[i] === "ipv6") {
+        frags[i] = "IPv6";
+      } else if (frags[i] === "cname") {
+        frags[i] = "CNAME";
+      } else {
+        frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
+      }
     }
+    return frags.join(" ");
   }
-  return frags.join(" ");
 };
 
 export const GetExpressionOutput = (expr) => {
@@ -371,6 +373,21 @@ export const TimeToText = (value) => {
     return `${value / 2678400} months`;
   } else {
     return "1 year";
+  }
+};
+
+/**
+ * Takes in a boolean value and returns a green tick if true else returns a red cross
+ * @param {boolean} value
+ * @returns
+ */
+export const TickOrCross = (value) => {
+  if (value === false) {
+    return <CloseIcon color={"red"} />;
+  } else if (value === true) {
+    return <CheckIcon color={"green"} />;
+  } else {
+    return value;
   }
 };
 

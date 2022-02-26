@@ -2,6 +2,7 @@ import React from "react";
 import SslSetting from "./SslSetting";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import EdgeCertificates from "./EdgeCertificates";
+import HttpStrictTransportSecurity from "./HttpStrictTransportSecurity";
 
 /**
  *
@@ -23,6 +24,7 @@ const SslTlsCompare = (props) => {
         <Heading size="xl">SSL</Heading>
         <SslSetting />
         <EdgeCertificates />
+        <HttpStrictTransportSecurity />
         {/* {sslTlsData?.security_header !== undefined ? (
           <HttpStrictTransportSecurity data={sslTlsData.security_header} />
         ) : (
