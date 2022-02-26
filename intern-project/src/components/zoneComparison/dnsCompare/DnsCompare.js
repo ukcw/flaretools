@@ -9,6 +9,7 @@ import { useCompareContext } from "../../../lib/contextLib";
 import { getMultipleZoneSettings } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 import NameServers from "./NameServers";
+import CustomNs from "./CustomNs";
 
 const DnsCompare = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -48,8 +49,8 @@ const DnsCompare = (props) => {
         </Heading>
         <DnsRecords />
         <NameServers />
-        {/* {dnsData ? <CustomNs data={dnsData.custom_ns} /> : <LoadingBox />}
-        {dnsData ? <Dnssec data={dnsData.dnssec} /> : <LoadingBox />}
+        <CustomNs />
+        {/* {dnsData ? <Dnssec data={dnsData.dnssec} /> : <LoadingBox />}
         {dnsData ? (
           <CnameFlattening data={dnsData.cname_flattening} />
         ) : (

@@ -1,5 +1,6 @@
 import {
   Heading,
+  HStack,
   Stack,
   Table,
   Tbody,
@@ -20,24 +21,35 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-// make data.result = newly formatted object
 const makeData = (data) => {
-  return data.map((nameServer) => {
-    const dataObj = {
-      type: "NS",
-      value: nameServer,
-    };
-    return dataObj;
-  });
+  if (
+    data.vanity_name_servers.length !== 0 &&
+    data.vanity_name_servers_ips !== null
+  ) {
+    return data.vanity_name_servers.map((nameServer) => {
+      const dataObj = {
+        nameserver: nameServer,
+        ipv4: data.vanity_name_servers_ips[nameServer]["ipv4"],
+        ipv6: data.vanity_name_servers_ips[nameServer]["ipv6"],
+      };
+      return dataObj;
+    });
+  } else {
+    return [];
+  }
 };
 
 const conditionsToMatch = (base, toCompare) => {
-  return base.value === toCompare.value;
+  return (
+    base.nameserver === toCompare.nameserver &&
+    base.ipv4 === toCompare.ipv4 &&
+    base.ipv6 === toCompare.ipv6
+  );
 };
 
-const NameServers = (props) => {
+const CustomNs = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [nameServers, setNameServers] = useState();
+  const [customNs, setCustomNs] = useState();
 
   useEffect(() => {
     async function getData() {
@@ -48,60 +60,63 @@ const NameServers = (props) => {
       );
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.zone_details };
-        if (zone.zone_details.result?.name_servers !== undefined) {
-          newObj["result"] = makeData(zone.zone_details.result.name_servers);
+        if (zone.zone_details.result?.vanity_name_servers !== undefined) {
+          newObj["result"] = makeData(zone.zone_details.result);
         } else {
           newObj["result"] = [];
         }
         return newObj;
       });
-      setNameServers(processedResp);
+      setCustomNs(processedResp);
     }
-    setNameServers();
+    setCustomNs();
     getData();
   }, [credentials, zoneKeys]);
 
   const columns = React.useMemo(() => {
     const baseHeaders = [
       {
-        Header: "Type",
-        accessor: "type",
-        Cell: (props) => "NS",
+        Header: "Nameserver",
+        accessor: "nameserver",
       },
       {
-        Header: "Value",
-        accessor: "value",
+        Header: "IPv4 Address",
+        accessor: "ipv4",
+      },
+      {
+        Header: "IPv6 Address",
+        accessor: "ipv6",
       },
     ];
 
-    const dynamicHeaders = nameServers ? HeaderFactory(nameServers.length) : [];
+    const dynamicHeaders = customNs ? HeaderFactory(customNs.length) : [];
 
-    return nameServers && nameServers[0].success && nameServers[0].result.length
+    return customNs && customNs[0].success && customNs[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
       : UnsuccessfulHeaders.concat(dynamicHeaders);
-  }, [nameServers]);
+  }, [customNs]);
 
-  const data = React.useMemo(
-    () =>
-      nameServers
-        ? compareData(
-            CompareBaseToOthers,
-            nameServers,
-            conditionsToMatch,
-            "Cloudflare Nameservers"
-          )
-        : [],
-    [nameServers]
-  );
+  const data = React.useMemo(() => {
+    return customNs
+      ? compareData(
+          CompareBaseToOthers,
+          customNs,
+          conditionsToMatch,
+          "Custom Nameservers"
+        )
+      : [];
+  }, [customNs]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Cloudflare Nameservers</Heading>
-      {!nameServers && <LoadingBox />}
-      {nameServers && (
+      <HStack w="100%" spacing={4}>
+        <Heading size="md">Custom Nameservers</Heading>
+      </HStack>
+      {!customNs && <LoadingBox />}
+      {customNs && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -159,4 +174,4 @@ const NameServers = (props) => {
   );
 };
 
-export default NameServers;
+export default CustomNs;
