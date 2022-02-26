@@ -309,7 +309,7 @@ router.post('/dnssec', async request => {
   return FetchRequest(query.zoneId, query.apiToken, '/dnssec')
 })
 
-router.post('/cname_flattening', async request => {
+router.post('/settings/cname_flattening', async request => {
   const { query } = await request.json()
   return FetchRequest(
     query.zoneId,
@@ -334,6 +334,7 @@ router.post('/cname_flattening', async request => {
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/custom_hostnames/:identifier
   */
 
+// Bundler for SSL/TLS endpoints
 router.post('/ssl_tls', async request => {
   const { query } = await request.json()
 
@@ -416,6 +417,12 @@ router.post('/ssl_tls', async request => {
       },
     })
   }
+})
+
+// SSL Setting
+router.post('/settings/ssl', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/ssl')
 })
 
 /* Firewall */

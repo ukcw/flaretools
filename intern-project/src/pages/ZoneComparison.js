@@ -12,6 +12,7 @@ import {
 import { getMultipleZoneSettings } from "../utils/utils";
 import { CompareContext } from "../lib/contextLib";
 import DnsCompare from "../components/zoneComparison/dnsCompare/DnsCompare";
+import SslTlsCompare from "../components/zoneComparison/sslTlsCompare/SslTlsCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -147,6 +148,7 @@ function ZoneComparison() {
           }}
         >
           <DnsCompare />
+          <SslTlsCompare />
         </CompareContext.Provider>
       )}
     </Container>

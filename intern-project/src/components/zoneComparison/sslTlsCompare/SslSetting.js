@@ -10,6 +10,8 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { useTable } from "react-table";
+import { useCompareContext } from "../../../lib/contextLib";
 import {
   CompareBaseToOthers,
   CompareData,
@@ -18,71 +20,90 @@ import {
   Humanize,
   UnsuccessfulHeaders,
 } from "../../../utils/utils";
-import { useCompareContext } from "../../../lib/contextLib";
-import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {
-  return base.value === toCompare.value;
+const ValueName = (name) => {
+  switch (name) {
+    case "off":
+      return "Off (not secure)";
+    case "flexible":
+      return "Flexible";
+    case "full":
+      return "Full";
+    case "strict":
+      return "Full (strict)";
+    case "origin_pull":
+      return "Strict (SSL-Only Origin Pull)";
+    default:
+      return null;
+  }
 };
 
-const CnameFlattening = (props) => {
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    base.value === toCompare.value &&
+    base.certificate_status === toCompare.certificate_status
+  );
+};
+
+const SslSetting = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [cnameFlatteningData, setCnameFlatteningData] = useState();
+  const [sslSettingData, setSslSettingData] = useState();
 
   useEffect(() => {
     async function getData() {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/settings/cname_flattening"
+        "/cname_flattening"
       );
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.resp };
         newObj["result"] = [newObj.result];
         return newObj;
       });
-      setCnameFlatteningData(processedResp);
+      console.log(processedResp);
+      setSslSettingData(processedResp);
     }
-    setCnameFlatteningData();
+    setSslSettingData();
     getData();
   }, [credentials, zoneKeys]);
 
   const columns = React.useMemo(() => {
     const baseHeaders = [
       {
-        Header: "Setting",
-        accessor: "id",
-        Cell: (props) => Humanize(props.value),
-      },
-      {
         Header: "Value",
         accessor: "value",
+        Cell: (props) => ValueName(props.value),
+      },
+      {
+        Header: "Certificate Status",
+        accessor: "certificate_status",
         Cell: (props) => Humanize(props.value),
       },
     ];
 
-    const dynamicHeaders = cnameFlatteningData
-      ? HeaderFactory(cnameFlatteningData.length)
+    const dynamicHeaders = sslSettingData
+      ? HeaderFactory(sslSettingData.length)
       : [];
 
-    return cnameFlatteningData &&
-      cnameFlatteningData[0].success &&
-      cnameFlatteningData[0].result.length
+    return sslSettingData &&
+      sslSettingData[0].success &&
+      sslSettingData[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
       : UnsuccessfulHeaders.concat(dynamicHeaders);
-  }, [cnameFlatteningData]);
+  }, [sslSettingData]);
 
   const data = React.useMemo(() => {
-    return cnameFlatteningData
+    return sslSettingData
       ? CompareData(
           CompareBaseToOthers,
-          cnameFlatteningData,
+          sslSettingData,
           conditionsToMatch,
-          "CNAME Flattening"
+          "SSL Setting"
         )
       : [];
-  }, [cnameFlatteningData]);
+  }, [sslSettingData]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
@@ -90,10 +111,10 @@ const CnameFlattening = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">CNAME Flattening</Heading>
+        <Heading size="md">SSL Setting</Heading>
       </HStack>
-      {!cnameFlatteningData && <LoadingBox />}
-      {cnameFlatteningData && (
+      {!sslSettingData && <LoadingBox />}
+      {sslSettingData && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -149,6 +170,25 @@ const CnameFlattening = (props) => {
       )}
     </Stack>
   );
+  // return (
+  //   <Stack w="100%" spacing={4}>
+  //     <HStack w="100%" spacing={4}>
+  //       <Heading size="md">SSL Setting</Heading>
+  //     </HStack>
+  //     <Table>
+  //       <Tbody>
+  //         <Tr>
+  //           <Th>Value</Th>
+  //           <Td>{ValueName(props.data.result.value)}</Td>
+  //         </Tr>
+  //         <Tr>
+  //           <Th>Certificate Status</Th>
+  //           <Td>{Humanize(props.data.result.certificate_status)}</Td>
+  //         </Tr>
+  //       </Tbody>
+  //     </Table>
+  //   </Stack>
+  // );
 };
 
-export default CnameFlattening;
+export default SslSetting;

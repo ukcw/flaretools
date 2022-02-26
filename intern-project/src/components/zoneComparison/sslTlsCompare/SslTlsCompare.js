@@ -1,13 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import SslSetting from "./SslSetting";
 import { Container, Heading, Stack } from "@chakra-ui/react";
-import EdgeCertificates from "./EdgeCertificates";
-import SslSubcategories from "./SslSubcategories";
-import HttpStrictTransportSecurity from "./HttpStrictTransportSecurity";
-import CustomHostnames from "./CustomHostnames";
-import { useZoneContext } from "../../../lib/contextLib";
-import { getZoneSetting } from "../../../utils/utils";
-import LoadingBox from "../../LoadingBox";
 
 /**
  *
@@ -15,24 +8,6 @@ import LoadingBox from "../../LoadingBox";
  * @returns
  */
 const SslTlsCompare = (props) => {
-  const { zoneId, apiToken } = useZoneContext();
-  const [sslTlsData, setSslTlsData] = useState();
-
-  useEffect(() => {
-    async function getData() {
-      const resp = await getZoneSetting(
-        {
-          zoneId: zoneId,
-          apiToken: `Bearer ${apiToken}`,
-        },
-        "/ssl_tls"
-      );
-      setSslTlsData(resp);
-    }
-    setSslTlsData();
-    getData();
-  }, [apiToken, zoneId]);
-
   return (
     <Container maxW="container.xl">
       <Stack
@@ -45,12 +20,13 @@ const SslTlsCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">SSL</Heading>
-        {sslTlsData?.ssl_setting !== undefined ? (
+        <SslSetting />
+        {/* {sslTlsData?.ssl_setting !== undefined ? (
           <SslSetting data={sslTlsData.ssl_setting} />
         ) : (
           <LoadingBox />
-        )}
-        {sslTlsData?.ssl_certificate_packs !== undefined ? (
+        )} */}
+        {/* {sslTlsData?.ssl_certificate_packs !== undefined ? (
           <EdgeCertificates data={sslTlsData.ssl_certificate_packs} />
         ) : (
           <LoadingBox />
@@ -80,7 +56,7 @@ const SslTlsCompare = (props) => {
           />
         ) : (
           <LoadingBox />
-        )}
+        )} */}
       </Stack>
     </Container>
   );
