@@ -412,7 +412,7 @@ export const getMultipleZoneSettings = async (
 
 /**
  * Produces extension of headers for comparison zones
- * @param {*} len
+ * @param {*} len - This is the length of the data array (including base zone and all other zones)
  * @returns
  */
 export const HeaderFactory = (len) => {
@@ -433,12 +433,19 @@ export const HeaderFactory = (len) => {
 };
 
 /**
- * Compares DNS Records for any given amount of zones provided in array format and returns an array
+ * Compares a base zone to any number of other zones and returns an array
  * @param {*} baseData
  * @param {*} restData
+ * @param {*} matchConditions - The conditions on which to compare an object from the base zone to an object from another zone
+ * @param {string} settingTitle - The title to name the "Setting" if the Base Zone has no records
  * @returns
  */
-export const CompareDnsRecords = (baseData, restData) => {
+export const CompareBaseToOthers = (
+  baseData,
+  restData,
+  matchConditions,
+  settingTitle
+) => {
   if (baseData.success === true && baseData.result.length) {
     const baseZoneData = baseData.result;
     return baseZoneData.map((baseObj) => {
@@ -447,12 +454,7 @@ export const CompareDnsRecords = (baseData, restData) => {
           const currentCompareZoneData = restData[j].result;
           let foundMatch = false;
           currentCompareZoneData.forEach((compareObj) => {
-            if (
-              baseObj.type === compareObj.type &&
-              baseObj.name === compareObj.name &&
-              baseObj.content === compareObj.content &&
-              baseObj.proxied === compareObj.proxied
-            ) {
+            if (matchConditions(baseObj, compareObj)) {
               foundMatch = true;
             }
             foundMatch
@@ -466,7 +468,7 @@ export const CompareDnsRecords = (baseData, restData) => {
   } else {
     // base zone is unsuccessful or has no entries
     let newObj = {
-      setting: "DNS Management",
+      setting: settingTitle,
       value: false,
     };
     for (let j = 0; j < restData.length; j++) {
@@ -480,10 +482,28 @@ export const CompareDnsRecords = (baseData, restData) => {
 
 /**
  * Takes in a comparison function and data, and returns an array for React-Table
- * @param {*} comp_fn
- * @param {*} data
+ * @param {*} comp_fn - This is a comparison function that takes in four arguments: base zone data, other zones data, conditions to match, title for this setting
+ * @param {*} data - This needs to be an array containing the data from the base zone in index 0 and other zones in all other indexes
+ * @param {*} conditions - This a function that should take in two objects, one from the base zone and one from the other zone and do the equality checks
+ * @param {*} title - This is the title for the setting
  * @returns
  */
-export const compareData = (comp_fn, data) => {
-  return comp_fn(data[0], data.slice(1));
+export const compareData = (comp_fn, data, conditions, title) => {
+  return comp_fn(data[0], data.slice(1), conditions, title);
 };
+
+/**
+ * General Unsuccessful Headers Template
+ */
+export const UnsuccessfulHeaders = [
+  {
+    Header: "Setting",
+    accessor: "setting",
+  },
+  {
+    Header: "Value",
+    accessor: "value",
+    Cell: (props) =>
+      props.value ? <CheckIcon color={"green"} /> : <CloseIcon color={"red"} />,
+  },
+];

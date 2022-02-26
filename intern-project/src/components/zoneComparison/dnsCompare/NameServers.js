@@ -3,7 +3,6 @@ import {
   Heading,
   Stack,
   Table,
-  Text,
   Tbody,
   Td,
   Th,
@@ -22,27 +21,44 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) =>
-  base.type === toCompare.type &&
-  base.name === toCompare.name &&
-  base.content === toCompare.content &&
-  base.proxied === toCompare.proxied;
+// make data.result = newly formatted object
+const makeData = (data) => {
+  return data.map((nameServer) => {
+    const dataObj = {
+      type: "NS",
+      value: nameServer,
+    };
+    return dataObj;
+  });
+};
 
-const DnsRecords = (props) => {
+const conditionsToMatch = (base, toCompare) => {
+  return base.value === toCompare.value;
+};
+
+const NameServers = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [dnsRecords, setDnsRecords] = useState();
+  const [nameServers, setNameServers] = useState();
 
   useEffect(() => {
     async function getData() {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/dns_records"
+        "/zone_details"
       );
-      const processedResp = resp.map((zone) => zone.resp);
-      setDnsRecords(processedResp);
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.zone_details };
+        if (zone.zone_details.result?.name_servers !== undefined) {
+          newObj["result"] = makeData(zone.zone_details.result.name_servers);
+        } else {
+          newObj["result"] = { type: "NS", value: [] };
+        }
+        return newObj;
+      });
+      setNameServers(processedResp);
     }
-    setDnsRecords();
+    setNameServers();
     getData();
   }, [credentials, zoneKeys]);
 
@@ -51,64 +67,32 @@ const DnsRecords = (props) => {
       {
         Header: "Type",
         accessor: "type",
-      },
-      {
-        Header: "Name",
-        accessor: "name",
-      },
-      {
-        Header: "Content",
-        accessor: "content",
-      },
-      {
-        Header: "Proxied",
-        accessor: "proxied",
-        Cell: (props) =>
-          props.value ? <CheckIcon color="green" /> : <CloseIcon color="red" />,
-      },
-      {
-        Header: "TTL",
-        accessor: "ttl",
-        Cell: (props) => (props.value === 1 ? <Text>Auto</Text> : props.value),
-      },
-    ];
-
-    const unsuccessfulHeaders = [
-      {
-        Header: "Setting",
-        accessor: "setting",
+        Cell: (props) => "NS",
       },
       {
         Header: "Value",
         accessor: "value",
-        Cell: (props) =>
-          props.value ? (
-            <CheckIcon color={"green"} />
-          ) : (
-            <CloseIcon color={"red"} />
-          ),
       },
     ];
 
-    const dynamicHeaders =
-      dnsRecords !== undefined ? HeaderFactory(dnsRecords.length) : [];
+    const dynamicHeaders = nameServers ? HeaderFactory(nameServers.length) : [];
 
-    return dnsRecords && dnsRecords[0].success && dnsRecords[0].result.length
+    return nameServers && nameServers[0].success && nameServers[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
       : UnsuccessfulHeaders.concat(dynamicHeaders);
-  }, [dnsRecords]);
+  }, [nameServers]);
 
   const data = React.useMemo(
     () =>
-      dnsRecords
+      nameServers
         ? compareData(
             CompareBaseToOthers,
-            dnsRecords,
+            nameServers,
             conditionsToMatch,
-            "DNS Management"
+            "Cloudflare Nameservers"
           )
         : [],
-    [dnsRecords]
+    [nameServers]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -116,10 +100,10 @@ const DnsRecords = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">DNS Management</Heading>
-      {!dnsRecords && <LoadingBox />}
-      {dnsRecords && (
-        <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
+      <Heading size="md">Cloudflare Nameservers</Heading>
+      {!nameServers && <LoadingBox />}
+      {nameServers && (
+        <Table {...getTableProps}>
           <Thead>
             {
               // Loop over the header rows
@@ -176,4 +160,4 @@ const DnsRecords = (props) => {
   );
 };
 
-export default DnsRecords;
+export default NameServers;

@@ -8,6 +8,7 @@ import { Container, Heading, Stack } from "@chakra-ui/react";
 import { useCompareContext } from "../../../lib/contextLib";
 import { getMultipleZoneSettings } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
+import NameServers from "./NameServers";
 
 const DnsCompare = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -46,8 +47,8 @@ const DnsCompare = (props) => {
           DNS
         </Heading>
         <DnsRecords />
-        {/* {dnsData ? <NameServers data={dnsData.name_servers} /> : <LoadingBox />}
-        {dnsData ? <CustomNs data={dnsData.custom_ns} /> : <LoadingBox />}
+        <NameServers />
+        {/* {dnsData ? <CustomNs data={dnsData.custom_ns} /> : <LoadingBox />}
         {dnsData ? <Dnssec data={dnsData.dnssec} /> : <LoadingBox />}
         {dnsData ? (
           <CnameFlattening data={dnsData.cname_flattening} />
