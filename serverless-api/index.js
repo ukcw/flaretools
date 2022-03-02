@@ -437,6 +437,12 @@ router.post('/settings/security_header', async request => {
   return FetchRequest(query.zoneId, query.apiToken, '/settings/security_header')
 })
 
+// Custom Hostnames
+router.post('/custom_hostnames', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/custom_hostnames')
+})
+
 /* Firewall */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/rules
