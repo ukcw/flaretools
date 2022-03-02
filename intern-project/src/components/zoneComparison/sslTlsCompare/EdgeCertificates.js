@@ -38,7 +38,7 @@ const EdgeCertificates = (props) => {
         "/ssl/certificate_packs"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log(processedResp);
+      console.log("ADD CONDITIONS TO MATCH");
       setEdgeCertificatesData(processedResp);
     }
     setEdgeCertificatesData();

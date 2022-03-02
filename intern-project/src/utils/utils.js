@@ -1,4 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { Tag } from "@chakra-ui/react";
 
 export const Humanize = (str) => {
   if (str === "js_challenge") {
@@ -391,6 +392,21 @@ export const TickOrCross = (value) => {
   }
 };
 
+/**
+ * Takes in a boolean value and returns a green TAG if true else returns a red TAG
+ * @param {boolean} value
+ * @returns
+ */
+export const DisabledOrEnabled = (value) => {
+  if (value === false) {
+    return <Tag colorScheme={"red"}>Disabled</Tag>;
+  } else if (value === true) {
+    return <Tag colorScheme={"green"}>Enabled</Tag>;
+  } else {
+    return value;
+  }
+};
+
 export const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
   const resp = await fetch(url, {
@@ -446,6 +462,37 @@ export const HeaderFactory = (len) => {
         ) : (
           <CloseIcon color={"red"} />
         ),
+    });
+  }
+  return output;
+};
+
+/**
+ * Produces extension of headers for comparison zones with output formatted using TAGS
+ * @param {*} len
+ * @returns
+ */
+export const HeaderFactoryWithTags = (len, enabledTag) => {
+  let output = [];
+  for (let i = 2; i <= len; i++) {
+    output.push({
+      Header: `Zone ${i}`,
+      accessor: `zone${i}`,
+      Cell: (props) => {
+        if (enabledTag) {
+          return props.value ? (
+            <Tag colorScheme={"green"}>Enabled</Tag>
+          ) : (
+            <Tag colorScheme={"red"}>Disabled</Tag>
+          );
+        } else {
+          return props.value ? (
+            <Tag colorScheme={"green"}>Configured</Tag>
+          ) : (
+            <Tag colorScheme={"red"}>Not Configured</Tag>
+          );
+        }
+      },
     });
   }
   return output;
@@ -526,3 +573,53 @@ export const UnsuccessfulHeaders = [
       props.value ? <CheckIcon color={"green"} /> : <CloseIcon color={"red"} />,
   },
 ];
+
+/**
+ * General Unsucccesful Headers Template that uses TAGS
+ */
+export const UnsuccessfulHeadersWithTags = [
+  {
+    Header: "Setting",
+    accessor: "setting",
+  },
+  {
+    Header: "Value",
+    accessor: "value",
+    Cell: (props) =>
+      props.value ? (
+        <Tag colorScheme={"green"}>Configured</Tag>
+      ) : (
+        <Tag colorScheme={"red"}>Not Configured</Tag>
+      ),
+  },
+];
+
+/**
+ * This is a utility function to count the differences in records between a base zone and any number of zones.
+ * @param {*} keys
+ * @param {*} processedData
+ * @param {*} unprocessedData
+ * @returns
+ */
+export const CountDeltaDifferences = (keys, processedData, unprocessedData) => {
+  const deltaObj = {};
+  const keysArray = keys.map((key) => key.replace("_", "")).slice(1);
+  keysArray.forEach((key) => {
+    const zoneNumber = parseInt(key.replace("zone", ""));
+    const zoneData = unprocessedData[zoneNumber - 1];
+    if (zoneData.success === true && zoneData.result.length) {
+      deltaObj[key] = zoneData.result.length;
+    } else {
+      deltaObj[key] = 0;
+    }
+  });
+  processedData.forEach((row) => {
+    keysArray.forEach((key) => {
+      if (row[key]) {
+        // check if zoneX has a matching record, minus the count in delta
+        deltaObj[key] = deltaObj[key] - 1;
+      }
+    });
+  });
+  return [deltaObj];
+};

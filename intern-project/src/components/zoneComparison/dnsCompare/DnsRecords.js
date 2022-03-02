@@ -16,6 +16,7 @@ import { useCompareContext } from "../../../lib/contextLib";
 import {
   CompareBaseToOthers,
   CompareData,
+  CountDeltaDifferences,
   getMultipleZoneSettings,
   HeaderFactory,
   UnsuccessfulHeaders,
@@ -96,6 +97,11 @@ const DnsRecords = (props) => {
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
+
+  const delta = React.useMemo(
+    () => (dnsRecords ? CountDeltaDifferences(zoneKeys, data, dnsRecords) : []),
+    [data, dnsRecords, zoneKeys]
+  );
 
   return (
     <Stack w="100%" spacing={4}>

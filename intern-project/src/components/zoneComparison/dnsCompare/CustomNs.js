@@ -17,7 +17,8 @@ import {
   CompareData,
   getMultipleZoneSettings,
   HeaderFactory,
-  UnsuccessfulHeaders,
+  HeaderFactoryWithTags,
+  UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
@@ -89,11 +90,16 @@ const CustomNs = (props) => {
       },
     ];
 
-    const dynamicHeaders = customNs ? HeaderFactory(customNs.length) : [];
+    const dynamicHeaders =
+      customNs && customNs[0].result.length
+        ? HeaderFactory(customNs.length)
+        : customNs && customNs[0].result.length === 0
+        ? HeaderFactoryWithTags(customNs.length, false)
+        : [];
 
     return customNs && customNs[0].success && customNs[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
-      : UnsuccessfulHeaders.concat(dynamicHeaders);
+      : UnsuccessfulHeadersWithTags.concat(dynamicHeaders);
   }, [customNs]);
 
   const data = React.useMemo(() => {

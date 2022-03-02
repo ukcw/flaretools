@@ -12,11 +12,11 @@ import React, { useEffect, useState } from "react";
 import {
   CompareBaseToOthers,
   CompareData,
+  DisabledOrEnabled,
   getMultipleZoneSettings,
-  HeaderFactory,
+  HeaderFactoryWithTags,
   Humanize,
-  TickOrCross,
-  UnsuccessfulHeaders,
+  UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
@@ -62,15 +62,17 @@ const HttpStrictTransportSecurity = (props) => {
       {
         Header: "Enabled",
         accessor: (row) => row.value.strict_transport_security.enabled,
-        Cell: (props) => TickOrCross(props.value),
+        Cell: (props) => DisabledOrEnabled(props.value),
       },
     ];
 
-    const dynamicHeaders = hstsData ? HeaderFactory(hstsData.length) : [];
+    const dynamicHeaders = hstsData
+      ? HeaderFactoryWithTags(hstsData.length, true)
+      : [];
 
     return hstsData && hstsData[0].success && hstsData[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
-      : UnsuccessfulHeaders.concat(dynamicHeaders);
+      : UnsuccessfulHeadersWithTags.concat(dynamicHeaders);
   }, [hstsData]);
 
   const data = React.useMemo(
