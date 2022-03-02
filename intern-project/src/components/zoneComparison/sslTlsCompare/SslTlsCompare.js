@@ -3,6 +3,7 @@ import SslSetting from "./SslSetting";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import EdgeCertificates from "./EdgeCertificates";
 import HttpStrictTransportSecurity from "./HttpStrictTransportSecurity";
+import CustomHostnames from "./CustomHostnames";
 
 /**
  *
@@ -25,12 +26,8 @@ const SslTlsCompare = (props) => {
         <SslSetting />
         <EdgeCertificates />
         <HttpStrictTransportSecurity />
-        {/* {sslTlsData?.security_header !== undefined ? (
-          <HttpStrictTransportSecurity data={sslTlsData.security_header} />
-        ) : (
-          <LoadingBox />
-        )}
-        {sslTlsData?.custom_hostnames !== undefined ? (
+        <CustomHostnames />
+        {/* {sslTlsData?.custom_hostnames !== undefined ? (
           <CustomHostnames data={sslTlsData.custom_hostnames} />
         ) : (
           <LoadingBox />
