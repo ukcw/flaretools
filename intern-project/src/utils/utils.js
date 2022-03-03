@@ -16,6 +16,10 @@ export const Humanize = (str) => {
     return "Maximum Upload Size";
   } else if (str === "true_client_ip_header") {
     return "True-Client-IP-Header";
+  } else if (str === "tls_1_3") {
+    return "TLS 1.3";
+  } else if (str === "tls_client_auth") {
+    return "Authenticated Origin Pulls";
   } else {
     var i,
       frags = str.split("_");

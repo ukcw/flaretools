@@ -27,12 +27,7 @@ const SslTlsCompare = (props) => {
         <EdgeCertificates />
         <HttpStrictTransportSecurity />
         <CustomHostnames />
-        {/* {sslTlsData?.custom_hostnames !== undefined ? (
-          <CustomHostnames data={sslTlsData.custom_hostnames} />
-        ) : (
-          <LoadingBox />
-        )}
-        {sslTlsData ? (
+        {/* {sslTlsData ? (
           <SslSubcategories
             data={{
               ssl_recommendation: sslTlsData.ssl_recommendation,

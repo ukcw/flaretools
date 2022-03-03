@@ -443,6 +443,66 @@ router.post('/custom_hostnames', async request => {
   return FetchRequest(query.zoneId, query.apiToken, '/custom_hostnames')
 })
 
+// SSL Recommendation
+router.post('/ssl/recommendation', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/ssl/recommendation')
+})
+
+// Always Use HTTPS
+router.post('/settings/always_use_https', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/always_use_https',
+  )
+})
+
+// Minimum TLS Version
+router.post('/settings/min_tls_version', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/min_tls_version')
+})
+
+// Opportunistic Encryption
+router.post('/settings/opportunistic_encryption', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/opportunistic_encryption',
+  )
+})
+
+// TLS 1.3
+router.post('/settings/tls_1_3', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/tls_1_3')
+})
+
+// Automatic HTTPS Rewrites
+router.post('/settings/automatic_https_rewrites', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/automatic_https_rewrites',
+  )
+})
+
+// Universal SSL Certificate Authority
+router.post('/ssl/universal/settings', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/ssl/universal/settings')
+})
+
+// Authenticated Origin Pulls
+router.post('/settings/tls_client_auth', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/tls_client_auth')
+})
+
 /* Firewall */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/firewall/rules
