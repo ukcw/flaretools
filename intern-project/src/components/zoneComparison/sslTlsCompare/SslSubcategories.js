@@ -1,82 +1,197 @@
 import {
   Heading,
-  HStack,
   Stack,
   Table,
   Tbody,
   Td,
   Th,
+  Thead,
   Tr,
 } from "@chakra-ui/react";
-import React from "react";
-import { Humanize } from "../../../utils/utils";
+import React, { useEffect, useState } from "react";
+import {
+  CompareBaseToOthersCategorical,
+  CompareData,
+  getMultipleZoneSettings,
+  HeaderFactoryOverloaded,
+  Humanize,
+} from "../../../utils/utils";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { useCompareContext } from "../../../lib/contextLib";
+import { useTable } from "react-table";
+import LoadingBox from "../../LoadingBox";
 
-const SettingName = (name) => {
-  if (name === "tls_1_3") {
-    return "TLS 1.3";
-  } else if (name === "tls_client_auth") {
-    return "Authenticated Origin Pulls";
+const convertOutput = (value) => {
+  return value === true ? (
+    <CheckIcon color={"green"} />
+  ) : value === false ? (
+    <CloseIcon color={"red"} />
+  ) : (
+    Humanize(value)
+  );
+};
+
+const returnConditions = (data) => {
+  if (data.success === false) {
+    return data.messages[0];
+  } else if (data.result?.certificate_authority !== undefined) {
+    return data.result["certificate_authority"];
+  } else if (data.result.value === "on") {
+    return true;
+  } else if (data.result.value === "off") {
+    return false;
   } else {
-    return Humanize(name);
+    return data.result.value;
   }
 };
 
 const SslSubcategories = (props) => {
-  const keys = Object.keys(props.data);
+  const { zoneKeys, credentials } = useCompareContext();
+  const [sslSubcategoriesData, setSslSubcategoriesData] = useState();
+
+  useEffect(() => {
+    async function getData() {
+      const resp = await Promise.all([
+        getMultipleZoneSettings(zoneKeys, credentials, "/ssl/recommendation"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/always_use_https"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/min_tls_version"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/opportunistic_encryption"
+        ),
+        getMultipleZoneSettings(zoneKeys, credentials, "/settings/tls_1_3"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/automatic_https_rewrites"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/ssl/universal/settings"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/tls_client_auth"
+        ),
+      ]);
+      const processedResp = resp.map((settingArray) =>
+        settingArray.map((zone) => zone.resp)
+      );
+      setSslSubcategoriesData(processedResp);
+    }
+    setSslSubcategoriesData();
+    getData();
+  }, [credentials, zoneKeys]);
+
+  const columns = React.useMemo(() => {
+    const baseHeaders = [
+      {
+        Header: "Setting",
+        accessor: "setting",
+        Cell: (props) => Humanize(props.value),
+      },
+      {
+        Header: "Value",
+        accessor: "value",
+        Cell: (props) => convertOutput(props.value),
+      },
+    ];
+    const dynamicHeaders =
+      sslSubcategoriesData && sslSubcategoriesData.length
+        ? HeaderFactoryOverloaded(sslSubcategoriesData[0].length, convertOutput)
+        : [];
+
+    return sslSubcategoriesData ? baseHeaders.concat(dynamicHeaders) : [];
+  }, [sslSubcategoriesData]);
+
+  const data = React.useMemo(
+    () =>
+      sslSubcategoriesData
+        ? sslSubcategoriesData.map((data) => {
+            return CompareData(
+              CompareBaseToOthersCategorical,
+              data,
+              returnConditions,
+              data[0].result?.id !== undefined
+                ? data[0].result.id
+                : "ssl_universal"
+            );
+          })
+        : [],
+    [sslSubcategoriesData]
+  );
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable({ columns, data });
+
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md">SSL Subcategories</Heading>
-      </HStack>
-      <Table>
-        <Tbody>
-          {keys.map((key) => {
-            if (props.data[key].success === false) {
-              return (
-                <Tr key={key}>
-                  <Th>{SettingName(key)}</Th>
-                  <Td>{props.data[key].messages}</Td>
+      <Heading size="md">SSL Subcategories</Heading>
+      {!sslSubcategoriesData && <LoadingBox />}
+      {sslSubcategoriesData && (
+        <Table {...getTableProps}>
+          <Thead>
+            {
+              // Loop over the header rows
+              headerGroups.map((headerGroup) => (
+                <Tr {...headerGroup.getHeaderGroupProps()}>
+                  {
+                    // Loop over the headers in each row
+                    headerGroup.headers.map((column) => (
+                      // Apply the header cell props
+                      <Th {...column.getHeaderProps()}>
+                        {
+                          // Render the header
+                          column.render("Header")
+                        }
+                      </Th>
+                    ))
+                  }
                 </Tr>
-              );
-            } else if (key === "ssl_universal") {
-              return (
-                <Tr key={key}>
-                  <Th>{SettingName(key)}</Th>
-                  <Td>
-                    {Humanize(props.data[key].result["certificate_authority"])}
-                  </Td>
-                </Tr>
-              );
-            } else if (props.data[key].result.value === "on") {
-              return (
-                <Tr key={key}>
-                  <Th>{SettingName(key)}</Th>
-                  <Td>
-                    <CheckIcon color={"green"} />
-                  </Td>
-                </Tr>
-              );
-            } else if (props.data[key].result.value === "off") {
-              return (
-                <Tr key={key}>
-                  <Th>{SettingName(key)}</Th>
-                  <Td>
-                    <CloseIcon color={"red"} />
-                  </Td>
-                </Tr>
-              );
-            } else {
-              return (
-                <Tr key={key}>
-                  <Th>{SettingName(key)}</Th>
-                  <Td>{props.data[key].result.value}</Td>
-                </Tr>
-              );
+              ))
             }
-          })}
-        </Tbody>
-      </Table>
+          </Thead>
+          {/* Apply the table body props */}
+          <Tbody {...getTableBodyProps()}>
+            {
+              // Loop over the table rows
+              rows.map((row) => {
+                // Prepare the row for display
+                prepareRow(row);
+                return (
+                  // Apply the row props
+                  <Tr {...row.getRowProps()}>
+                    {
+                      // Loop over the rows cells
+                      row.cells.map((cell) => {
+                        // Apply the cell props
+                        return (
+                          <Td {...cell.getCellProps()}>
+                            {
+                              // Render the cell contents
+                              cell.render("Cell")
+                            }
+                          </Td>
+                        );
+                      })
+                    }
+                  </Tr>
+                );
+              })
+            }
+          </Tbody>
+        </Table>
+      )}
     </Stack>
   );
 };

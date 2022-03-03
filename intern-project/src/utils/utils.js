@@ -20,6 +20,8 @@ export const Humanize = (str) => {
     return "TLS 1.3";
   } else if (str === "tls_client_auth") {
     return "Authenticated Origin Pulls";
+  } else if (str === "min_tls_version") {
+    return "Minimum TLS Version";
   } else {
     var i,
       frags = str.split("_");
@@ -473,7 +475,7 @@ export const HeaderFactory = (len) => {
 
 /**
  * Produces extension of headers for comparison zones with output formatted using TAGS
- * @param {*} len
+ * @param {*} len - This is the length of the data array (including base zone and all other zones)
  * @returns
  */
 export const HeaderFactoryWithTags = (len, enabledTag) => {
@@ -497,6 +499,24 @@ export const HeaderFactoryWithTags = (len, enabledTag) => {
           );
         }
       },
+    });
+  }
+  return output;
+};
+
+/**
+ * Produces extension of headers for comparison zones with output formatted using a passed in converting function
+ * @param {*} len - This is the length of the data array (including base zone and all other zones)
+ * @param {*} convertOutput - This is the function to convert the output value and should render JSX
+ * @returns
+ */
+export const HeaderFactoryOverloaded = (len, convertOutput) => {
+  let output = [];
+  for (let i = 2; i <= len; i++) {
+    output.push({
+      Header: `Zone ${i}`,
+      accessor: `zone${i}`,
+      Cell: (props) => convertOutput(props.value),
     });
   }
   return output;
@@ -547,6 +567,39 @@ export const CompareBaseToOthers = (
         : (newObj[`zone${j + 2}`] = false);
     }
     return [newObj];
+  }
+};
+
+/**
+ * Compares a base zone to any number of other zones and returns an array
+ * @param {*} baseData
+ * @param {*} restData
+ * @param {*} matchConditions - The conditions on which to compare an object from the base zone to an object from another zone
+ * @param {string} settingTitle - The title to name the "Setting" if the Base Zone has no records
+ * @returns
+ */
+export const CompareBaseToOthersCategorical = (
+  baseData,
+  restData,
+  returnConditions,
+  settingTitle
+) => {
+  let newObj = {
+    setting: settingTitle,
+    value: false, // default to false, if baseZone has some activated state, then it will be set here
+  };
+  if (baseData.success === true) {
+    const baseZoneData = baseData;
+    newObj.value = returnConditions(baseZoneData);
+  }
+  for (let j = 0; j < restData.length; j++) {
+    if (restData[j].success === true) {
+      const currentCompareZoneData = restData[j];
+      newObj[`zone${j + 2}`] = returnConditions(currentCompareZoneData);
+    } else {
+      newObj[`zone${j + 2}`] = false;
+    }
+    return newObj;
   }
 };
 
