@@ -1,13 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import SpeedSubcategories from "./SpeedSubcategories";
-import AutomaticPlatformOptimization from "./AutomaticPlatformOptimization";
-import MobileRedirect from "./MobileRedirect";
-import Minify from "./Minify";
-import Railgun from "./Railgun";
-import { useZoneContext } from "../../../lib/contextLib";
-import { getZoneSetting } from "../../../utils/utils";
-import LoadingBox from "../../LoadingBox";
 
 /**
  *
@@ -28,6 +21,7 @@ const SpeedViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Speed</Heading>
+        <SpeedSubcategories />
         {/* {speedData ? (
           <SpeedSubcategories
             data={{

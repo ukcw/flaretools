@@ -13,6 +13,7 @@ import { getMultipleZoneSettings } from "../utils/utils";
 import { CompareContext } from "../lib/contextLib";
 import DnsCompare from "../components/zoneComparison/dnsCompare/DnsCompare";
 import SslTlsCompare from "../components/zoneComparison/sslTlsCompare/SslTlsCompare";
+import SpeedCompare from "../components/zoneComparison/speedCompare/SpeedCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -29,8 +30,6 @@ function ZoneComparison() {
     if (zoneKeys.length < 2) {
       return alert("You need to input a minimum of two zones.");
     }
-
-    console.log(zoneKeys);
 
     // send zone_details API request for all zones provided
     const zoneDetailsResp = await getMultipleZoneSettings(
@@ -149,6 +148,15 @@ function ZoneComparison() {
         >
           <DnsCompare />
           <SslTlsCompare />
+          {/* FIREWALL */}
+          <SpeedCompare />
+          {/* <CachingViewer />
+          <WorkersViewer />
+          <RulesViewer />
+          <NetworkViewer />
+          <TrafficViewer />
+          <ScrapeShieldViewer />
+          <SpectrumViewer /> */}
         </CompareContext.Provider>
       )}
     </Container>
