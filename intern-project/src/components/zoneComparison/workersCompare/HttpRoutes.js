@@ -88,7 +88,7 @@ const HttpRoutes = (props) => {
             CompareBaseToOthers,
             httpRoutesData,
             conditionsToMatch,
-            "Railguns"
+            "HTTP Routes"
           )
         : [],
     [httpRoutesData]

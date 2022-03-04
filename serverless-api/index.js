@@ -1468,6 +1468,12 @@ router.post('/spectrum/applications', async request => {
   }
 })
 
+// Spectrum Applications
+router.post('/spectrum/apps', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/spectrum/apps')
+})
+
 /**
  * Respond with hello worker text
  * @param {Request} request
