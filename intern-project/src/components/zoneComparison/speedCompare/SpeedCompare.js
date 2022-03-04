@@ -12,7 +12,7 @@ import Railgun from "./Railgun";
  * @returns
  */
 
-const SpeedViewer = (props) => {
+const SpeedCompare = (props) => {
   return (
     <Container maxW="container.xl">
       <Stack
@@ -35,4 +35,4 @@ const SpeedViewer = (props) => {
   );
 };
 
-export default React.memo(SpeedViewer);
+export default React.memo(SpeedCompare);

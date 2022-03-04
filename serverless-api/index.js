@@ -947,6 +947,70 @@ router.post('/caching', async request => {
   }
 })
 
+// Argo Tiered Caching
+router.post('/argo/tiered_caching', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/argo/tiered_caching')
+})
+
+// Tiered Cache Topology
+router.post('/cache/tiered_cache_smart_topology_enable', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/cache/tiered_cache_smart_topology_enable',
+  )
+})
+
+// Cache Level
+router.post('/settings/cache_level', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/cache_level')
+})
+
+// Browser Cache TTL
+router.post('/settings/browser_cache_ttl', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/browser_cache_ttl',
+  )
+})
+
+// Crawlhints => "cache": "crawlhints_enabled"
+router.post('/flags', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/flags')
+})
+
+// Always Online
+router.post('/settings/always_online', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/always_online')
+})
+
+// Development Mode
+router.post('/settings/development_mode', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/development_mode',
+  )
+})
+
+// Query String Sort
+router.post('/settings/sort_query_string_for_cache', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/sort_query_string_for_cache',
+  )
+})
+
 /* Workers */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/workers/routes
