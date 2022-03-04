@@ -1432,6 +1432,35 @@ router.post('/scrape_shield', async request => {
     })
   }
 })
+// Email Address Obfuscation
+router.post('/settings/email_obfuscation', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/email_obfuscation',
+  )
+})
+
+// Server-side Excludes
+router.post('/settings/server_side_exclude', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/server_side_exclude',
+  )
+})
+
+// Hotlink Protection
+router.post('/settings/hotlink_protection', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/hotlink_protection',
+  )
+})
 
 /**
  * Spectrum
