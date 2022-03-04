@@ -62,6 +62,8 @@ export const Humanize = (str) => {
         frags[i] = "CSS";
       } else if (frags[i] === "js") {
         frags[i] = "JS";
+      } else if (frags[i] === "0rtt") {
+        frags[i] = "0-RTT Connection Resumption";
       } else {
         frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
       }

@@ -1228,6 +1228,86 @@ router.post('/network', async request => {
   }
 })
 
+// HTTP/2
+router.post('/settings/http2', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/http2')
+})
+
+// HTTP/3 (with QUIC)
+router.post('/settings/http3', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/http3')
+})
+
+// 0-RTT Connection Resumption
+router.post('/settings/0rtt', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/0rtt')
+})
+
+// IPv6 Compatibility
+router.post('/settings/ipv6', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/ipv6')
+})
+
+//gRPC ==> /flags "protocol": { "gRPC": boolean }
+
+// WebSockets
+router.post('/settings/websockets', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/websockets')
+})
+
+// Onion Routing
+router.post('/settings/opportunistic_onion', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/opportunistic_onion',
+  )
+})
+
+// Pseudo IPv4
+router.post('/settings/pseudo_ipv4', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/pseudo_ipv4')
+})
+
+// IP Geolocation
+router.post('/settings/ip_geolocation', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/ip_geolocation')
+})
+
+// Maximum Upload Size
+router.post('/settings/max_upload', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/max_upload')
+})
+
+// Response Buffering
+router.post('/settings/response_buffering', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/response_buffering',
+  )
+})
+
+// Response Buffering
+router.post('/settings/true_client_ip_header', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/true_client_ip_header',
+  )
+})
+
 /* Traffic */
 /*
   to be added

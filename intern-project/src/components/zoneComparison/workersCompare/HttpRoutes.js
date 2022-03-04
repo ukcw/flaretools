@@ -1,4 +1,3 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,

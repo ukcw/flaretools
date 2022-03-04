@@ -16,6 +16,7 @@ import SslTlsCompare from "../components/zoneComparison/sslTlsCompare/SslTlsComp
 import SpeedCompare from "../components/zoneComparison/speedCompare/SpeedCompare";
 import CachingCompare from "../components/zoneComparison/cachingCompare/CachingCompare";
 import WorkersCompare from "../components/zoneComparison/workersCompare/WorkersCompare";
+import NetworkCompare from "../components/zoneComparison/networkCompare/NetworkCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -154,6 +155,7 @@ function ZoneComparison() {
           <SpeedCompare />
           <CachingCompare />
           <WorkersCompare />
+          <NetworkCompare />
           {/* <RulesViewer />
           <NetworkViewer />
           <TrafficViewer />
