@@ -22,11 +22,6 @@ const CachingCompare = (props) => {
       >
         <Heading size="xl">Caching</Heading>
         <CachingSubcategories />
-        {/* {cachingData ? (
-          <CachingSubcategories data={cachingData} />
-        ) : (
-          <LoadingBox />
-        )} */}
       </Stack>
     </Container>
   );
