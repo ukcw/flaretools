@@ -30,7 +30,6 @@ const SpeedViewer = (props) => {
         <MobileRedirect />
         <Minify />
         <Railgun />
-        {/* {speedData ? <Railgun data={speedData.railguns} /> : <LoadingBox />} */}
       </Stack>
     </Container>
   );
