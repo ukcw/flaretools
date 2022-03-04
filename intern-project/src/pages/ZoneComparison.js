@@ -14,6 +14,7 @@ import { CompareContext } from "../lib/contextLib";
 import DnsCompare from "../components/zoneComparison/dnsCompare/DnsCompare";
 import SslTlsCompare from "../components/zoneComparison/sslTlsCompare/SslTlsCompare";
 import SpeedCompare from "../components/zoneComparison/speedCompare/SpeedCompare";
+import CachingCompare from "../components/zoneComparison/cachingCompare/CachingCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -150,6 +151,7 @@ function ZoneComparison() {
           <SslTlsCompare />
           {/* FIREWALL */}
           <SpeedCompare />
+          <CachingCompare />
           {/* <CachingViewer />
           <WorkersViewer />
           <RulesViewer />

@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
-import CachingSubcategories from "./CachingSubcategories";
+import CachingSubcategories from "./CachingSubcategories.js";
 
 /**
  *
@@ -21,6 +21,7 @@ const CachingCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Caching</Heading>
+        <CachingSubcategories />
         {/* {cachingData ? (
           <CachingSubcategories data={cachingData} />
         ) : (
