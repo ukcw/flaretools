@@ -1047,6 +1047,12 @@ router.post('/workers', async request => {
   }
 })
 
+// Workers Routes
+router.post('/workers/routes', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/workers/routes')
+})
+
 /* Rules */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/pagerules
