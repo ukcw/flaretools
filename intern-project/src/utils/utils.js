@@ -22,6 +22,8 @@ export const Humanize = (str) => {
     return "Authenticated Origin Pulls";
   } else if (str === "min_tls_version") {
     return "Minimum TLS Version";
+  } else if (str === "strip_uri") {
+    return "Strip URI";
   } else {
     var i,
       frags = str.split("_");
