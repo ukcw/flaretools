@@ -782,6 +782,91 @@ router.post('/speed', async request => {
     })
   }
 })
+
+// Mirage
+router.post('/settings/mirage', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/mirage')
+})
+
+// Image Resizing
+router.post('/settings/image_resizing', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/image_resizing')
+})
+
+// Polish
+router.post('/settings/polish', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/polish')
+})
+
+// Minify
+router.post('/settings/minify', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/minify')
+})
+
+// Brotli
+router.post('/settings/brotli', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/brotli')
+})
+
+// Early Hints
+router.post('/settings/early_hints', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/early_hints')
+})
+
+// Automatic Platform Optimization
+router.post('/settings/automatic_platform_optimization', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/automatic_platform_optimization',
+  )
+})
+
+// H2 Prioritization
+router.post('/settings/h2_prioritization', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/h2_prioritization',
+  )
+})
+
+// Rocket Loader
+router.post('/settings/rocket_loader', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/rocket_loader')
+})
+
+// Railguns
+router.post('/railguns', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/railguns')
+})
+
+// Prefetch Preload
+router.post('/settings/prefetch_preload', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/prefetch_preload',
+  )
+})
+
+// Mobile Redirect
+router.post('/settings/mobile_redirect', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/mobile_redirect')
+})
+
 /* Caching */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/argo/tiered_caching
