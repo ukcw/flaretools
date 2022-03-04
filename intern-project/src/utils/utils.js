@@ -559,6 +559,8 @@ export const CompareBaseToOthers = (
               ? (baseObj[`zone${j + 2}`] = true)
               : (baseObj[`zone${j + 2}`] = false);
           });
+        } else {
+          baseObj[`zone${j + 2}`] = false; // added this line to cover cases where calls are unsuccessful to default to a false entry
         }
       }
       return baseObj;

@@ -4,6 +4,7 @@ import SpeedSubcategories from "./SpeedSubcategories";
 import AutomaticPlatformOptimization from "./AutomaticPlatformOptimization";
 import MobileRedirect from "./MobileRedirect";
 import Minify from "./Minify";
+import Railgun from "./Railgun";
 
 /**
  *
@@ -28,8 +29,8 @@ const SpeedViewer = (props) => {
         <AutomaticPlatformOptimization />
         <MobileRedirect />
         <Minify />
-        {/* {speedData ? <Minify data={speedData.minify} /> : <LoadingBox />}
-        {speedData ? <Railgun data={speedData.railguns} /> : <LoadingBox />} */}
+        <Railgun />
+        {/* {speedData ? <Railgun data={speedData.railguns} /> : <LoadingBox />} */}
       </Stack>
     </Container>
   );
