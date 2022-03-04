@@ -56,6 +56,12 @@ export const Humanize = (str) => {
         frags[i] = "IPv6";
       } else if (frags[i] === "cname") {
         frags[i] = "CNAME";
+      } else if (frags[i] === "html") {
+        frags[i] = "HTML";
+      } else if (frags[i] === "css") {
+        frags[i] = "CSS";
+      } else if (frags[i] === "js") {
+        frags[i] = "JS";
       } else {
         frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
       }

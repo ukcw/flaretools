@@ -10,44 +10,77 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
-  CompareBaseToOthers,
+  CompareBaseToOthersCategorical,
   CompareData,
-  DisabledOrEnabled,
   getMultipleZoneSettings,
-  HeaderFactoryWithTags,
+  HeaderFactoryOverloaded,
   Humanize,
-  UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {
-  return (
-    base.value.strict_transport_security.enabled ===
-    toCompare.value.strict_transport_security.enabled
+const convertOutput = (value) => {
+  return value === true ? (
+    <CheckIcon color={"green"} />
+  ) : value === false ? (
+    <CloseIcon color={"red"} />
+  ) : (
+    value
   );
 };
 
-const HttpStrictTransportSecurity = (props) => {
+const returnConditions = (data) => {
+  if (data.success === false) {
+    return data.messages[0];
+  } else if (data.result.id === "html") {
+    return data.result.value.html === "on" ? true : false;
+  } else if (data.result.id === "css") {
+    return data.result.value.css === "on" ? true : false;
+  } else if (data.result.id === "js") {
+    return data.result.value.js === "on" ? true : false;
+  } else {
+    return data.result.value;
+  }
+};
+
+const Minify = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [hstsData, setHstsData] = useState(); // HSTS = HTTP Strict Transport Security
+  const [minifyData, setMinifyData] = useState();
 
   useEffect(() => {
     async function getData() {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/settings/security_header"
+        "/settings/minify"
       );
-      const processedResp = resp.map((zone) => {
-        const newObj = { ...zone.resp };
-        newObj["result"] = [newObj.result];
+      const processedResp = resp.map((zone) => zone.resp);
+      const secondaryProcessedResp = [
+        [JSON.parse(JSON.stringify(processedResp))], // this method does a deep copy of the objects
+        [JSON.parse(JSON.stringify(processedResp))],
+        [JSON.parse(JSON.stringify(processedResp))],
+      ];
+
+      secondaryProcessedResp[0] = secondaryProcessedResp[0][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result.id = "html";
         return newObj;
       });
-      setHstsData(processedResp);
+      secondaryProcessedResp[1] = secondaryProcessedResp[1][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result.id = "css";
+        return newObj;
+      });
+      secondaryProcessedResp[2] = secondaryProcessedResp[2][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result.id = "js";
+        return newObj;
+      });
+      setMinifyData(secondaryProcessedResp);
     }
-    setHstsData();
+    setMinifyData();
     getData();
   }, [credentials, zoneKeys]);
 
@@ -55,46 +88,45 @@ const HttpStrictTransportSecurity = (props) => {
     const baseHeaders = [
       {
         Header: "Setting",
-        accessor: "id",
+        accessor: "setting",
         Cell: (props) => Humanize(props.value),
       },
       {
-        Header: "Enabled",
-        accessor: (row) => row.value.strict_transport_security.enabled,
-        Cell: (props) => DisabledOrEnabled(props.value),
+        Header: "Value",
+        accessor: "value",
+        Cell: (props) => convertOutput(props.value),
       },
     ];
+    const dynamicHeaders =
+      minifyData && minifyData.length
+        ? HeaderFactoryOverloaded(minifyData[0].length, convertOutput)
+        : [];
 
-    const dynamicHeaders = hstsData
-      ? HeaderFactoryWithTags(hstsData.length, true)
-      : [];
-
-    return hstsData && hstsData[0].success && hstsData[0].result.length
-      ? baseHeaders.concat(dynamicHeaders)
-      : UnsuccessfulHeadersWithTags.concat(dynamicHeaders);
-  }, [hstsData]);
+    return minifyData ? baseHeaders.concat(dynamicHeaders) : [];
+  }, [minifyData]);
 
   const data = React.useMemo(
     () =>
-      hstsData
-        ? CompareData(
-            CompareBaseToOthers,
-            hstsData,
-            conditionsToMatch,
-            "HTTP Strict Transport Security"
-          )
+      minifyData
+        ? minifyData.map((data) => {
+            return CompareData(
+              CompareBaseToOthersCategorical,
+              data,
+              returnConditions,
+              data[0].result.id
+            );
+          })
         : [],
-    [hstsData]
+    [minifyData]
   );
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">HTTP Strict Transport Security</Heading>
-      {!hstsData && <LoadingBox />}
-      {hstsData && (
+      <Heading size="md">Minify</Heading>
+      {!minifyData && <LoadingBox />}
+      {minifyData && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -152,4 +184,4 @@ const HttpStrictTransportSecurity = (props) => {
   );
 };
 
-export default HttpStrictTransportSecurity;
+export default Minify;
