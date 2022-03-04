@@ -18,6 +18,7 @@ import CachingCompare from "../components/zoneComparison/cachingCompare/CachingC
 import WorkersCompare from "../components/zoneComparison/workersCompare/WorkersCompare";
 import NetworkCompare from "../components/zoneComparison/networkCompare/NetworkCompare";
 import SpectrumCompare from "../components/zoneComparison/spectrumCompare/SpectrumCompare";
+import ScrapeShieldCompare from "../components/zoneComparison/scrapeShieldCompare/ScrapeShieldCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -158,8 +159,8 @@ function ZoneComparison() {
           <WorkersCompare />
           {/* <RulesViewer /> */}
           <NetworkCompare />
-          {/* <TrafficViewer />
-          <ScrapeShieldViewer />*/}
+          {/* <TrafficViewer /> */}
+          <ScrapeShieldCompare />
           <SpectrumCompare />
         </CompareContext.Provider>
       )}
