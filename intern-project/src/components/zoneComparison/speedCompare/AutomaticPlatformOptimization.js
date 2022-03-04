@@ -34,52 +34,64 @@ const convertOutput = (value) => {
 const returnConditions = (data) => {
   if (data.success === false) {
     return data.messages[0];
-  } else if (data.result.value === "on") {
+  } else if (
+    data.result.id === "enabled" &&
+    typeof data.result.value === "object"
+  ) {
     return true;
   } else if (data.result.value === "off") {
+    return false;
+  } else if (
+    data.result.id === "cache_by_device_type" &&
+    data.result.value?.cache_by_device_type !== undefined
+  ) {
+    return data.result.value.cache_by_device_type;
+  } else if (
+    data.result.id === "cache_by_device_type" &&
+    data.result.value?.cache_by_device_type === undefined
+  ) {
     return false;
   } else {
     return data.result.value;
   }
 };
 
-const SpeedSubcategories = (props) => {
+const AutomaticPlatformOptimization = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [speedSubcategoriesData, setSpeedSubcategoriesData] = useState();
+  const [
+    automaticPlatformOptimizationData,
+    setAutomaticPlatformOptimizationData,
+  ] = useState();
+
   useEffect(() => {
     async function getData() {
-      const resp = await Promise.all([
-        getMultipleZoneSettings(zoneKeys, credentials, "/settings/mirage"),
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/image_resizing"
-        ),
-        getMultipleZoneSettings(zoneKeys, credentials, "/settings/polish"),
-        getMultipleZoneSettings(zoneKeys, credentials, "/settings/brotli"),
-        getMultipleZoneSettings(zoneKeys, credentials, "/settings/early_hints"),
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/h2_prioritization"
-        ),
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/rocket_loader"
-        ),
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/prefetch_preload"
-        ),
-      ]);
-      const processedResp = resp.map((settingArray) =>
-        settingArray.map((zone) => zone.resp)
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/automatic_platform_optimization"
       );
-      setSpeedSubcategoriesData(processedResp);
+      const resp2 = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/automatic_platform_optimization"
+      );
+      const valueResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result.id = "enabled";
+        return newObj;
+      });
+      const cacheByDeviceTypeResp = resp2.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result.id = "cache_by_device_type";
+        return newObj;
+      });
+      const secondaryProcessedResp = [
+        [...valueResp],
+        [...cacheByDeviceTypeResp],
+      ];
+      setAutomaticPlatformOptimizationData(secondaryProcessedResp);
     }
-    setSpeedSubcategoriesData();
+    setAutomaticPlatformOptimizationData();
     getData();
   }, [credentials, zoneKeys]);
 
@@ -97,20 +109,23 @@ const SpeedSubcategories = (props) => {
       },
     ];
     const dynamicHeaders =
-      speedSubcategoriesData && speedSubcategoriesData.length
+      automaticPlatformOptimizationData &&
+      automaticPlatformOptimizationData.length
         ? HeaderFactoryOverloaded(
-            speedSubcategoriesData[0].length,
+            automaticPlatformOptimizationData[0].length,
             convertOutput
           )
         : [];
 
-    return speedSubcategoriesData ? baseHeaders.concat(dynamicHeaders) : [];
-  }, [speedSubcategoriesData]);
+    return automaticPlatformOptimizationData
+      ? baseHeaders.concat(dynamicHeaders)
+      : [];
+  }, [automaticPlatformOptimizationData]);
 
   const data = React.useMemo(
     () =>
-      speedSubcategoriesData
-        ? speedSubcategoriesData.map((data) => {
+      automaticPlatformOptimizationData
+        ? automaticPlatformOptimizationData.map((data) => {
             return CompareData(
               CompareBaseToOthersCategorical,
               data,
@@ -119,16 +134,16 @@ const SpeedSubcategories = (props) => {
             );
           })
         : [],
-    [speedSubcategoriesData]
+    [automaticPlatformOptimizationData]
   );
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Speed Subcategories</Heading>
-      {!speedSubcategoriesData && <LoadingBox />}
-      {speedSubcategoriesData && (
+      <Heading size="md">Automatic Platform Optimization</Heading>
+      {!automaticPlatformOptimizationData && <LoadingBox />}
+      {automaticPlatformOptimizationData && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -186,4 +201,4 @@ const SpeedSubcategories = (props) => {
   );
 };
 
-export default SpeedSubcategories;
+export default AutomaticPlatformOptimization;

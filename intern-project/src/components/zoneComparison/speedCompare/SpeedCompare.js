@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import SpeedSubcategories from "./SpeedSubcategories";
+import AutomaticPlatformOptimization from "./AutomaticPlatformOptimization";
 
 /**
  *
@@ -22,23 +23,8 @@ const SpeedViewer = (props) => {
       >
         <Heading size="xl">Speed</Heading>
         <SpeedSubcategories />
+        <AutomaticPlatformOptimization />
         {/* {speedData ? (
-          <SpeedSubcategories
-            data={{
-              mirage: speedData.mirage,
-              image_resizing: speedData.image_resizing,
-              polish: speedData.polish,
-              brotli: speedData.brotli,
-              early_hints: speedData.early_hints,
-              h2_prioritization: speedData.h2_prioritization,
-              rocket_loader: speedData.rocket_loader,
-              prefetch_preload: speedData.prefetch_preload,
-            }}
-          />
-        ) : (
-          <LoadingBox />
-        )}
-        {speedData ? (
           <AutomaticPlatformOptimization
             data={speedData.automatic_platform_optimization}
           />
