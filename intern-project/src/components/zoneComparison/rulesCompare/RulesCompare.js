@@ -4,6 +4,7 @@ import { useZoneContext } from "../../../lib/contextLib";
 import { getZoneSetting } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 import PageRules from "./PageRules";
+import UrlRewrite from "./UrlRewrite";
 
 /**
  *
@@ -25,7 +26,7 @@ const RulesCompare = (props) => {
       >
         <Heading size="xl">Rules</Heading>
         <PageRules />
-        {/* {rulesData ? <PageRules data={rulesData.pagerules} /> : <LoadingBox />} */}
+        <UrlRewrite />
         {/* {rulesData ? (
           <UrlRewrite data={rulesData.url_rewrite} />
         ) : (

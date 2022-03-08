@@ -1197,6 +1197,78 @@ router.post('/rules', async request => {
     })
   }
 })
+
+// Page Rules
+router.post('/pagerules', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/pagerules')
+})
+
+// URL Rewrite
+router.post(
+  '/rulesets/phases/http_request_transform/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return FetchRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_request_transform/entrypoint',
+    )
+  },
+)
+
+// HTTP Request Late Modification
+router.post(
+  '/rulesets/phases/http_request_late_transform/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return FetchRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_request_late_transform/entrypoint',
+    )
+  },
+)
+
+// HTTP Response Headers Modification
+router.post(
+  '/rulesets/phases/http_response_headers_transform/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return FetchRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_response_headers_transform/entrypoint',
+    )
+  },
+)
+
+// Normalization Settings
+router.post('/rulesets/normalization_settings', async request => {
+  const getNormalizationSettingsId = resultArray => {
+    for (let i = 0; i < resultArray.length; i++) {
+      const current = resultArray[i]
+      if (current.name === 'Cloudflare Normalization Ruleset') {
+        return current.id
+      }
+    }
+  }
+  const { query } = await request.json()
+
+  const { result: ruleSets } = await getZoneSetting(
+    query.zoneId,
+    query.apiToken,
+    '/rulesets',
+  )
+  const normalizationSettingsId = await getNormalizationSettingsId(ruleSets)
+
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    `/rulesets/${normalizationSettingsId}`,
+  )
+})
+
 /* Network */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/http2
