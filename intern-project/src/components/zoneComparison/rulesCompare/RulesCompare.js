@@ -5,6 +5,7 @@ import { getZoneSetting } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 import PageRules from "./PageRules";
 import UrlRewrite from "./UrlRewrite";
+import HttpRequestHeaderMod from "./HttpRequestHeaderMod";
 
 /**
  *
@@ -27,18 +28,7 @@ const RulesCompare = (props) => {
         <Heading size="xl">Rules</Heading>
         <PageRules />
         <UrlRewrite />
-        {/* {rulesData ? (
-          <UrlRewrite data={rulesData.url_rewrite} />
-        ) : (
-          <LoadingBox />
-        )} */}
-        {/* {rulesData ? (
-          <HttpRequestHeaderMod
-            data={rulesData.http_request_late_modification}
-          />
-        ) : (
-          <LoadingBox />
-        )} */}
+        <HttpRequestHeaderMod />
         {/* {rulesData ? (
           <HttpResponseHeaderMod
             data={rulesData.http_response_headers_modification}
