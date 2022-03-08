@@ -164,7 +164,6 @@ function ZoneComparison() {
           {/* <RulesViewer /> */}
           <NetworkCompare />
           <TrafficCompare />
-          {/* <TrafficViewer /> */}
           <ScrapeShieldCompare />
           <SpectrumCompare />
         </CompareContext.Provider>
