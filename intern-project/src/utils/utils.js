@@ -439,21 +439,48 @@ export const getZoneSetting = async (query, endpoint) => {
 /**
  * Returns an array with the results of the same API call for different zones
  *
- * @param {*} zoneKeys
- * @param {*} zoneDetailsObj
- * @param {*} endpoint
+ * @param {*} zoneKeys - This an array of keys
+ * @param {*} credentials - This is an object of keys (which are objects containing zoneId and apiToken key)
+ * @param {*} endpoint - This is the endpoint to be requested
  * @returns
  */
 export const getMultipleZoneSettings = async (
   zoneKeys,
+  credentials,
+  endpoint
+) => {
+  const resp = await Promise.all(
+    zoneKeys.map((key) => {
+      const payload = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      return getZoneSetting(payload, endpoint);
+    })
+  );
+  return resp;
+};
+
+/**
+ * Returns an array with the results of the same API call for different accounts
+ *
+ * @param {*} zoneKeys - This an array of keys
+ * @param {*} credentials - This is an object of keys (which are objects containing zoneId and apiToken key)
+ * @param {*} zoneDetailsObj - This is an object containing keys (which are objects containing Zone Details)
+ * @param {*} endpoint - This is the endpoint to be requested
+ * @returns
+ */
+export const getMultipleAccountSettings = async (
+  zoneKeys,
+  credentials,
   zoneDetailsObj,
   endpoint
 ) => {
   const resp = await Promise.all(
     zoneKeys.map((key) => {
       const payload = {
-        zoneId: zoneDetailsObj[key].zoneId,
-        apiToken: `Bearer ${zoneDetailsObj[key].apiToken}`,
+        accountId: zoneDetailsObj[key].account.id,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
       };
       return getZoneSetting(payload, endpoint);
     })

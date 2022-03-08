@@ -174,7 +174,36 @@ async function getAccountSetting(accountId, apiToken, endpoint) {
 }
 
 /**
- * This is a helper function to make a fetch request and paginate the request if there is more than one page.
+ * This is a helper function to make a paginated Account Setting type request
+ * @param {*} zoneId
+ * @param {*} apiToken
+ * @param {*} endpoint
+ * @returns
+ */
+async function getPaginatedAccountSetting(accountId, apiToken, endpoint) {
+  const firstRequest = await getAccountSetting(accountId, apiToken, endpoint)
+
+  if (
+    firstRequest.result_info !== undefined &&
+    firstRequest.result_info.total_pages !== undefined &&
+    firstRequest.result_info.total_pages > 1
+  ) {
+    for (let i = 2; i <= firstRequest.result_info.total_pages; i++) {
+      const pageNumber = `${endpoint}?page=${i}`
+      const subsequentRequest = await getAccountSetting(
+        accountId,
+        apiToken,
+        pageNumber,
+      )
+      firstRequest.result.push(...subsequentRequest.result)
+    }
+  }
+
+  return firstRequest
+}
+
+/**
+ * This is a helper function to make a fetch request and paginate the request if there is more than one page. Use this for a Zone related request.
  * @param {*} zoneId
  * @param {*} apiToken
  * @param {*} endpoint
@@ -183,6 +212,38 @@ async function getAccountSetting(accountId, apiToken, endpoint) {
 async function FetchRequest(zoneId, apiToken, endpoint) {
   try {
     const resp = await getPaginatedZoneSetting(zoneId, apiToken, endpoint)
+
+    return new Response(
+      JSON.stringify({
+        resp,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+}
+
+/**
+ * This is a helper function to make a fetch request and paginate the request if there is more than one page. Use this for an Account related request.
+ * @param {*} accountId
+ * @param {*} apiToken
+ * @param {*} endpoint
+ * @returns
+ */
+async function FetchAccountRequest(accountId, apiToken, endpoint) {
+  try {
+    const resp = await getPaginatedAccountSetting(accountId, apiToken, endpoint)
 
     return new Response(
       JSON.stringify({
@@ -1313,6 +1374,7 @@ router.post('/settings/true_client_ip_header', async request => {
   to be added
   */
 
+// can be deprecated, replaced using /load_balancers
 router.post('/traffic/load_balancers', async request => {
   const { query } = await request.json()
 
@@ -1344,6 +1406,7 @@ router.post('/traffic/load_balancers', async request => {
   }
 })
 
+// can be deprecated, replaced using /load_balancers/pools
 router.post('/traffic/load_balancers/pools', async request => {
   const { query } = await request.json()
 
@@ -1373,6 +1436,22 @@ router.post('/traffic/load_balancers/pools', async request => {
       },
     })
   }
+})
+
+// Load Balancers
+router.post('/load_balancers', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/load_balancers')
+})
+
+// Load Balancers Pools
+router.post('/load_balancers/pools', async request => {
+  const { query } = await request.json()
+  return FetchAccountRequest(
+    query.accountId,
+    query.apiToken,
+    '/load_balancers/pools',
+  )
 })
 
 /* Custom Pages */

@@ -19,6 +19,7 @@ import WorkersCompare from "../components/zoneComparison/workersCompare/WorkersC
 import NetworkCompare from "../components/zoneComparison/networkCompare/NetworkCompare";
 import SpectrumCompare from "../components/zoneComparison/spectrumCompare/SpectrumCompare";
 import ScrapeShieldCompare from "../components/zoneComparison/scrapeShieldCompare/ScrapeShieldCompare";
+import TrafficCompare from "../components/zoneComparison/trafficCompare/TrafficCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -63,12 +64,13 @@ function ZoneComparison() {
         } ${incorrectZoneDetailsArray.join(", ")} was incorrect.`
       );
     } else {
-      const zoneDetailsRenamed = zoneDetailsResp.map((zone, idx) => ({
-        [`zone_${idx + 1}`]: zone.zone_details,
-      }));
+      const zoneDetailsObj = {};
+      zoneDetailsResp.forEach((zone, idx) => {
+        zoneDetailsObj[`zone_${idx + 1}`] = zone.zone_details.result;
+      });
       setCredentials({ ...searchDetails.current });
       setKeys(zoneKeys);
-      setZoneDetails(zoneDetailsRenamed);
+      setZoneDetails(zoneDetailsObj);
     }
   };
 
@@ -149,9 +151,11 @@ function ZoneComparison() {
           value={{
             zoneKeys: keys,
             credentials: credentials,
+            zoneDetails: zoneDetails,
           }}
         >
           <DnsCompare />
+          {console.log(zoneDetails)}
           <SslTlsCompare />
           {/* FIREWALL */}
           <SpeedCompare />
@@ -159,6 +163,7 @@ function ZoneComparison() {
           <WorkersCompare />
           {/* <RulesViewer /> */}
           <NetworkCompare />
+          <TrafficCompare />
           {/* <TrafficViewer /> */}
           <ScrapeShieldCompare />
           <SpectrumCompare />

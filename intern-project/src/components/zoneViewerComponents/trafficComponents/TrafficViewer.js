@@ -11,20 +11,20 @@ const TrafficViewer = (props) => {
 
   useEffect(() => {
     async function getTrafficData() {
-      const { load_balancers } = await getZoneSetting(
+      const { resp: load_balancers } = await getZoneSetting(
         {
           zoneId: zoneId,
           apiToken: `Bearer ${apiToken}`,
         },
-        "/traffic/load_balancers"
+        "/load_balancers"
       );
       setTrafficData((prevState) => ({ ...prevState, load_balancers }));
-      const { load_balancers_pools } = await getZoneSetting(
+      const { resp: load_balancers_pools } = await getZoneSetting(
         {
           accountId: zoneDetails.account.id,
           apiToken: `Bearer ${apiToken}`,
         },
-        "/traffic/load_balancers/pools"
+        "/load_balancers/pools"
       );
       setTrafficData((prevState) => ({ ...prevState, load_balancers_pools }));
     }
