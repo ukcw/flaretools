@@ -2,6 +2,7 @@ import {
   Heading,
   Stack,
   Table,
+  Tag,
   Tbody,
   Td,
   Th,
@@ -23,9 +24,9 @@ import LoadingBox from "../../LoadingBox";
 
 const convertOutput = (value) => {
   return value === true ? (
-    <CheckIcon color={"green"} />
+    <Tag colorScheme={"green"}>Match</Tag>
   ) : value === false ? (
-    <CloseIcon color={"red"} />
+    <Tag colorScheme={"red"}>No Match</Tag>
   ) : (
     value
   );
@@ -34,58 +35,75 @@ const convertOutput = (value) => {
 const returnConditions = (data) => {
   if (data.success === false) {
     return data.messages[0];
-  } else if (data.result.id === "mobile_subdomain") {
-    return data.result.value.mobile_subdomain;
-  } else if (data.result.id === "strip_uri") {
-    return data.result.value.strip_uri ? "Drop Path" : "Keep Path";
-  } else if (data.result.id === "status" && data.result.value.status === "on") {
-    return true;
+  } else if (data.result.id === "normalization_type") {
+    return data.result.type;
   } else if (
-    data.result.id === "status" &&
-    data.result.value.status === "off"
+    data.result.id === "incoming_urls" &&
+    data.result.scope === "none"
   ) {
     return false;
+  } else if (
+    data.result.id === "incoming_urls" &&
+    (data.result.scope === "both" || data.result.scope === "incoming")
+  ) {
+    return true;
+  } else if (
+    data.result.id === "urls_to_origin" &&
+    (data.result.scope === "none" || data.result.scope === "incoming")
+  ) {
+    return false;
+  } else if (
+    data.result.id === "urls_to_origin" &&
+    data.result.scope === "both"
+  ) {
+    return true;
   } else {
     return data.result.value;
   }
 };
 
-const MobileRedirect = (props) => {
+const NormalizationRules = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [mobileRedirectData, setMobileRedirectData] = useState();
+  const [normalizationRulesData, setNormalizationRulesData] = useState();
 
   useEffect(() => {
     async function getData() {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/settings/mobile_redirect"
+        "/url_normalization"
       );
       const processedResp = resp.map((zone) => zone.resp);
+      console.log(processedResp);
       const secondaryProcessedResp = [
         [JSON.parse(JSON.stringify(processedResp))], // this method does a deep copy of the objects
-        [JSON.parse(JSON.stringify(processedResp))],
+        [JSON.parse(JSON.stringify(processedResp))], // use this for as many times as unique setting values required
         [JSON.parse(JSON.stringify(processedResp))],
       ];
 
+      // NORMALIZE TYPE
       secondaryProcessedResp[0] = secondaryProcessedResp[0][0].map((res) => {
         let newObj = { ...res };
-        newObj.result.id = "status";
+        newObj.result["id"] = "normalization_type";
         return newObj;
       });
+
+      // NORMALIZE INCOMING URLS
       secondaryProcessedResp[1] = secondaryProcessedResp[1][0].map((res) => {
         let newObj = { ...res };
-        newObj.result.id = "mobile_subdomain";
+        newObj.result["id"] = "incoming_urls";
         return newObj;
       });
+
+      // NORMALIZE URLS TO ORIGIN
       secondaryProcessedResp[2] = secondaryProcessedResp[2][0].map((res) => {
         let newObj = { ...res };
-        newObj.result.id = "strip_uri";
+        newObj.result["id"] = "urls_to_origin";
         return newObj;
       });
-      setMobileRedirectData(secondaryProcessedResp);
+      setNormalizationRulesData(secondaryProcessedResp);
     }
-    setMobileRedirectData();
+    setNormalizationRulesData();
     getData();
   }, [credentials, zoneKeys]);
 
@@ -99,22 +117,31 @@ const MobileRedirect = (props) => {
       {
         Header: "Value",
         accessor: "value",
-        Cell: (props) => convertOutput(props.value),
+        Cell: (props) =>
+          props.value === true ? (
+            <CheckIcon color={"green"} />
+          ) : props.value === false ? (
+            <CloseIcon color={"red"} />
+          ) : (
+            props.value
+          ),
       },
     ];
     const dynamicHeaders =
-      mobileRedirectData && mobileRedirectData.length
-        ? HeaderFactoryOverloaded(mobileRedirectData[0].length, convertOutput)
+      normalizationRulesData && normalizationRulesData.length
+        ? HeaderFactoryOverloaded(
+            normalizationRulesData[0].length,
+            convertOutput
+          )
         : [];
 
-    return mobileRedirectData ? baseHeaders.concat(dynamicHeaders) : [];
-  }, [mobileRedirectData]);
+    return normalizationRulesData ? baseHeaders.concat(dynamicHeaders) : [];
+  }, [normalizationRulesData]);
 
   const data = React.useMemo(
     () =>
-      mobileRedirectData
-        ? mobileRedirectData.map((data) => {
-            console.log(data);
+      normalizationRulesData
+        ? normalizationRulesData.map((data) => {
             return CompareData(
               CompareBaseToOthersCategorical,
               data,
@@ -123,16 +150,16 @@ const MobileRedirect = (props) => {
             );
           })
         : [],
-    [mobileRedirectData]
+    [normalizationRulesData]
   );
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Mobile Redirect</Heading>
-      {!mobileRedirectData && <LoadingBox />}
-      {mobileRedirectData && (
+      <Heading size="md">Normalization Settings</Heading>
+      {!normalizationRulesData && <LoadingBox />}
+      {normalizationRulesData && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -190,4 +217,4 @@ const MobileRedirect = (props) => {
   );
 };
 
-export default MobileRedirect;
+export default NormalizationRules;

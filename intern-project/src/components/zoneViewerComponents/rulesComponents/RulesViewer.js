@@ -28,6 +28,7 @@ const RulesViewer = (props) => {
         },
         "/rules"
       );
+      console.log(resp.normalization_settings);
       setRulesData(resp);
     }
     setRulesData();

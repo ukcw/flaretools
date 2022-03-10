@@ -24,6 +24,12 @@ export const Humanize = (str) => {
     return "Minimum TLS Version";
   } else if (str === "strip_uri") {
     return "Strip URI";
+  } else if (str === "normalization_type") {
+    return "Normalization Type";
+  } else if (str === "incoming_urls") {
+    return "Incoming URLs";
+  } else if (str === "urls_to_origin") {
+    return "URLs to origin";
   } else {
     var i,
       frags = str.split("_");
@@ -634,7 +640,8 @@ export const CompareBaseToOthersCategorical = (
   for (let j = 0; j < restData.length; j++) {
     if (restData[j].success === true) {
       const currentCompareZoneData = restData[j];
-      newObj[`zone${j + 2}`] = returnConditions(currentCompareZoneData);
+      newObj[`zone${j + 2}`] =
+        newObj.value === returnConditions(currentCompareZoneData);
     } else {
       newObj[`zone${j + 2}`] = false;
     }

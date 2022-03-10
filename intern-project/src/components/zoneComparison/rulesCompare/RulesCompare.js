@@ -6,6 +6,8 @@ import LoadingBox from "../../LoadingBox";
 import PageRules from "./PageRules";
 import UrlRewrite from "./UrlRewrite";
 import HttpRequestHeaderMod from "./HttpRequestHeaderMod";
+import HttpResponseHeaderMod from "./HttpResponseHeaderMod";
+import NormalizationRules from "./NormalizationRules";
 
 /**
  *
@@ -29,13 +31,8 @@ const RulesCompare = (props) => {
         <PageRules />
         <UrlRewrite />
         <HttpRequestHeaderMod />
-        {/* {rulesData ? (
-          <HttpResponseHeaderMod
-            data={rulesData.http_response_headers_modification}
-          />
-        ) : (
-          <LoadingBox />
-        )} */}
+        <HttpResponseHeaderMod />
+        <NormalizationRules />
         {/* {rulesData ? (
           <RulesSubcategories data={rulesData.normalization_settings} />
         ) : (

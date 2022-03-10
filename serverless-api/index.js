@@ -1243,30 +1243,11 @@ router.post(
   },
 )
 
-// Normalization Settings
-router.post('/rulesets/normalization_settings', async request => {
-  const getNormalizationSettingsId = resultArray => {
-    for (let i = 0; i < resultArray.length; i++) {
-      const current = resultArray[i]
-      if (current.name === 'Cloudflare Normalization Ruleset') {
-        return current.id
-      }
-    }
-  }
+// Normalization Settings (ENDPOINT HAS BEEN UPDATED BY CLOUDFLARE last checked 10/03/2022)
+router.post('/url_normalization', async request => {
   const { query } = await request.json()
 
-  const { result: ruleSets } = await getZoneSetting(
-    query.zoneId,
-    query.apiToken,
-    '/rulesets',
-  )
-  const normalizationSettingsId = await getNormalizationSettingsId(ruleSets)
-
-  return FetchRequest(
-    query.zoneId,
-    query.apiToken,
-    `/rulesets/${normalizationSettingsId}`,
-  )
+  return FetchRequest(query.zoneId, query.apiToken, '/url_normalization')
 })
 
 /* Network */
