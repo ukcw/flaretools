@@ -2,6 +2,7 @@ import {
   Heading,
   Stack,
   Table,
+  Tag,
   Tbody,
   Td,
   Th,
@@ -23,9 +24,9 @@ import LoadingBox from "../../LoadingBox";
 
 const convertOutput = (value) => {
   return value === true ? (
-    <CheckIcon color={"green"} />
+    <Tag colorScheme={"green"}>Match</Tag>
   ) : value === false ? (
-    <CloseIcon color={"red"} />
+    <Tag colorScheme={"red"}>No Match</Tag>
   ) : (
     value
   );
@@ -70,7 +71,6 @@ const ScrapeShieldSubcategories = (props) => {
       const processedResp = resp.map((settingArray) =>
         settingArray.map((zone) => zone.resp)
       );
-      console.log(processedResp);
       setScrapeShieldSubcategoriesData(processedResp);
     }
     setScrapeShieldSubcategoriesData();
@@ -87,7 +87,14 @@ const ScrapeShieldSubcategories = (props) => {
       {
         Header: "Value",
         accessor: "value",
-        Cell: (props) => convertOutput(props.value),
+        Cell: (props) =>
+          props.value === true ? (
+            <CheckIcon color={"green"} />
+          ) : props.value === false ? (
+            <CloseIcon color={"red"} />
+          ) : (
+            props.value
+          ),
       },
     ];
     const dynamicHeaders =

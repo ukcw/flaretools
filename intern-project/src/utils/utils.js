@@ -507,9 +507,9 @@ export const HeaderFactory = (len) => {
       accessor: `zone${i}`,
       Cell: (props) =>
         props.value ? (
-          <CheckIcon color={"green"} />
+          <Tag colorScheme={"green"}>Match</Tag>
         ) : (
-          <CloseIcon color={"red"} />
+          <Tag colorScheme={"red"}>No Match</Tag>
         ),
     });
   }
@@ -530,15 +530,15 @@ export const HeaderFactoryWithTags = (len, enabledTag) => {
       Cell: (props) => {
         if (enabledTag) {
           return props.value ? (
-            <Tag colorScheme={"green"}>Enabled</Tag>
+            <Tag colorScheme={"green"}>Match</Tag> // <Tag colorScheme={"green"}>Enabled</Tag>
           ) : (
-            <Tag colorScheme={"red"}>Disabled</Tag>
+            <Tag colorScheme={"red"}>No Match</Tag> // <Tag colorScheme={"red"}>Disabled</Tag>
           );
         } else {
           return props.value ? (
-            <Tag colorScheme={"green"}>Configured</Tag>
+            <Tag colorScheme={"green"}>Match</Tag> // <Tag colorScheme={"green"}>Configured</Tag>
           ) : (
-            <Tag colorScheme={"red"}>Not Configured</Tag>
+            <Tag colorScheme={"red"}>No Match</Tag> // <Tag colorScheme={"red"}>Not Configured</Tag>
           );
         }
       },
@@ -607,9 +607,13 @@ export const CompareBaseToOthers = (
       value: false,
     };
     for (let j = 0; j < restData.length; j++) {
+      // reverse the logic --> we want to say that if base zone has no entries or is unsuccessful AND the compare zone has some entries
+      // --------------------- then match is false
+      // --------------------- otherwise, if both base zone has no entries or is unsuccessful AND the compare zone has no entries or is unsuccessful
+      // --------------------- then match is true
       restData[j].success === true && restData[j].result.length
-        ? (newObj[`zone${j + 2}`] = true)
-        : (newObj[`zone${j + 2}`] = false);
+        ? (newObj[`zone${j + 2}`] = false)
+        : (newObj[`zone${j + 2}`] = true);
     }
     return [newObj];
   }

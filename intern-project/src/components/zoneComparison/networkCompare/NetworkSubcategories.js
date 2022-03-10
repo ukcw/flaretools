@@ -20,12 +20,13 @@ import {
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 
 const convertOutput = (value) => {
   return value === true ? (
-    <Tag colorScheme={"green"}>Enabled</Tag> // <CheckIcon color={"green"} />
+    <Tag colorScheme={"green"}>Match</Tag>
   ) : value === false ? (
-    <Tag colorScheme={"red"}>Disabled</Tag> // <CloseIcon color={"red"} />
+    <Tag colorScheme={"red"}>No Match</Tag>
   ) : (
     value
   );
@@ -100,7 +101,14 @@ const NetworkSubcategories = (props) => {
       {
         Header: "Value",
         accessor: "value",
-        Cell: (props) => convertOutput(props.value),
+        Cell: (props) =>
+          props.value === true ? (
+            <CheckIcon color={"green"} />
+          ) : props.value === false ? (
+            <CloseIcon color={"red"} />
+          ) : (
+            props.value
+          ),
       },
     ];
     const dynamicHeaders =
@@ -133,7 +141,6 @@ const NetworkSubcategories = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      {console.log("should this be TAGS or TickOrCross")}
       <Heading size="md">Network Subcategories</Heading>
       {!networkSubcategoriesData && <LoadingBox />}
       {networkSubcategoriesData && (

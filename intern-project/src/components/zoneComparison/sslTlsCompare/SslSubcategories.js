@@ -2,6 +2,7 @@ import {
   Heading,
   Stack,
   Table,
+  Tag,
   Tbody,
   Td,
   Th,
@@ -23,11 +24,11 @@ import LoadingBox from "../../LoadingBox";
 
 const convertOutput = (value) => {
   return value === true ? (
-    <CheckIcon color={"green"} />
+    <Tag colorScheme={"green"}>Match</Tag>
   ) : value === false ? (
-    <CloseIcon color={"red"} />
+    <Tag colorScheme={"red"}>No Match</Tag>
   ) : (
-    Humanize(value)
+    value
   );
 };
 
@@ -104,7 +105,14 @@ const SslSubcategories = (props) => {
       {
         Header: "Value",
         accessor: "value",
-        Cell: (props) => convertOutput(props.value),
+        Cell: (props) =>
+          props.value === true ? (
+            <CheckIcon color={"green"} />
+          ) : props.value === false ? (
+            <CloseIcon color={"red"} />
+          ) : (
+            props.value
+          ),
       },
     ];
     const dynamicHeaders =
