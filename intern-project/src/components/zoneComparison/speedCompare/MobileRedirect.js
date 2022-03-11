@@ -122,7 +122,6 @@ const MobileRedirect = (props) => {
     () =>
       mobileRedirectData
         ? mobileRedirectData.map((data) => {
-            console.log(data);
             return CompareData(
               CompareBaseToOthersCategorical,
               data,
