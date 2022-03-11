@@ -74,7 +74,6 @@ const NormalizationRules = (props) => {
         "/url_normalization"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log(processedResp);
       const secondaryProcessedResp = [
         [JSON.parse(JSON.stringify(processedResp))], // this method does a deep copy of the objects
         [JSON.parse(JSON.stringify(processedResp))], // use this for as many times as unique setting values required
