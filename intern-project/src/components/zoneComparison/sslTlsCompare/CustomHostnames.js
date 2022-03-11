@@ -21,7 +21,6 @@ import {
   getMultipleZoneSettings,
   HeaderFactory,
   HeaderFactoryWithTags,
-  UnsuccessfulHeaders,
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
@@ -40,7 +39,6 @@ const CustomHostnames = (props) => {
         "/custom_hostnames"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log(processedResp);
       console.log("ADD CONDITIONS TO MATCH");
       setcustomHostnamesData(processedResp);
     }
