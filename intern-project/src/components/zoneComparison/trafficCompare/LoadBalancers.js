@@ -52,7 +52,7 @@ const LoadBalancers = (props) => {
         zone.result.forEach((lb) => {
           lb["pools"] = processRespPool[idx].result;
         });
-        console.log(processedResp);
+        console.log("ADD CONDITIONS TO MATCH");
         setLoadBalancersData(processedResp);
       });
     }
@@ -180,7 +180,6 @@ const LoadBalancers = (props) => {
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
         <Heading size="md">Load Balancers</Heading>
-        {console.log("ADD CONDITIONS TO MATCH")}
       </HStack>
       {!loadBalancersData && <LoadingBox />}
       {loadBalancersData && (
