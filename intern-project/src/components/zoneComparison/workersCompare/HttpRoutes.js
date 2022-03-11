@@ -38,7 +38,6 @@ const HttpRoutes = (props) => {
         "/workers/routes"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log(processedResp);
       setHttpRoutesData(processedResp);
     }
     setHttpRoutesData();
