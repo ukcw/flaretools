@@ -1,12 +1,16 @@
 //import logo from "./logo.svg";
 import React, { useRef, useState } from "react";
 import {
+  Box,
   Button,
   Container,
+  Grid,
+  GridItem,
   Heading,
   Input,
   InputGroup,
   InputLeftAddon,
+  SimpleGrid,
   Stack,
 } from "@chakra-ui/react";
 import { getMultipleZoneSettings } from "../utils/utils";
@@ -21,12 +25,14 @@ import SpectrumCompare from "../components/zoneComparison/spectrumCompare/Spectr
 import ScrapeShieldCompare from "../components/zoneComparison/scrapeShieldCompare/ScrapeShieldCompare";
 import TrafficCompare from "../components/zoneComparison/trafficCompare/TrafficCompare";
 import RulesCompare from "../components/zoneComparison/rulesCompare/RulesCompare";
+import AfterSearch from "../components/zoneComparison/credentialsInputCompare/AfterSearch";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
   const [credentials, setCredentials] = useState();
   const [keys, setKeys] = useState();
   const searchDetails = useRef({});
+  const [successfulSearch, setSuccessfulSearch] = useState(false);
 
   const search = async () => {
     const zoneKeys = Object.keys(searchDetails.current).sort(
@@ -72,6 +78,7 @@ function ZoneComparison() {
       setCredentials({ ...searchDetails.current });
       setKeys(zoneKeys);
       setZoneDetails(zoneDetailsObj);
+      setSuccessfulSearch(true);
     }
   };
 
@@ -85,90 +92,108 @@ function ZoneComparison() {
   };
 
   return (
-    <Container maxW="container.xl" p={8}>
-      <Stack
-        spacing={8}
-        borderColor="#ccc"
-        borderWidth={0.1}
-        borderRadius={10}
-        padding={8}
-        margin={8}
-        boxShadow="0 0 3px #ccc"
-      >
-        <Stack spacing={4}>
-          <Heading size={"md"}>Zone 1</Heading>
-          <InputGroup>
-            <InputLeftAddon children="Zone ID" minWidth={"90"} />
-            <Input
-              type="text"
-              placeholder="Zone ID"
-              defaultValue={process.env.REACT_APP_PERSONAL_ZONE_ID}
-              onChange={(e) => handleChange(e, "zone_1", "zoneId")}
-              onBlur={(e) => handleChange(e, "zone_1", "zoneId")} // for testing
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftAddon children="Bearer" minWidth={"90"} />
-            <Input
-              type="text"
-              placeholder="API Token"
-              defaultValue={process.env.REACT_APP_READ_ONLY_ALL_API_TOKEN}
-              onChange={(e) => handleChange(e, "zone_1", "apiToken")}
-              onBlur={(e) => handleChange(e, "zone_1", "apiToken")} // for testing
-            />
-          </InputGroup>
-        </Stack>
-        <Stack spacing={4}>
-          <Heading size={"md"}>Zone 2</Heading>
-          <InputGroup>
-            <InputLeftAddon children="Zone ID" minWidth={"90"} />
-            <Input
-              type="text"
-              placeholder="Zone ID"
-              defaultValue={process.env.REACT_APP_BURRITO_BOT_ZONE_ID}
-              onChange={(e) => handleChange(e, "zone_2", "zoneId")}
-              onBlur={(e) => handleChange(e, "zone_2", "zoneId")} // for testing
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftAddon children="Bearer" minWidth={"90"} />
-            <Input
-              type="text"
-              placeholder="API Token"
-              defaultValue={
-                process.env.REACT_APP_BURRITO_BOT_READ_ONLY_API_TOKEN
-              }
-              onChange={(e) => handleChange(e, "zone_2", "apiToken")}
-              onBlur={(e) => handleChange(e, "zone_2", "apiToken")} // for testing
-            />
-          </InputGroup>
-        </Stack>
-        <Button colorScheme={"blue"} onClick={search}>
-          Compare
-        </Button>
-      </Stack>
-      {zoneDetails && (
-        <CompareContext.Provider
-          value={{
-            zoneKeys: keys,
-            credentials: credentials,
-            zoneDetails: zoneDetails,
-          }}
-        >
-          <DnsCompare />
-          <SslTlsCompare />
-          {/* FIREWALL */}
-          <SpeedCompare />
-          <CachingCompare />
-          <WorkersCompare />
-          <RulesCompare />
-          <NetworkCompare />
-          <TrafficCompare />
-          <ScrapeShieldCompare />
-          <SpectrumCompare />
-        </CompareContext.Provider>
-      )}
-    </Container>
+    // minmax(0,1fr) minmax(0,2.5fr) minmax(0,15rem)
+    <Grid
+      gridTemplateColumns={
+        successfulSearch ? "minmax(0,3.5fr) minmax(0,15rem)" : "minmax(0,5fr)"
+      }
+      justifyContent="center"
+    >
+      <Container maxW="container.xl" p={8}>
+        {/* {successfulSearch && (
+    <AfterSearch
+          zone1name={zoneDetails.zone_1.name}
+          zone2name={zoneDetails.zone_2.name}
+          style={{ float: "right" }}
+        />
+      )} */}
+        {!successfulSearch && (
+          <Stack
+            spacing={8}
+            borderColor="#ccc"
+            borderWidth={0.1}
+            borderRadius={10}
+            padding={8}
+            margin={8}
+            boxShadow="0 0 3px #ccc"
+            style={{ position: "sticky", top: 0 }}
+          >
+            <Stack spacing={4}>
+              <Heading size={"md"}>Zone 1</Heading>
+              <InputGroup>
+                <InputLeftAddon children="Zone ID" minWidth={"90"} />
+                <Input
+                  type="text"
+                  placeholder="Zone ID"
+                  defaultValue={process.env.REACT_APP_PERSONAL_ZONE_ID}
+                  onChange={(e) => handleChange(e, "zone_1", "zoneId")}
+                  onBlur={(e) => handleChange(e, "zone_1", "zoneId")} // for testing
+                />
+              </InputGroup>
+              <InputGroup>
+                <InputLeftAddon children="Bearer" minWidth={"90"} />
+                <Input
+                  type="text"
+                  placeholder="API Token"
+                  defaultValue={process.env.REACT_APP_READ_ONLY_ALL_API_TOKEN}
+                  onChange={(e) => handleChange(e, "zone_1", "apiToken")}
+                  onBlur={(e) => handleChange(e, "zone_1", "apiToken")} // for testing
+                />
+              </InputGroup>
+            </Stack>
+            <Stack spacing={4}>
+              <Heading size={"md"}>Zone 2</Heading>
+              <InputGroup>
+                <InputLeftAddon children="Zone ID" minWidth={"90"} />
+                <Input
+                  type="text"
+                  placeholder="Zone ID"
+                  defaultValue={process.env.REACT_APP_BURRITO_BOT_ZONE_ID}
+                  onChange={(e) => handleChange(e, "zone_2", "zoneId")}
+                  onBlur={(e) => handleChange(e, "zone_2", "zoneId")} // for testing
+                />
+              </InputGroup>
+              <InputGroup>
+                <InputLeftAddon children="Bearer" minWidth={"90"} />
+                <Input
+                  type="text"
+                  placeholder="API Token"
+                  defaultValue={
+                    process.env.REACT_APP_BURRITO_BOT_READ_ONLY_API_TOKEN
+                  }
+                  onChange={(e) => handleChange(e, "zone_2", "apiToken")}
+                  onBlur={(e) => handleChange(e, "zone_2", "apiToken")} // for testing
+                />
+              </InputGroup>
+            </Stack>
+            <Button colorScheme={"blue"} onClick={search}>
+              Compare
+            </Button>
+          </Stack>
+        )}
+        {zoneDetails && (
+          <CompareContext.Provider
+            value={{
+              zoneKeys: keys,
+              credentials: credentials,
+              zoneDetails: zoneDetails,
+            }}
+          >
+            <DnsCompare />
+            <SslTlsCompare />
+            {/* FIREWALL */}
+            <SpeedCompare />
+            <CachingCompare />
+            <WorkersCompare />
+            <RulesCompare />
+            <NetworkCompare />
+            <TrafficCompare />
+            <ScrapeShieldCompare />
+            <SpectrumCompare />
+          </CompareContext.Provider>
+        )}
+      </Container>
+    </Grid>
   );
 }
 
