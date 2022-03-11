@@ -26,6 +26,7 @@ import ScrapeShieldCompare from "../components/zoneComparison/scrapeShieldCompar
 import TrafficCompare from "../components/zoneComparison/trafficCompare/TrafficCompare";
 import RulesCompare from "../components/zoneComparison/rulesCompare/RulesCompare";
 import AfterSearch from "../components/zoneComparison/credentialsInputCompare/AfterSearch";
+import FirewallCompare from "../components/zoneComparison/firewallCompare/FirewallCompare";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -181,7 +182,7 @@ function ZoneComparison() {
           >
             <DnsCompare />
             <SslTlsCompare />
-            {/* FIREWALL */}
+            <FirewallCompare />
             <SpeedCompare />
             <CachingCompare />
             <WorkersCompare />
