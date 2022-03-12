@@ -1,5 +1,6 @@
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import React from "react";
+import DdosProtection from "./DdosProtection";
 import FirewallSubcategories from "./FirewallSubcategories";
 import IpAccessRules from "./IpAccessRules";
 import RateLimiting from "./RateLimiting";
@@ -123,6 +124,7 @@ const FirewallViewer = (props) => {
         ) : (
           <LoadingBox />
         )} */}
+        <DdosProtection />
         <IpAccessRules />
         <RateLimiting />
         <UserAgentBlocking />

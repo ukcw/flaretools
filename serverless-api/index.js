@@ -863,6 +863,18 @@ router.post('/rulesets/phases/ddos_l7/entrypoint', async request => {
   )
 })
 
+// DDoS L7 ruleset
+// DDoS L7 Ruleset ID = 4d21379b4f9f4bb088e0729962c8b3cf
+// if this ID changes on Cloudflare API's side, then this value needs to be updated
+router.post('/rulesets/ddos_l7', async request => {
+  const { query } = await request.json()
+  return FetchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/rulesets/4d21379b4f9f4bb088e0729962c8b3cf',
+  )
+})
+
 /* Speed */
 /*
   https://api.cloudflare.com/client/v4/zones/${query.zoneId}/settings/mirage
