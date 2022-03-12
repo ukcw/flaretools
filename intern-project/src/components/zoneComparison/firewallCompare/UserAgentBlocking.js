@@ -1,140 +1,119 @@
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Heading,
   Stack,
   Table,
-  Tag,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
+  HStack,
+  VStack,
+  Text,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { useTable } from "react-table";
+import { useCompareContext } from "../../../lib/contextLib";
 import {
-  CompareBaseToOthersCategorical,
+  CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
-  HeaderFactoryOverloaded,
-  Humanize,
+  HeaderFactory,
+  HeaderFactoryWithTags,
+  UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
-import { useCompareContext } from "../../../lib/contextLib";
-import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { Humanize } from "../../../utils/utils";
 
-const convertOutput = (value) => {
-  return value === true ? (
-    <Tag colorScheme={"green"}>Match</Tag>
-  ) : value === false ? (
-    <Tag colorScheme={"red"}>No Match</Tag>
-  ) : (
-    value
-  );
-};
+const conditionsToMatch = (base, toCompare) => {};
 
-const returnConditions = (data) => {
-  if (data.success === false) {
-    return data.messages[0];
-  } else if (data.result.value === "on") {
-    return true;
-  } else if (data.result.value === "off") {
-    return false;
-  } else {
-    return data.result.value;
-  }
-};
-
-const FirewallSubcategories = (props) => {
+const UserAgentBlocking = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [firewallSubcategoriesData, setFirewallSubcategoriesData] = useState();
+  const [userAgentBlockingData, setUserAgentBlockingData] = useState();
+
   useEffect(() => {
     async function getData() {
-      const resp = await Promise.all([
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/security_level"
-        ),
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/challenge_ttl"
-        ),
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/browser_check"
-        ),
-        getMultipleZoneSettings(
-          zoneKeys,
-          credentials,
-          "/settings/privacy_pass"
-        ),
-      ]);
-      const processedResp = resp.map((settingArray) =>
-        settingArray.map((zone) => {
-          return zone.resp;
-        })
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/firewall/ua_rules"
       );
-      setFirewallSubcategoriesData(processedResp);
+      console.log("ADD CONDITIONS TO MATCH");
+      const processedResp = resp.map((zone) => zone.resp);
+      setUserAgentBlockingData(processedResp);
     }
-    setFirewallSubcategoriesData();
+    setUserAgentBlockingData();
     getData();
   }, [credentials, zoneKeys]);
-
   const columns = React.useMemo(() => {
     const baseHeaders = [
       {
-        Header: "Setting",
-        accessor: "setting",
+        Header: "Rule Name/Description",
+        accessor: (row) => {
+          return (
+            <VStack w="100%" p={0} align={"flex-start"}>
+              <Text>{row.description}</Text>
+              <Text color={"grey"}>{row.configuration.value}</Text>
+            </VStack>
+          );
+        },
+      },
+      {
+        Header: "Action",
+        accessor: "mode",
         Cell: (props) => Humanize(props.value),
       },
       {
-        Header: "Value",
-        accessor: "value",
+        Header: "Enabled",
+        accessor: "paused",
         Cell: (props) =>
-          props.value === true ? (
-            <CheckIcon color={"green"} />
-          ) : props.value === false ? (
+          props.value ? (
             <CloseIcon color={"red"} />
           ) : (
-            props.value
+            <CheckIcon color={"green"} />
           ),
       },
     ];
+
     const dynamicHeaders =
-      firewallSubcategoriesData && firewallSubcategoriesData.length
-        ? HeaderFactoryOverloaded(
-            firewallSubcategoriesData[0].length,
-            convertOutput
-          )
+      userAgentBlockingData && userAgentBlockingData[0].result.length
+        ? HeaderFactory(userAgentBlockingData.length)
+        : userAgentBlockingData && userAgentBlockingData[0].result.length === 0
+        ? HeaderFactoryWithTags(userAgentBlockingData.length, false)
         : [];
 
-    return firewallSubcategoriesData ? baseHeaders.concat(dynamicHeaders) : [];
-  }, [firewallSubcategoriesData]);
+    return userAgentBlockingData &&
+      userAgentBlockingData[0].success &&
+      userAgentBlockingData[0].result.length
+      ? baseHeaders.concat(dynamicHeaders)
+      : UnsuccessfulHeadersWithTags.concat(dynamicHeaders);
+  }, [userAgentBlockingData]);
 
   const data = React.useMemo(
     () =>
-      firewallSubcategoriesData
-        ? firewallSubcategoriesData.map((data) => {
-            return CompareData(
-              CompareBaseToOthersCategorical,
-              data,
-              returnConditions,
-              data[0].result.id
-            );
-          })
+      userAgentBlockingData
+        ? CompareData(
+            CompareBaseToOthers,
+            userAgentBlockingData,
+            conditionsToMatch,
+            "User Agent Blocking"
+          )
         : [],
-    [firewallSubcategoriesData]
+    [userAgentBlockingData]
   );
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Firewall Subcategories</Heading>
-      {!firewallSubcategoriesData && <LoadingBox />}
-      {firewallSubcategoriesData && (
+      <HStack w="100%" spacing={4}>
+        <Heading size="md">User Agent Blocking</Heading>
+        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
+      </HStack>
+      {!userAgentBlockingData && <LoadingBox />}
+      {userAgentBlockingData && (
         <Table {...getTableProps}>
           <Thead>
             {
@@ -192,4 +171,4 @@ const FirewallSubcategories = (props) => {
   );
 };
 
-export default FirewallSubcategories;
+export default UserAgentBlocking;

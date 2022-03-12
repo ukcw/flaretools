@@ -1,6 +1,9 @@
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import React from "react";
 import FirewallSubcategories from "./FirewallSubcategories";
+import RateLimiting from "./RateLimiting";
+import UserAgentBlocking from "./UserAgentBlocking";
+import ZoneLockdown from "./ZoneLockdown";
 
 const FirewallViewer = (props) => {
   //   const { zoneId, apiToken } = useZoneContext();
@@ -124,37 +127,10 @@ const FirewallViewer = (props) => {
         ) : (
           <LoadingBox />
         )} */}
-        {/* {firewallData?.rate_limits ? (
-          <RateLimiting data={firewallData.rate_limits} />
-        ) : (
-          <LoadingBox />
-        )} */}
-        {/* {firewallData?.firewall_ua_rules ? (
-          <UserAgentBlocking data={firewallData.firewall_ua_rules} />
-        ) : (
-          <LoadingBox />
-        )} */}
-        {/* {firewallData?.firewall_lockdowns ? (
-          <ZoneLockdown data={firewallData.firewall_lockdowns} />
-        ) : (
-          <LoadingBox />
-        )} */}
+        <RateLimiting />
+        <UserAgentBlocking />
+        <ZoneLockdown />
         <FirewallSubcategories />
-        {/* {firewallData?.security_level &&
-        firewallData?.challenge_ttl &&
-        firewallData?.browser_check &&
-        firewallData?.privacy_pass ? (
-          <FirewallSubcategories
-            data={{
-              security_level: firewallData.security_level,
-              challenge_passage: firewallData.challenge_ttl,
-              browser_integrity_check: firewallData.browser_check,
-              privacy_pass_support: firewallData.privacy_pass,
-            }}
-          />
-        ) : (
-          <LoadingBox />
-        )} */}
       </Stack>
     </Container>
   );
