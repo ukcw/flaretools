@@ -159,7 +159,7 @@ const DdosProtection = (props) => {
             CompareBaseToOthers,
             ddosProtectionData,
             conditionsToMatch,
-            "DDoS L7 ruleset"
+            "HTTP DDoS attack protection"
           )
         : [],
     [ddosProtectionData]
@@ -171,7 +171,7 @@ const DdosProtection = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">DDoS L7 ruleset</Heading>
+        <Heading size="md">HTTP DDoS attack protection</Heading>
       </HStack>
       {!ddosProtectionData && <LoadingBox />}
       {ddosProtectionData && (

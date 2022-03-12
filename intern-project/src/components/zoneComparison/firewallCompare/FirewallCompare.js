@@ -110,20 +110,6 @@ const FirewallViewer = (props) => {
         ) : (
           <LoadingBox />
         )} */}
-        {/* {firewallData?.ddos_l7 &&
-        firewallData?.managed_rulesets_results[ddosId] &&
-        firewallData.managed_rulesets_results[ddosId].id ===
-          "4d21379b4f9f4bb088e0729962c8b3cf" ? (
-          <DdosProtection
-            data={{
-              ddos_l7: firewallData.ddos_l7,
-              ddos_ruleset: firewallData.managed_rulesets_results[ddosId],
-            }}
-            title="HTTP DDoS attack protection"
-          />
-        ) : (
-          <LoadingBox />
-        )} */}
         <DdosProtection />
         <IpAccessRules />
         <RateLimiting />
