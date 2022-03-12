@@ -1,5 +1,6 @@
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import React from "react";
+import CustomRulesRateLimits from "./CustomRulesRateLimits";
 import DdosProtection from "./DdosProtection";
 import FirewallRules from "./FirewallRules";
 import FirewallSubcategories from "./FirewallSubcategories";
@@ -96,16 +97,7 @@ const FirewallViewer = (props) => {
           firewallData &&
           !("custom_rules_firewall" in firewallData) && <LoadingBox />
         )} */}
-        {/* {firewallData?.custom_rules_ratelimit &&
-        firewallData.custom_rules_ratelimit.success ? (
-          <CustomRules
-            data={firewallData.custom_rules_ratelimit}
-            title="Custom Rules Rate Limit"
-          />
-        ) : (
-          firewallData &&
-          !("custom_rules_ratelimit" in firewallData) && <LoadingBox />
-        )} */}
+        <CustomRulesRateLimits />
         <FirewallRules />
         <DdosProtection />
         <IpAccessRules />
