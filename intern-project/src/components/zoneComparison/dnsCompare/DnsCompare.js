@@ -21,11 +21,11 @@ const DnsCompare = (props) => {
         <Heading size="xl" id="DNS">
           DNS
         </Heading>
-        <DnsRecords />
-        <NameServers />
-        <CustomNs />
-        <Dnssec />
-        <CnameFlattening />
+        <DnsRecords id="dns_management" />
+        <NameServers id="cloudflare_nameservers" />
+        <CustomNs id="custom_nameservers" />
+        <Dnssec id="dnssec" />
+        <CnameFlattening id="cname_flattening" />
       </Stack>
     </Container>
   );

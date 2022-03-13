@@ -77,7 +77,9 @@ const Dnssec = (props) => {
     <Stack w="100%" spacing={4}>
       {console.log("FIX OUTPUT TO TAGS")}
       <HStack w="100%" spacing={4}>
-        <Heading size="md">DNSSEC</Heading>
+        <Heading size="md" id={props.id}>
+          DNSSEC
+        </Heading>
       </HStack>
       {!dnssec && <LoadingBox />}
       {dnssec && (

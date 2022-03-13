@@ -1,10 +1,12 @@
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import React from "react";
+import CustomRulesFirewall from "./CustomRulesFirewall";
 import CustomRulesRateLimits from "./CustomRulesRateLimits";
 import DdosProtection from "./DdosProtection";
 import FirewallRules from "./FirewallRules";
 import FirewallSubcategories from "./FirewallSubcategories";
 import IpAccessRules from "./IpAccessRules";
+import ManagedRules from "./ManagedRules";
 import RateLimiting from "./RateLimiting";
 import UserAgentBlocking from "./UserAgentBlocking";
 import ZoneLockdown from "./ZoneLockdown";
@@ -87,16 +89,8 @@ const FirewallViewer = (props) => {
         ) : (
           <LoadingBox />
         )} */}
-        {/* {firewallData?.custom_rules_firewall &&
-        firewallData.custom_rules_firewall.success ? (
-          <CustomRules
-            data={firewallData.custom_rules_firewall}
-            title="Custom Rules Firewall"
-          />
-        ) : (
-          firewallData &&
-          !("custom_rules_firewall" in firewallData) && <LoadingBox />
-        )} */}
+        <ManagedRules />
+        <CustomRulesFirewall />
         <CustomRulesRateLimits />
         <FirewallRules />
         <DdosProtection />

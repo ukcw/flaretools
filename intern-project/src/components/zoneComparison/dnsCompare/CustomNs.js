@@ -119,7 +119,9 @@ const CustomNs = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Custom Nameservers</Heading>
+        <Heading size="md" id={props.id}>
+          Custom Nameservers
+        </Heading>
       </HStack>
       {!customNs && <LoadingBox />}
       {customNs && (

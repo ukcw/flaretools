@@ -3,12 +3,12 @@ import {
   Heading,
   Stack,
   Table,
-  Text,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
+  HStack,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
@@ -16,101 +16,106 @@ import { useCompareContext } from "../../../lib/contextLib";
 import {
   CompareBaseToOthers,
   CompareData,
-  CountDeltaDifferences,
   getMultipleZoneSettings,
   HeaderFactory,
-  UnsuccessfulHeaders,
+  HeaderFactoryWithTags,
+  Humanize,
+  UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) =>
-  base.type === toCompare.type &&
-  base.name === toCompare.name &&
-  base.content === toCompare.content &&
-  base.proxied === toCompare.proxied;
+const conditionsToMatch = (base, toCompare) => {};
 
-const DnsRecords = (props) => {
+const CustomRulesFirewall = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
-  const [dnsRecords, setDnsRecords] = useState();
+  const [customRulesFirewallData, setCustomRulesFirewallData] = useState();
 
   useEffect(() => {
     async function getData() {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/dns_records"
+        "/rulesets/phases/http_request_firewall_custom/entrypoint"
       );
-      const processedResp = resp.map((zone) => zone.resp);
-      setDnsRecords(processedResp);
+      console.log("ADD CONDITIONS TO MATCH");
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result?.rules !== undefined
+          ? (newObj.result = newObj.result.rules)
+          : (newObj.result = []);
+        return newObj;
+      });
+      setCustomRulesFirewallData(processedResp);
     }
-    setDnsRecords();
+    setCustomRulesFirewallData();
     getData();
   }, [credentials, zoneKeys]);
 
   const columns = React.useMemo(() => {
     const baseHeaders = [
       {
-        Header: "Type",
-        accessor: "type",
+        Header: "Action",
+        accessor: "action",
+        Cell: (props) => Humanize(props.value),
       },
       {
         Header: "Name",
-        accessor: "name",
+        accessor: "description",
       },
       {
-        Header: "Content",
-        accessor: "content",
+        Header: "Expression",
+        accessor: "expression",
       },
       {
-        Header: "Proxied",
-        accessor: "proxied",
+        Header: "Enabled",
+        accessor: "enabled",
         Cell: (props) =>
-          props.value ? <CheckIcon color="green" /> : <CloseIcon color="red" />,
-      },
-      {
-        Header: "TTL",
-        accessor: "ttl",
-        Cell: (props) => (props.value === 1 ? <Text>Auto</Text> : props.value),
+          props.value ? (
+            <CheckIcon color={"green"} />
+          ) : (
+            <CloseIcon color={"red"} />
+          ),
       },
     ];
-
     const dynamicHeaders =
-      dnsRecords !== undefined ? HeaderFactory(dnsRecords.length) : [];
+      customRulesFirewallData && customRulesFirewallData[0].result.length
+        ? HeaderFactory(customRulesFirewallData.length)
+        : customRulesFirewallData &&
+          customRulesFirewallData[0].result.length === 0
+        ? HeaderFactoryWithTags(customRulesFirewallData.length, false)
+        : [];
 
-    return dnsRecords && dnsRecords[0].success && dnsRecords[0].result.length
+    return customRulesFirewallData &&
+      customRulesFirewallData[0].success &&
+      customRulesFirewallData[0].result.length
       ? baseHeaders.concat(dynamicHeaders)
-      : UnsuccessfulHeaders.concat(dynamicHeaders);
-  }, [dnsRecords]);
+      : UnsuccessfulHeadersWithTags.concat(dynamicHeaders);
+  }, [customRulesFirewallData]);
 
   const data = React.useMemo(
     () =>
-      dnsRecords
+      customRulesFirewallData
         ? CompareData(
             CompareBaseToOthers,
-            dnsRecords,
+            customRulesFirewallData,
             conditionsToMatch,
-            "DNS Management"
+            "Custom Rules Firewall"
           )
         : [],
-    [dnsRecords]
+    [customRulesFirewallData]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
-  const delta = React.useMemo(
-    () => (dnsRecords ? CountDeltaDifferences(zoneKeys, data, dnsRecords) : []),
-    [data, dnsRecords, zoneKeys]
-  );
-
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md" id={props.id}>
-        DNS Management
-      </Heading>
-      {!dnsRecords && <LoadingBox />}
-      {dnsRecords && (
-        <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
+      <HStack w="100%" spacing={4}>
+        <Heading size="md">Custom Rules Firewall</Heading>
+      </HStack>
+      {!customRulesFirewallData && <LoadingBox />}
+      {customRulesFirewallData && (
+        <Table {...getTableProps}>
           <Thead>
             {
               // Loop over the header rows
@@ -167,4 +172,4 @@ const DnsRecords = (props) => {
   );
 };
 
-export default DnsRecords;
+export default CustomRulesFirewall;

@@ -1,15 +1,24 @@
 //import logo from "./logo.svg";
 import React, { useRef, useState } from "react";
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   Container,
+  Flex,
   Grid,
   GridItem,
   Heading,
   Input,
   InputGroup,
   InputLeftAddon,
+  Link,
+  List,
+  ListItem,
   SimpleGrid,
   Stack,
 } from "@chakra-ui/react";
@@ -27,6 +36,7 @@ import TrafficCompare from "../components/zoneComparison/trafficCompare/TrafficC
 import RulesCompare from "../components/zoneComparison/rulesCompare/RulesCompare";
 import AfterSearch from "../components/zoneComparison/credentialsInputCompare/AfterSearch";
 import FirewallCompare from "../components/zoneComparison/firewallCompare/FirewallCompare";
+import LeftSidebar from "../components/zoneComparison/leftSidebar/LeftSidebar";
 
 function ZoneComparison() {
   const [zoneDetails, setZoneDetails] = useState();
@@ -96,18 +106,14 @@ function ZoneComparison() {
     // minmax(0,1fr) minmax(0,2.5fr) minmax(0,15rem)
     <Grid
       gridTemplateColumns={
-        successfulSearch ? "minmax(0,3.5fr) minmax(0,15rem)" : "minmax(0,5fr)"
+        successfulSearch
+          ? "minmax(0,1fr) minmax(0,3.5fr) minmax(0,15rem)"
+          : "minmax(0,5fr)"
       }
       justifyContent="center"
     >
+      {successfulSearch && <LeftSidebar />}
       <Container maxW="container.xl" p={8}>
-        {/* {successfulSearch && (
-    <AfterSearch
-          zone1name={zoneDetails.zone_1.name}
-          zone2name={zoneDetails.zone_2.name}
-          style={{ float: "right" }}
-        />
-      )} */}
         {!successfulSearch && (
           <Stack
             spacing={8}
@@ -194,6 +200,15 @@ function ZoneComparison() {
           </CompareContext.Provider>
         )}
       </Container>
+      {successfulSearch && (
+        <>
+          <AfterSearch
+            zone1name={zoneDetails.zone_1.name}
+            zone2name={zoneDetails.zone_2.name}
+            style={{ float: "right" }}
+          />
+        </>
+      )}
     </Grid>
   );
 }

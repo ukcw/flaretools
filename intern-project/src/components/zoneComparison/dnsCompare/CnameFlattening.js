@@ -90,7 +90,9 @@ const CnameFlattening = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">CNAME Flattening</Heading>
+        <Heading size="md" id={props.id}>
+          CNAME Flattening
+        </Heading>
       </HStack>
       {!cnameFlatteningData && <LoadingBox />}
       {cnameFlatteningData && (
