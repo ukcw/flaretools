@@ -110,7 +110,9 @@ const SslSetting = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">SSL Setting</Heading>
+        <Heading size="md" id={props.id}>
+          SSL Setting
+        </Heading>
       </HStack>
       {!sslSettingData && <LoadingBox />}
       {sslSettingData && (

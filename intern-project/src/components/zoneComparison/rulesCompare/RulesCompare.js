@@ -28,16 +28,11 @@ const RulesCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Rules</Heading>
-        <PageRules />
-        <UrlRewrite />
-        <HttpRequestHeaderMod />
-        <HttpResponseHeaderMod />
-        <NormalizationRules />
-        {/* {rulesData ? (
-          <RulesSubcategories data={rulesData.normalization_settings} />
-        ) : (
-          <LoadingBox />
-        )} */}
+        <PageRules id="page_rules" />
+        <UrlRewrite id="url_rewrite" />
+        <HttpRequestHeaderMod id="http_request_header_modification" />
+        <HttpResponseHeaderMod id="http_response_header_modification" />
+        <NormalizationRules id="normalization_settings" />
       </Stack>
     </Container>
   );

@@ -143,7 +143,9 @@ const RateLimiting = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Rate Limiting</Heading>
+        <Heading size="md" id={props.id}>
+          Rate Limiting
+        </Heading>
       </HStack>
       {!rateLimitingData && <LoadingBox />}
       {rateLimitingData && (

@@ -132,7 +132,9 @@ const Minify = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Minify</Heading>
+      <Heading size="md" id={props.id}>
+        Minify
+      </Heading>
       {!minifyData && <LoadingBox />}
       {minifyData && (
         <Table {...getTableProps}>

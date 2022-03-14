@@ -144,7 +144,9 @@ const SslSubcategories = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">SSL Subcategories</Heading>
+      <Heading size="md" id={props.id}>
+        SSL Subcategories
+      </Heading>
       {!sslSubcategoriesData && <LoadingBox />}
       {sslSubcategoriesData && (
         <Table {...getTableProps}>

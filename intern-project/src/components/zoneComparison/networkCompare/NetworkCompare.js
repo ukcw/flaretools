@@ -21,7 +21,7 @@ const NetworkCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Network</Heading>
-        <NetworkSubcategories />
+        <NetworkSubcategories id="network_subcategories" />
       </Stack>
     </Container>
   );

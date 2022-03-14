@@ -111,7 +111,9 @@ const CustomRulesFirewall = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Custom Rules Firewall</Heading>
+        <Heading size="md" id={props.id}>
+          Custom Rules Firewall
+        </Heading>
       </HStack>
       {!customRulesFirewallData && <LoadingBox />}
       {customRulesFirewallData && (

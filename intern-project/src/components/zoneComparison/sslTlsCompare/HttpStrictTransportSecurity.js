@@ -92,7 +92,9 @@ const HttpStrictTransportSecurity = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">HTTP Strict Transport Security</Heading>
+      <Heading size="md" id={props.id}>
+        HTTP Strict Transport Security
+      </Heading>
       {!hstsData && <LoadingBox />}
       {hstsData && (
         <Table {...getTableProps}>

@@ -156,7 +156,9 @@ const NormalizationRules = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Normalization Settings</Heading>
+      <Heading size="md" id={props.id}>
+        Normalization Settings
+      </Heading>
       {!normalizationRulesData && <LoadingBox />}
       {normalizationRulesData && (
         <Table {...getTableProps}>

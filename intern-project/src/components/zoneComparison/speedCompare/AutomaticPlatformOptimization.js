@@ -149,7 +149,9 @@ const AutomaticPlatformOptimization = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Automatic Platform Optimization</Heading>
+      <Heading size="md" id={props.id}>
+        Automatic Platform Optimization
+      </Heading>
       {!automaticPlatformOptimizationData && <LoadingBox />}
       {automaticPlatformOptimizationData && (
         <Table {...getTableProps}>

@@ -146,7 +146,9 @@ const CustomHostnames = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Custom Hostnames</Heading>
+      <Heading size="md" id={props.id}>
+        Custom Hostnames
+      </Heading>
       {!customHostnamesData && <LoadingBox />}
       {customHostnamesData && (
         <Table {...getTableProps}>

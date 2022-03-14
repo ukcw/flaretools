@@ -15,7 +15,7 @@ const SpectrumCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Spectrum</Heading>
-        <SpectrumApplications />
+        <SpectrumApplications id="spectrum_applications" />
       </Stack>
     </Container>
   );

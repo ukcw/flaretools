@@ -171,7 +171,9 @@ const DdosProtection = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">HTTP DDoS attack protection</Heading>
+        <Heading size="md" id={props.id}>
+          HTTP DDoS attack protection
+        </Heading>
       </HStack>
       {!ddosProtectionData && <LoadingBox />}
       {ddosProtectionData && (

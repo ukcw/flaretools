@@ -98,7 +98,9 @@ const HttpRoutes = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">HTTP Routes</Heading>
+      <Heading size="md" id={props.id}>
+        HTTP Routes
+      </Heading>
       {!httpRoutesData && <LoadingBox />}
       {httpRoutesData && (
         <Table {...getTableProps}>

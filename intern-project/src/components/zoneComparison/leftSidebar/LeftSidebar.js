@@ -18,7 +18,6 @@ import { Humanize, ZoneComparisonLeftSidebarData } from "../../../utils/utils";
 const LeftSidebar = (props) => {
   return (
     <VStack
-      p={8}
       mt={16}
       ml={16}
       borderColor="#ccc"

@@ -129,7 +129,9 @@ const ScrapeShieldSubcategories = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Scrape Shield Subcategories</Heading>
+      <Heading size="md" id={props.id}>
+        Scrape Shield Subcategories
+      </Heading>
       {!scrapeShieldSubcategoriesData && <LoadingBox />}
       {scrapeShieldSubcategoriesData && (
         <Table {...getTableProps}>

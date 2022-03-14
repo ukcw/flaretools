@@ -109,7 +109,9 @@ const UserAgentBlocking = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">User Agent Blocking</Heading>
+        <Heading size="md" id={props.id}>
+          User Agent Blocking
+        </Heading>
         {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!userAgentBlockingData && <LoadingBox />}

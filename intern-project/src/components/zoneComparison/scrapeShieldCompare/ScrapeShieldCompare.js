@@ -21,7 +21,7 @@ const ScrapeShieldCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Scrape Shield</Heading>
-        <ScrapeShieldSubcategories />
+        <ScrapeShieldSubcategories id="scrape_shield_subcategories" />
       </Stack>
     </Container>
   );

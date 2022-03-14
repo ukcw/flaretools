@@ -21,7 +21,7 @@ const TrafficCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Traffic</Heading>
-        <LoadBalancers />
+        <LoadBalancers id="load_balancers" />
       </Stack>
     </Container>
   );

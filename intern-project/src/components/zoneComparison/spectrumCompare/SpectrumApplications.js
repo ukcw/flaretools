@@ -145,7 +145,9 @@ const SpectrumApplications = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Spectrum Applications</Heading>
+      <Heading size="md" id={props.id}>
+        Spectrum Applications
+      </Heading>
       {!spectrumApplicationsData && <LoadingBox />}
       {spectrumApplicationsData && (
         <Table style={{ tableLayout: "auto" }} {...getTableProps}>

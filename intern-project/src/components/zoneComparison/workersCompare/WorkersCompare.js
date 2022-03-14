@@ -21,7 +21,7 @@ const WorkersCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Workers</Heading>
-        <HttpRoutes />
+        <HttpRoutes id="http_routes" />
       </Stack>
     </Container>
   );

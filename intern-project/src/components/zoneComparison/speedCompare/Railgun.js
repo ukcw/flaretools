@@ -106,7 +106,9 @@ const Railgun = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Railguns</Heading>
+      <Heading size="md" id={props.id}>
+        Railguns
+      </Heading>
       {!railgunData && <LoadingBox />}
       {railgunData && (
         <Table {...getTableProps}>

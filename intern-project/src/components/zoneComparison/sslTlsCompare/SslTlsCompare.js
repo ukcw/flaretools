@@ -24,11 +24,11 @@ const SslTlsCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">SSL</Heading>
-        <SslSetting />
-        <EdgeCertificates />
-        <HttpStrictTransportSecurity />
-        <CustomHostnames />
-        <SslSubcategories />
+        <SslSetting id="ssl_setting" />
+        <EdgeCertificates id="edge_certificates" />
+        <HttpStrictTransportSecurity id="http_strict_transport_security" />
+        <CustomHostnames id="custom_hostnames" />
+        <SslSubcategories id="ssl_subcategories" />
       </Stack>
     </Container>
   );

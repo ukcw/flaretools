@@ -148,7 +148,9 @@ const CachingSubcategories = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Caching Subcategories</Heading>
+      <Heading size="md" id={props.id}>
+        Caching Subcategories
+      </Heading>
       {!cachingSubcategoriesData && <LoadingBox />}
       {cachingSubcategoriesData && (
         <Table {...getTableProps}>

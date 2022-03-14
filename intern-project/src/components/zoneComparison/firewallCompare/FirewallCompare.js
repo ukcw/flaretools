@@ -90,15 +90,15 @@ const FirewallViewer = (props) => {
           <LoadingBox />
         )} */}
         <ManagedRules />
-        <CustomRulesFirewall />
-        <CustomRulesRateLimits />
-        <FirewallRules />
-        <DdosProtection />
-        <IpAccessRules />
-        <RateLimiting />
-        <UserAgentBlocking />
-        <ZoneLockdown />
-        <FirewallSubcategories />
+        <CustomRulesFirewall id="custom_rules_firewall" />
+        <CustomRulesRateLimits id="custom_rules_rate_limits" />
+        <FirewallRules id="firewall_rules" />
+        <DdosProtection id="http_ddos_attack_protection" />
+        <IpAccessRules id="ip_access_rules" />
+        <RateLimiting id="rate_limiting" />
+        <UserAgentBlocking id="user_agent_blocking" />
+        <ZoneLockdown id="zone_lockdown" />
+        <FirewallSubcategories id="firewall_subcategories" />
       </Stack>
     </Container>
   );

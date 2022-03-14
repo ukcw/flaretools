@@ -25,11 +25,11 @@ const SpeedCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Speed</Heading>
-        <AutomaticPlatformOptimization />
-        <MobileRedirect />
-        <Minify />
-        <Railgun />
-        <SpeedSubcategories />
+        <AutomaticPlatformOptimization id="automatic_platform_optimization" />
+        <MobileRedirect id="mobile_redirect" />
+        <Minify id="minify" />
+        <Railgun id="railguns" />
+        <SpeedSubcategories id="speed_subcategories" />
       </Stack>
     </Container>
   );

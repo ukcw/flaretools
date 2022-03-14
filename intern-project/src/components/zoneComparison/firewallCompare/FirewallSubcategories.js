@@ -132,7 +132,9 @@ const FirewallSubcategories = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Firewall Subcategories</Heading>
+      <Heading size="md" id={props.id}>
+        Firewall Subcategories
+      </Heading>
       {!firewallSubcategoriesData && <LoadingBox />}
       {firewallSubcategoriesData && (
         <Table {...getTableProps}>

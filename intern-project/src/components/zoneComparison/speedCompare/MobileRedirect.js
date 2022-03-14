@@ -137,7 +137,9 @@ const MobileRedirect = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Mobile Redirect</Heading>
+      <Heading size="md" id={props.id}>
+        Mobile Redirect
+      </Heading>
       {!mobileRedirectData && <LoadingBox />}
       {mobileRedirectData && (
         <Table {...getTableProps}>

@@ -222,7 +222,9 @@ const HttpRequestHeaderMod = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">HTTP Request Header Modification</Heading>
+        <Heading size="md" id={props.id}>
+          HTTP Request Header Modification
+        </Heading>
       </HStack>
       {!httpRequestHeaderModData && <LoadingBox />}
       {httpRequestHeaderModData && (

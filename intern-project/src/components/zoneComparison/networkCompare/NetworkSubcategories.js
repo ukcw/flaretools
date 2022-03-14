@@ -141,7 +141,9 @@ const NetworkSubcategories = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Network Subcategories</Heading>
+      <Heading size="md" id={props.id}>
+        Network Subcategories
+      </Heading>
       {!networkSubcategoriesData && <LoadingBox />}
       {networkSubcategoriesData && (
         <Table {...getTableProps}>

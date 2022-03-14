@@ -162,7 +162,9 @@ const PageRules = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Page Rules</Heading>
+        <Heading size="md" id={props.id}>
+          Page Rules
+        </Heading>
       </HStack>
       {console.log("ADD CONDITIONS TO MATCH")}
       {!pageRulesData && <LoadingBox />}

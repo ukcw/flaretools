@@ -206,7 +206,9 @@ const UrlRewrite = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">URL Rewrite</Heading>
+        <Heading size="md" id={props.id}>
+          URL Rewrite
+        </Heading>
       </HStack>
       {!urlRewriteData && <LoadingBox />}
       {urlRewriteData && (

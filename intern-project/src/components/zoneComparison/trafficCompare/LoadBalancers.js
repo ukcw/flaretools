@@ -179,7 +179,9 @@ const LoadBalancers = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Load Balancers</Heading>
+        <Heading size="md" id={props.id}>
+          Load Balancers
+        </Heading>
       </HStack>
       {!loadBalancersData && <LoadingBox />}
       {loadBalancersData && (

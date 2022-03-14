@@ -111,7 +111,9 @@ const CustomRulesRateLimits = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Custom Rules Rate Limits</Heading>
+        <Heading size="md" id={props.id}>
+          Custom Rules Rate Limits
+        </Heading>
       </HStack>
       {!customRulesRateLimitsData && <LoadingBox />}
       {customRulesRateLimitsData && (

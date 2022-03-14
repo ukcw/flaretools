@@ -21,7 +21,7 @@ const CachingCompare = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Caching</Heading>
-        <CachingSubcategories />
+        <CachingSubcategories id="caching_subcategories" />
       </Stack>
     </Container>
   );
