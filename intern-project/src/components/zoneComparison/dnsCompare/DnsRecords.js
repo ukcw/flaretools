@@ -27,7 +27,8 @@ const conditionsToMatch = (base, toCompare) =>
   base.type === toCompare.type &&
   base.name === toCompare.name &&
   base.content === toCompare.content &&
-  base.proxied === toCompare.proxied;
+  base.proxied === toCompare.proxied &&
+  base.ttl === toCompare.ttl;
 
 const DnsRecords = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
