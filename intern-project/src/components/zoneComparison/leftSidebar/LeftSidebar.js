@@ -5,8 +5,6 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Flex,
-  Heading,
   Link,
   List,
   ListItem,
@@ -28,7 +26,7 @@ const LeftSidebar = (props) => {
       <Accordion allowMultiple allowToggle w="100%">
         {Object.keys(ZoneComparisonLeftSidebarData).map((key) => {
           return (
-            <AccordionItem>
+            <AccordionItem key={key}>
               <h2>
                 <AccordionButton>
                   <AccordionIcon />
@@ -41,7 +39,7 @@ const LeftSidebar = (props) => {
                 <List>
                   {ZoneComparisonLeftSidebarData[key].map((subcategory) => {
                     return (
-                      <ListItem>
+                      <ListItem key={subcategory}>
                         <Link href={`/zone-comparison/#${subcategory}`}>
                           {Humanize(subcategory)}
                         </Link>
