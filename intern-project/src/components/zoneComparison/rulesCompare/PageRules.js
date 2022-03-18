@@ -76,7 +76,10 @@ const ActionsOutput = (actionsArr) => {
   return toBeConcatenatedActions.join(", ");
 };
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  // match on actions array
+  // targets -> constraint
+};
 
 const PageRules = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -94,6 +97,8 @@ const PageRules = (props) => {
         newObj["result"] = makeData(zone.resp.result);
         return newObj;
       });
+      console.log("CHECKED - ADD CONDITIONS TO MATCH");
+      // console.log(processedResp);
       setPageRulesData(processedResp);
     }
     setPageRulesData();
@@ -166,7 +171,6 @@ const PageRules = (props) => {
           Page Rules
         </Heading>
       </HStack>
-      {console.log("ADD CONDITIONS TO MATCH")}
       {!pageRulesData && <LoadingBox />}
       {pageRulesData && (
         <Table {...getTableProps}>

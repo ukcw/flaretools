@@ -24,6 +24,7 @@ import LoadingBox from "../../LoadingBox";
 
 const conditionsToMatch = (base, toCompare) => {
   // to be implemented
+  // match on hosts, certificates->expiry, certificates->signature, type, status
 };
 
 const EdgeCertificates = (props) => {
@@ -38,7 +39,8 @@ const EdgeCertificates = (props) => {
         "/ssl/certificate_packs"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log("ADD CONDITIONS TO MATCH");
+      console.log("CHECKED - ADD CONDITIONS TO MATCH");
+      // console.log(processedResp);
       setEdgeCertificatesData(processedResp);
     }
     setEdgeCertificatesData();

@@ -66,6 +66,7 @@ const ZoneLockdown = (props) => {
       );
       console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => zone.resp);
+      console.log(processedResp);
       setZoneLockdownData(processedResp);
     }
     setZoneLockdownData();

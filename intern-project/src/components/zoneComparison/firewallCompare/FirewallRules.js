@@ -33,7 +33,12 @@ const ConcatenateExpressions = (expr) => {
   return output.join(", ");
 };
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  // match on filter->expression
+  // filter->paused
+  // action
+  // products (only exists if action == bypassed)
+};
 
 const FirewallRules = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -46,7 +51,7 @@ const FirewallRules = (props) => {
         credentials,
         "/firewall/rules"
       );
-      console.log("ADD CONDITIONS TO MATCH");
+      console.log("CHECKED - ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => zone.resp);
       setFirewallRulesData(processedResp);
     }

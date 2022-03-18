@@ -24,7 +24,51 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  const isRateLimitSame = (base, other) => {
+    if (base?.ratelimit === undefined && other?.ratelimit === undefined) {
+      return true;
+    } else if (
+      base?.ratelimit === undefined ||
+      other?.ratelimit === undefined
+    ) {
+      return false;
+    } else {
+      const rateLimitKeys = Object.keys(base.ratelimit);
+      let sameFlag = true;
+      rateLimitKeys.forEach((key) => {
+        if (key === "characteristics" && key in other.ratelimit) {
+          base.ratelimit[key].forEach((char) => {
+            if (!other.ratelimit[key].includes(char)) {
+              sameFlag = false;
+            }
+          });
+        } else if (
+          (key === "mitigation_timeout" ||
+            key === "period" ||
+            key === "requests_per_period") &&
+          key in other.ratelimit
+        ) {
+          if (base.ratelimit[key] !== other.ratelimit[key]) {
+            sameFlag = false;
+          }
+        }
+      });
+      return sameFlag;
+    }
+  };
+
+  return (
+    base.action === toCompare.action && // action
+    base.enabled === toCompare.enabled && // enabled
+    base.expression === toCompare.expression && // expression
+    isRateLimitSame(base, toCompare)
+  );
+  // ratelimit -> characteristics
+  // ratelimit -> mitigation_timeout
+  // ratelimit -> period
+  // ratelimit -> requests_per_period
+};
 
 const CustomRulesRateLimits = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -37,7 +81,6 @@ const CustomRulesRateLimits = (props) => {
         credentials,
         "/rulesets/phases/http_ratelimit/entrypoint"
       );
-      console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.resp };
         newObj.result?.rules !== undefined
