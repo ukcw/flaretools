@@ -67,6 +67,7 @@ const CustomHostnames = (props) => {
       {
         Header: "Custom Hostname",
         accessor: "hostname",
+        maxWidth: 130,
       },
       {
         Header: "SSL/TLS Certification Status",
@@ -127,6 +128,7 @@ const CustomHostnames = (props) => {
             return "Default";
           }
         },
+        maxWidth: 130,
       },
     ];
 
@@ -177,7 +179,13 @@ const CustomHostnames = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
+                      <Th
+                        {...column.getHeaderProps({
+                          style: {
+                            maxWidth: column.maxWidth,
+                          },
+                        })}
+                      >
                         {
                           // Render the header
                           column.render("Header")
@@ -204,7 +212,13 @@ const CustomHostnames = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td {...cell.getCellProps()}>
+                          <Td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                              },
+                            })}
+                          >
                             {
                               // Render the cell contents
                               cell.render("Cell")

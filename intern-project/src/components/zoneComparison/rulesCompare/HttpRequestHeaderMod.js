@@ -135,10 +135,12 @@ const HttpRequestHeaderMod = (props) => {
             </VStack>
           );
         },
+        maxWidth: 150,
       },
       {
         Header: "Expression",
         accessor: "expression",
+        maxWidth: 150,
       },
       {
         Header: "Then...",
@@ -183,6 +185,7 @@ const HttpRequestHeaderMod = (props) => {
             });
           }
         },
+        maxWidth: 200,
       },
       {
         Header: "Status",
@@ -246,7 +249,13 @@ const HttpRequestHeaderMod = (props) => {
                     // Loop over the headers in each row
                     headerGroup.headers.map((column) => (
                       // Apply the header cell props
-                      <Th {...column.getHeaderProps()}>
+                      <Th
+                        {...column.getHeaderProps({
+                          style: {
+                            maxWidth: column.maxWidth,
+                          },
+                        })}
+                      >
                         {
                           // Render the header
                           column.render("Header")
@@ -273,7 +282,13 @@ const HttpRequestHeaderMod = (props) => {
                       row.cells.map((cell) => {
                         // Apply the cell props
                         return (
-                          <Td {...cell.getCellProps()}>
+                          <Td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                              },
+                            })}
+                          >
                             {
                               // Render the cell contents
                               cell.render("Cell")

@@ -90,11 +90,13 @@ const SpectrumApplications = (props) => {
         accessor: (row) => row.edge_ips.connectivity,
         Cell: (props) =>
           props.value === "all" ? "IPv4 + IPv6" : `${Humanize(props.value)}`,
+        maxWidth: 130,
       },
       {
         Header: "TLS",
         accessor: "tls",
         Cell: (props) => Humanize(props.value),
+        maxWidth: 130,
       },
       {
         Header: "Argo Smart Routing",
@@ -115,11 +117,13 @@ const SpectrumApplications = (props) => {
           ) : (
             <CloseIcon color={"red"} />
           ),
+        maxWidth: 130,
       },
       {
         Header: "Proxy Protocols",
         accessor: "proxy_protocol",
         Cell: (props) => Humanize(props.value),
+        maxWidth: 130,
       },
     ];
 

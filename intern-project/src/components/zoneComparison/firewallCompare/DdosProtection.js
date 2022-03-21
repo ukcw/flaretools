@@ -114,12 +114,12 @@ const DdosProtection = (props) => {
       {
         Header: "Rule ID",
         accessor: "id",
-        maxWidth: 200,
+        maxWidth: 180,
       },
       {
         Header: "Description",
         accessor: "description",
-        maxWidth: 300,
+        maxWidth: 180,
       },
       {
         Header: "Tags",
@@ -135,13 +135,13 @@ const DdosProtection = (props) => {
         Header: "Action",
         accessor: "action",
         Cell: (props) => Humanize(props.value),
-        maxWidth: 120,
+        maxWidth: 100,
       },
       {
         Header: "Sensitivity",
         accessor: "sensitivity_level",
         Cell: (props) => Humanize(props.value),
-        maxWidth: 120,
+        maxWidth: 100,
       },
     ];
     const dynamicHeaders =

@@ -89,6 +89,7 @@ const FirewallRules = (props) => {
         Header: "Action",
         accessor: "action",
         Cell: (props) => Humanize(props.value),
+        maxWidth: 170,
       },
       {
         Header: "Description",
@@ -102,13 +103,13 @@ const FirewallRules = (props) => {
             </VStack>
           );
         },
-        maxWidth: 350,
+        maxWidth: 170,
       },
       {
         Header: "Expression",
         accessor: (row) => row.filter.expression,
         Cell: (props) => <Text>{props.value}</Text>,
-        maxWidth: 380,
+        maxWidth: 170,
       },
       {
         Header: "Enabled",
