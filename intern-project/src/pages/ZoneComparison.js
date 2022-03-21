@@ -1,25 +1,13 @@
 //import logo from "./logo.svg";
 import React, { useRef, useState } from "react";
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
   Button,
   Container,
-  Flex,
   Grid,
-  GridItem,
   Heading,
   Input,
   InputGroup,
   InputLeftAddon,
-  Link,
-  List,
-  ListItem,
-  SimpleGrid,
   Stack,
 } from "@chakra-ui/react";
 import { getMultipleZoneSettings } from "../utils/utils";
