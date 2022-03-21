@@ -45,6 +45,27 @@ const Navbar = (props) => {
             </Link>
           </PopoverTrigger>
         </Popover>
+
+        <Popover trigger={"hover"} placement={"bottom-start"}>
+          <PopoverTrigger>
+            <Link
+              p={2}
+              as={ReachLink}
+              to="/zone-comparison"
+              fontSize={"md"}
+              fontWeight={500}
+              color={linkColor}
+              rounded={"xl"}
+              _hover={{
+                textDecoration: "none",
+                color: linkHoverColor,
+                bg: useColorModeValue("gray.300", "gray.900"),
+              }}
+            >
+              Zone Comparison
+            </Link>
+          </PopoverTrigger>
+        </Popover>
       </Flex>
     </Box>
   );
