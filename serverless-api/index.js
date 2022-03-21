@@ -759,12 +759,23 @@ router.post('/firewall/rules', async request => {
 })
 
 // WAF Setting
-router.post('/firewall/rules', async request => {
+router.post('/settings/waf', async request => {
   const { query } = await request.json()
-  return FetchRequest(query.zoneId, query.apiToken, '/firewall/rules')
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/waf')
 })
 
 // managed_rulesets_results, to be added
+router.post(
+  '/rulesets/phases/http_request_firewall_managed/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return FetchRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_request_firewall_managed/entrypoint',
+    )
+  },
+)
 
 // Rulesets
 router.post('/rulesets', async request => {
