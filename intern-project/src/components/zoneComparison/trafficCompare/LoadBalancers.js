@@ -12,6 +12,7 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -27,7 +28,20 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    _.isEqual(base.default_pools, toCompare.default_pools) &&
+    _.isEqual(base.fallback_pool, toCompare.fallback_pool) &&
+    base.enabled === toCompare.enabled &&
+    base.proxied === toCompare.proxied &&
+    base.session_affinity === toCompare.session_affinity &&
+    _.isEqual(
+      base.session_affinity_attributes,
+      toCompare.session_affinity_attributes
+    ) &&
+    base.steering_policy === toCompare.steering_policy
+  );
+};
 
 const LoadBalancers = (props) => {
   const { zoneKeys, credentials, zoneDetails } = useCompareContext();
@@ -52,7 +66,6 @@ const LoadBalancers = (props) => {
         zone.result.forEach((lb) => {
           lb["pools"] = processRespPool[idx].result;
         });
-        console.log("ADD CONDITIONS TO MATCH");
         setLoadBalancersData(processedResp);
       });
     }

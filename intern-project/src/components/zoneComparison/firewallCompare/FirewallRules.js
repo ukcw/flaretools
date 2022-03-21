@@ -34,10 +34,31 @@ const ConcatenateExpressions = (expr) => {
 };
 
 const conditionsToMatch = (base, toCompare) => {
-  // match on filter->expression
-  // filter->paused
-  // action
-  // products (only exists if action == bypassed)
+  const checkProducts = (base, toCompare) => {
+    if (base.action === "bypassed") {
+      if (toCompare === "bypassed") {
+        const baseProducts = base.products;
+        const toCompareProducts = toCompare.products;
+        baseProducts.forEach((prod) => {
+          if (toCompareProducts.includes(prod) === false) {
+            return false;
+          }
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return base.action === toCompare.action ? true : false;
+    }
+  };
+
+  return (
+    base.filter.expression === toCompare.filter.expression && // match on filter->expression
+    base.filter.paused === toCompare.filter.paused && // filter->paused
+    base.action === toCompare.action && // action
+    checkProducts(base, toCompare)
+  ); // products (only exists if action == bypassed)
 };
 
 const FirewallRules = (props) => {
@@ -51,7 +72,6 @@ const FirewallRules = (props) => {
         credentials,
         "/firewall/rules"
       );
-      console.log("CHECKED - ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => zone.resp);
       setFirewallRulesData(processedResp);
     }

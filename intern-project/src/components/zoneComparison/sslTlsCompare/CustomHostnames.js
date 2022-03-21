@@ -25,7 +25,12 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    base.hostname === toCompare.hostname &&
+    base.ssl.status === toCompare.ssl.status
+  );
+};
 
 const CustomHostnames = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -39,7 +44,6 @@ const CustomHostnames = (props) => {
         "/custom_hostnames"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log("ADD CONDITIONS TO MATCH");
       setcustomHostnamesData(processedResp);
     }
     setcustomHostnamesData();

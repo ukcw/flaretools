@@ -9,6 +9,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -23,7 +24,18 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    _.isEqual(base.dns, toCompare.dns) &&
+    _.isEqual(base.edge_ips, toCompare.edge_ips) &&
+    base.ip_firewall === toCompare.ip_firewall &&
+    _.isEqual(base.origin_direct, toCompare.origin_direct) &&
+    base.protocol === toCompare.protocol &&
+    base.proxy_protocol === toCompare.proxy_protocol &&
+    base.tls === toCompare.tls &&
+    base.traffic_type === toCompare.traffic_type
+  );
+};
 
 const OriginOutput = (data) => {
   if (data.origin_dns !== undefined) {
@@ -47,7 +59,6 @@ const SpectrumApplications = (props) => {
         "/spectrum/apps"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log("ADD CONDITIONS TO MATCH");
       setSpectrumApplicationsData(processedResp);
     }
     setSpectrumApplicationsData();

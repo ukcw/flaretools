@@ -23,8 +23,32 @@ import {
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
+import _ from "lodash";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  const checkActionParameters = (base, toCompare) => {
+    if (
+      base?.action_parameters === undefined &&
+      toCompare?.action_parameters === undefined
+    ) {
+      return true;
+    } else if (
+      base?.action_parameters === undefined ||
+      toCompare?.action_parameters === undefined
+    ) {
+      return false;
+    } else {
+      return _.isEqual(base.action_parameters, toCompare.action_parameters);
+    }
+  };
+
+  return (
+    base.action === toCompare.action &&
+    base.enabled === toCompare.enabled &&
+    base.expression === toCompare.expression &&
+    checkActionParameters(base, toCompare)
+  );
+};
 
 const CustomRulesFirewall = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -37,7 +61,6 @@ const CustomRulesFirewall = (props) => {
         credentials,
         "/rulesets/phases/http_request_firewall_custom/entrypoint"
       );
-      console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.resp };
         newObj.result?.rules !== undefined

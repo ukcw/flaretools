@@ -12,6 +12,7 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -56,7 +57,28 @@ const StatusCodeOutput = (response) => {
   return "";
 };
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  const checkCorrelate = (base, toCompare) => {
+    if (base?.correlate === undefined && toCompare?.correlate === undefined) {
+      return true;
+    } else if (
+      base?.correlate === undefined ||
+      toCompare?.correlate === undefined
+    ) {
+      return false;
+    } else {
+      return _.isEqual(base.correlate, toCompare.correlate);
+    }
+  };
+  return (
+    _.isEqual(base.action, toCompare.action) &&
+    checkCorrelate(base, toCompare) &&
+    _.isEqual(base.match, toCompare.match) &&
+    base.period === toCompare.period &&
+    base.threshold === toCompare.threshold &&
+    base.disabled === toCompare.disabled
+  );
+};
 
 const RateLimiting = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -69,7 +91,6 @@ const RateLimiting = (props) => {
         credentials,
         "/rate_limits"
       );
-      console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => zone.resp);
       setRateLimitingData(processedResp);
     }

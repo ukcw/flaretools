@@ -12,6 +12,7 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -79,6 +80,12 @@ const ActionsOutput = (actionsArr) => {
 const conditionsToMatch = (base, toCompare) => {
   // match on actions array
   // targets -> constraint
+  return (
+    _.isEqual(base.actions, toCompare.actions) &&
+    base.priority === toCompare.priority &&
+    base.status === toCompare.status &&
+    _.isEqual(base.targets, toCompare.targets)
+  );
 };
 
 const PageRules = (props) => {
@@ -97,8 +104,6 @@ const PageRules = (props) => {
         newObj["result"] = makeData(zone.resp.result);
         return newObj;
       });
-      console.log("CHECKED - ADD CONDITIONS TO MATCH");
-      // console.log(processedResp);
       setPageRulesData(processedResp);
     }
     setPageRulesData();

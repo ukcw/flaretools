@@ -75,7 +75,6 @@ const Dnssec = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      {console.log("FIX OUTPUT TO TAGS")}
       <HStack w="100%" spacing={4}>
         <Heading size="md" id={props.id}>
           DNSSEC

@@ -11,6 +11,7 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -26,7 +27,14 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    _.isEqual(base.configuration === toCompare.configuration) &&
+    base.mode === toCompare.mode &&
+    base.paused === toCompare.paused &&
+    _.isEqual(base.scope, toCompare.scope)
+  );
+};
 
 const ActionName = (action) => {
   if (action === "js_challenge") {
@@ -47,7 +55,6 @@ const IpAccessRules = (props) => {
         credentials,
         "/firewall/access_rules/rules"
       );
-      console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => zone.resp);
       setIpAccessRulesData(processedResp);
     }
@@ -131,7 +138,6 @@ const IpAccessRules = (props) => {
         <Heading size="md" id={props.id}>
           IP Access Rules
         </Heading>
-        {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!ipAccessRulesData && <LoadingBox />}
       {ipAccessRulesData && (

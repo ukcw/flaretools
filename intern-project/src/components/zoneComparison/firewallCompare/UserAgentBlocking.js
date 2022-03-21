@@ -25,8 +25,15 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 import { Humanize } from "../../../utils/utils";
+import _ from "lodash";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    _.isEqual(base.configuration, toCompare.configuration) &&
+    base.mode === toCompare.mode &&
+    base.paused === toCompare.paused
+  );
+};
 
 const UserAgentBlocking = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -39,7 +46,6 @@ const UserAgentBlocking = (props) => {
         credentials,
         "/firewall/ua_rules"
       );
-      console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => zone.resp);
       setUserAgentBlockingData(processedResp);
     }

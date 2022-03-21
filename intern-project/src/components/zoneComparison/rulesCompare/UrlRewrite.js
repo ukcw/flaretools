@@ -12,6 +12,7 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -77,7 +78,15 @@ const makeData = (data) => {
   return data;
 };
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    base.action === toCompare.action &&
+    _.isEqual(base.action_parameters, toCompare.action_parameters) &&
+    base.enabled === toCompare.enabled &&
+    base.expression === toCompare.expression &&
+    base.priority === toCompare.priority
+  );
+};
 
 const UrlRewrite = (props) => {
   const { zoneKeys, credentials } = useCompareContext();
@@ -90,7 +99,6 @@ const UrlRewrite = (props) => {
         credentials,
         "/rulesets/phases/http_request_transform/entrypoint"
       );
-      console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.resp };
         newObj["result"] =

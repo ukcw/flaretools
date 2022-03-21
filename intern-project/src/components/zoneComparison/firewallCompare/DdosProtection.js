@@ -25,10 +25,12 @@ import {
 import LoadingBox from "../../LoadingBox";
 
 const conditionsToMatch = (base, toCompare) => {
-  // match on id
-  // sensitivity level
-  // action
-  // version
+  return (
+    base.id === toCompare.id && // id
+    base.sensitivity_level === toCompare.sensitivity_level && // sensitivity level
+    base.action === toCompare.action && // action
+    base.version === toCompare.version // version
+  );
 };
 
 const isOverridden = (index, overrideArray, ruleId) => {
@@ -72,7 +74,6 @@ const DdosProtection = (props) => {
         credentials,
         "/rulesets/phases/ddos_l7/entrypoint"
       );
-      console.log("CHECKED - ADD CONDITIONS TO MATCH");
       const processedOverrideResp = overrideResp.map((zone) => zone.resp);
       const ddosResp = await getMultipleZoneSettings(
         zoneKeys,

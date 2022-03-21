@@ -24,7 +24,42 @@ import LoadingBox from "../../LoadingBox";
 
 const conditionsToMatch = (base, toCompare) => {
   // to be implemented
-  // match on hosts, certificates->expiry, certificates->signature, type, status
+  const checkHosts = (base, toCompare) => {
+    base.hosts.forEach((host) => {
+      if (toCompare.hosts.includes(host) === false) {
+        return false;
+      }
+    });
+    return true;
+  };
+
+  const checkExpiry = (base, toCompare) => {
+    return (
+      base.certificates[0].expires_on === toCompare.certificates[0].expires_on
+    );
+  };
+
+  const checkSignature = (base, toCompare) => {
+    if (base.certificates.length !== toCompare.certificates.length) {
+      return false;
+    } else {
+      for (let i = 0; i < base.certificates.length; i++) {
+        if (
+          base.certificates[i].signature !== toCompare.certificates[i].signature
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }
+  };
+  return (
+    checkHosts(base, toCompare) && // hosts
+    checkExpiry(base, toCompare) && // certificates->expiry
+    checkSignature(base, toCompare) && // certificates->signature
+    base.type === toCompare.type && // type
+    base.status === toCompare.status // status
+  );
 };
 
 const EdgeCertificates = (props) => {
@@ -39,8 +74,6 @@ const EdgeCertificates = (props) => {
         "/ssl/certificate_packs"
       );
       const processedResp = resp.map((zone) => zone.resp);
-      console.log("CHECKED - ADD CONDITIONS TO MATCH");
-      // console.log(processedResp);
       setEdgeCertificatesData(processedResp);
     }
     setEdgeCertificatesData();

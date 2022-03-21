@@ -12,6 +12,7 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -25,7 +26,13 @@ import {
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 
-const conditionsToMatch = (base, toCompare) => {};
+const conditionsToMatch = (base, toCompare) => {
+  return (
+    _.isEqual(base.configurations, toCompare.configurations) &&
+    base.paused === toCompare.paused &&
+    _.isEqual(base.urls, toCompare.urls)
+  );
+};
 
 const SubDescription = (result) => {
   let numberOfUrls = null;
@@ -64,9 +71,7 @@ const ZoneLockdown = (props) => {
         credentials,
         "/firewall/lockdowns"
       );
-      console.log("ADD CONDITIONS TO MATCH");
       const processedResp = resp.map((zone) => zone.resp);
-      console.log(processedResp);
       setZoneLockdownData(processedResp);
     }
     setZoneLockdownData();
