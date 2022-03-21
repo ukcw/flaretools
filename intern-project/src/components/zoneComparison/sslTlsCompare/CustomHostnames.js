@@ -26,9 +26,21 @@ import {
 import LoadingBox from "../../LoadingBox";
 
 const conditionsToMatch = (base, toCompare) => {
+  const checkSslStatus = (base, toCompare) => {
+    if (base.ssl?.status === undefined && toCompare.ssl?.status === undefined) {
+      return true;
+    } else if (
+      base.ssl?.status === undefined ||
+      toCompare.ssl?.status === undefined
+    ) {
+      return false;
+    } else {
+      return base.ssl.status === toCompare.ssl.status;
+    }
+  };
+
   return (
-    base.hostname === toCompare.hostname &&
-    base.ssl.status === toCompare.ssl.status
+    base.hostname === toCompare.hostname && checkSslStatus(base, toCompare)
   );
 };
 

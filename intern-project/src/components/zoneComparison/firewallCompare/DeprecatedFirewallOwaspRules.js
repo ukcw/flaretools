@@ -57,7 +57,6 @@ const DeprecatedFirewallOwaspRules = (props) => {
         }
         return newObj;
       });
-      console.log(processedResp);
       setDeprecatedFirewallOwaspRulesData(processedResp);
     }
     setDeprecatedFirewallOwaspRulesData();
