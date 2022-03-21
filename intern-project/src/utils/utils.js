@@ -74,6 +74,10 @@ export const Humanize = (str) => {
         frags[i] = "JS";
       } else if (frags[i] === "0rtt") {
         frags[i] = "0-RTT Connection Resumption";
+      } else if (frags[i] === "owasp") {
+        frags[i] = "OWASP";
+      } else if (frags[i] === "modsecurity") {
+        frags[i] = "ModSecurity";
       } else {
         frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
       }
@@ -751,6 +755,9 @@ export const ZoneComparisonLeftSidebarData = {
     "ssl_subcategories",
   ],
   Firewall: [
+    "managed_rules",
+    "cloudflare_managed_ruleset",
+    "owasp_modsecurity_core_ruleset",
     "custom_rules_firewall",
     "custom_rules_rate_limits",
     "firewall_rules",

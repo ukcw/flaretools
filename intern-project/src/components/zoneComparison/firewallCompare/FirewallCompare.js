@@ -91,7 +91,7 @@ const FirewallViewer = (props) => {
         ) : (
           <LoadingBox />
         )} */}
-        <ManagedRules />
+        <ManagedRules id="managed_rules" />
         <DeprecatedFirewallCfRules id="cloudflare_managed_ruleset" />
         <DeprecatedFirewallOwaspRules id="owasp_modsecurity_core_ruleset" />
         <CustomRulesFirewall id="custom_rules_firewall" />

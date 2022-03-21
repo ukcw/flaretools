@@ -118,7 +118,9 @@ const DeprecatedFirewallCfRules = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Deprecated: Cloudflare Managed Ruleset</Heading>
+        <Heading size="md" id={props.id}>
+          Deprecated: Cloudflare Managed Ruleset
+        </Heading>
       </HStack>
       {!deprecatedFirewallCfRulesData && <LoadingBox />}
       {deprecatedFirewallCfRulesData && (

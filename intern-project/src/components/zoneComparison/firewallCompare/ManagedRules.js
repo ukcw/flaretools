@@ -124,7 +124,9 @@ const ManagedRules = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Managed Rules</Heading>
+        <Heading size="md" id={props.id}>
+          Managed Rules
+        </Heading>
       </HStack>
       {!managedRulesData && <LoadingBox />}
       {managedRulesData && (

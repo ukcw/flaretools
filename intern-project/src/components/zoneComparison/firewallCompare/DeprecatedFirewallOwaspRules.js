@@ -120,7 +120,9 @@ const DeprecatedFirewallOwaspRules = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Deprecated: OWASP ModSecurity Core Rule Set</Heading>
+        <Heading size="md" id={props.id}>
+          Deprecated: OWASP ModSecurity Core Rule Set
+        </Heading>
       </HStack>
       {!deprecatedFirewallOwaspRulesData && <LoadingBox />}
       {deprecatedFirewallOwaspRulesData && (
