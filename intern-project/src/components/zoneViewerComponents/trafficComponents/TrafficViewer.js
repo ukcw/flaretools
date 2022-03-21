@@ -46,6 +46,7 @@ const TrafficViewer = (props) => {
         <Heading size="xl">Traffic</Heading>
         {trafficData?.load_balancers && trafficData?.load_balancers_pools ? (
           <LoadBalancers
+            id="load_balancers"
             data={trafficData.load_balancers}
             pools={trafficData.load_balancers_pools}
           />

@@ -789,3 +789,52 @@ export const ZoneComparisonLeftSidebarData = {
   "Scrape Shield": ["scrape_shield_subcategories"],
   Spectrum: ["spectrum_applications"],
 };
+
+export const ZoneViewerLeftSidebarData = {
+  DNS: [
+    "dns_management",
+    "cloudflare_nameservers",
+    "custom_nameservers",
+    "dnssec",
+    "cname_flattening",
+  ],
+  "SSL/TLS": [
+    "ssl_setting",
+    "edge_certificates",
+    "http_strict_transport_security",
+    "custom_hostnames",
+    "ssl_subcategories",
+  ],
+  Firewall: [
+    "web_application_firewall",
+    //"custom_rules_firewall",
+    //"custom_rules_rate_limits",
+    "firewall_rules",
+    "http_ddos_attack_protection",
+    "ip_access_rules",
+    "rate_limiting",
+    "user_agent_blocking",
+    "zone_lockdown",
+    "firewall_subcategories",
+  ],
+  Speed: [
+    "speed_subcategories",
+    "automatic_platform_optimization",
+    "mobile_redirect",
+    "minify",
+    "railguns",
+  ],
+  Caching: ["caching_subcategories"],
+  Workers: ["http_routes"],
+  Rules: [
+    "page_rules",
+    "url_rewrite",
+    "http_request_header_modification",
+    "http_response_header_modification",
+    "normalization_settings",
+  ],
+  Network: ["network_subcategories"],
+  Traffic: ["load_balancers"],
+  "Scrape Shield": ["scrape_shield_subcategories"],
+  Spectrum: ["spectrum_applications"],
+};

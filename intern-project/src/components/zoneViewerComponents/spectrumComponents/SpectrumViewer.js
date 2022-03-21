@@ -37,7 +37,10 @@ const SpectrumViewer = (props) => {
       >
         <Heading size="xl">Spectrum</Heading>
         {specApplications ? (
-          <SpecApplications data={specApplications} />
+          <SpecApplications
+            id="spectrum_applications"
+            data={specApplications}
+          />
         ) : (
           <LoadingBox />
         )}

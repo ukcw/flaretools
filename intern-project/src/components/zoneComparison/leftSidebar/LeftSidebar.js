@@ -11,7 +11,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
-import { Humanize, ZoneComparisonLeftSidebarData } from "../../../utils/utils";
+import {
+  Humanize,
+  ZoneComparisonLeftSidebarData,
+  ZoneViewerLeftSidebarData,
+} from "../../../utils/utils";
 
 const LeftSidebar = (props) => {
   return (
@@ -33,33 +37,62 @@ const LeftSidebar = (props) => {
           top: "2rem",
         }}
       >
-        {Object.keys(ZoneComparisonLeftSidebarData).map((key) => {
-          return (
-            <AccordionItem key={key}>
-              <h2>
-                <AccordionButton>
-                  <AccordionIcon />
-                  <Box flex="1" textAlign="left">
-                    {key}
-                  </Box>
-                </AccordionButton>
-              </h2>
-              <AccordionPanel pb={4}>
-                <List>
-                  {ZoneComparisonLeftSidebarData[key].map((subcategory) => {
-                    return (
-                      <ListItem key={subcategory}>
-                        <Link href={`/zone-comparison/#${subcategory}`}>
-                          {Humanize(subcategory)}
-                        </Link>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-              </AccordionPanel>
-            </AccordionItem>
-          );
-        })}
+        {props.app === "compare" &&
+          Object.keys(ZoneComparisonLeftSidebarData).map((key) => {
+            return (
+              <AccordionItem key={key}>
+                <h2>
+                  <AccordionButton>
+                    <AccordionIcon />
+                    <Box flex="1" textAlign="left">
+                      {key}
+                    </Box>
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <List>
+                    {ZoneComparisonLeftSidebarData[key].map((subcategory) => {
+                      return (
+                        <ListItem key={subcategory}>
+                          <Link href={`/zone-comparison/#${subcategory}`}>
+                            {Humanize(subcategory)}
+                          </Link>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </AccordionPanel>
+              </AccordionItem>
+            );
+          })}
+        {props.app === "viewer" &&
+          Object.keys(ZoneViewerLeftSidebarData).map((key) => {
+            return (
+              <AccordionItem key={key}>
+                <h2>
+                  <AccordionButton>
+                    <AccordionIcon />
+                    <Box flex="1" textAlign="left">
+                      {key}
+                    </Box>
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <List>
+                    {ZoneViewerLeftSidebarData[key].map((subcategory) => {
+                      return (
+                        <ListItem key={subcategory}>
+                          <Link href={`/zone-viewer/#${subcategory}`}>
+                            {Humanize(subcategory)}
+                          </Link>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </AccordionPanel>
+              </AccordionItem>
+            );
+          })}
       </Accordion>
     </VStack>
   );

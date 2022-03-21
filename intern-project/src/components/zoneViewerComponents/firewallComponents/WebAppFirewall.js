@@ -80,7 +80,9 @@ const WithTable = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Web Application Firewall</Heading>
+        <Heading size="md" id={props.id}>
+          Web Application Firewall
+        </Heading>
         {/*props.data.waf_setting.result.value === "off" && (
           <Switch isReadOnly isChecked={false} />
         )*/}
@@ -155,7 +157,9 @@ const WithoutTable = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Web Application Firewall</Heading>
+        <Heading size="md" id={props.id}>
+          Web Application Firewall
+        </Heading>
         {/*props.data.waf_setting.result.value === "off" ? (
           <Switch isReadOnly isChecked={false} />
         ) : (
@@ -324,6 +328,7 @@ const WebAppFirewall = (props) => {
 
   return found ? (
     <WithTable
+      id={props.id}
       data={{
         tableData: props.data.managed_rulesets_results[index],
         waf_setting: props.data.waf_setting,
@@ -332,6 +337,7 @@ const WebAppFirewall = (props) => {
     />
   ) : (
     <WithoutTable
+      id={props.id}
       data={{
         waf_setting: props.data.waf_setting,
         deprecated_firewall_rules: props.data.deprecated_firewall_rules,

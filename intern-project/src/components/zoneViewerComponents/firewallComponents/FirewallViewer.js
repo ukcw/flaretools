@@ -83,6 +83,7 @@ const FirewallViewer = (props) => {
         {firewallData?.waf_setting &&
         "deprecatedFirewallRules" in firewallData ? (
           <WebAppFirewall
+            id="web_application_firewall"
             data={{
               waf_setting: firewallData.waf_setting,
               managed_rulesets_results: firewallData.managed_rulesets_results,
@@ -95,6 +96,7 @@ const FirewallViewer = (props) => {
         {firewallData?.custom_rules_firewall &&
         firewallData.custom_rules_firewall.success ? (
           <CustomRules
+            id="custom_rules_firewall"
             data={firewallData.custom_rules_firewall}
             title="Custom Rules Firewall"
           />
@@ -105,6 +107,7 @@ const FirewallViewer = (props) => {
         {firewallData?.custom_rules_ratelimit &&
         firewallData.custom_rules_ratelimit.success ? (
           <CustomRules
+            id="custom_rules_rate_limits"
             data={firewallData.custom_rules_ratelimit}
             title="Custom Rules Rate Limit"
           />
@@ -113,7 +116,10 @@ const FirewallViewer = (props) => {
           !("custom_rules_ratelimit" in firewallData) && <LoadingBox />
         )}
         {firewallData?.firewall_rules ? (
-          <FirewallRules data={firewallData.firewall_rules} />
+          <FirewallRules
+            id="firewall_rules"
+            data={firewallData.firewall_rules}
+          />
         ) : (
           <LoadingBox />
         )}
@@ -123,6 +129,7 @@ const FirewallViewer = (props) => {
         firewallData.managed_rulesets_results[ddosId].id ===
           "4d21379b4f9f4bb088e0729962c8b3cf" ? (
           <DdosProtection
+            id="http_ddos_attack_protection"
             data={{
               ddos_l7: firewallData.ddos_l7,
               ddos_ruleset: firewallData.managed_rulesets_results[ddosId],
@@ -133,22 +140,31 @@ const FirewallViewer = (props) => {
           <LoadingBox />
         )}
         {firewallData?.firewall_access_rules ? (
-          <IpAccessRules data={firewallData.firewall_access_rules} />
+          <IpAccessRules
+            id="ip_access_rules"
+            data={firewallData.firewall_access_rules}
+          />
         ) : (
           <LoadingBox />
         )}
         {firewallData?.rate_limits ? (
-          <RateLimiting data={firewallData.rate_limits} />
+          <RateLimiting id="rate_limiting" data={firewallData.rate_limits} />
         ) : (
           <LoadingBox />
         )}
         {firewallData?.firewall_ua_rules ? (
-          <UserAgentBlocking data={firewallData.firewall_ua_rules} />
+          <UserAgentBlocking
+            id="user_agent_blocking"
+            data={firewallData.firewall_ua_rules}
+          />
         ) : (
           <LoadingBox />
         )}
         {firewallData?.firewall_lockdowns ? (
-          <ZoneLockdown data={firewallData.firewall_lockdowns} />
+          <ZoneLockdown
+            id="zone_lockdown"
+            data={firewallData.firewall_lockdowns}
+          />
         ) : (
           <LoadingBox />
         )}
@@ -157,6 +173,7 @@ const FirewallViewer = (props) => {
         firewallData?.browser_check &&
         firewallData?.privacy_pass ? (
           <FirewallSubcategories
+            id="firewall_subcategories"
             data={{
               security_level: firewallData.security_level,
               challenge_passage: firewallData.challenge_ttl,

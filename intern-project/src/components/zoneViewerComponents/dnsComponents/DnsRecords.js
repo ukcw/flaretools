@@ -54,7 +54,9 @@ const DnsRecords = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">DNS Management</Heading>
+      <Heading size="md" id={props.id}>
+        DNS Management
+      </Heading>
       {!props.data.result.length && (
         <UnsuccessfulDefault setting="DNS Management" />
       )}

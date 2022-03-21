@@ -56,7 +56,9 @@ const CustomRules = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">{props.title}</Heading>
+        <Heading size="md" id={props.id}>
+          {props.title}
+        </Heading>
         {/*!props.data.result.rules.length && (
           <Switch isReadOnly isChecked={false} />
         )*/}

@@ -67,7 +67,9 @@ const EdgeCertificates = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Edge Certificates</Heading>
+      <Heading size="md" id={props.id}>
+        Edge Certificates
+      </Heading>
       {!props.data.result.length && (
         <UnsuccessfulDefault setting="Edge Certificates" />
       )}

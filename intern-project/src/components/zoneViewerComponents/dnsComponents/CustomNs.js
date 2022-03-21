@@ -67,7 +67,9 @@ const CustomNs = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Custom Nameservers</Heading>
+        <Heading size="md" id={props.id}>
+          Custom Nameservers
+        </Heading>
         {/*props.data.result.vanity_name_servers.length === 0 && (
           <Switch isReadOnly isChecked={false} />
         )*/}

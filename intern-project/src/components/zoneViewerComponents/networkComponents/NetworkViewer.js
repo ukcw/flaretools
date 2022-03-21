@@ -44,7 +44,7 @@ const NetworkViewer = (props) => {
       >
         <Heading size="xl">Network</Heading>
         {networkData ? (
-          <NetworkSubcategories data={networkData} />
+          <NetworkSubcategories id="network_subcategories" data={networkData} />
         ) : (
           <LoadingBox />
         )}

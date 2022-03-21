@@ -43,7 +43,14 @@ const ScrapeShieldViewer = (props) => {
         boxShadow="0 0 3px #ccc"
       >
         <Heading size="xl">Scrape Shield</Heading>
-        {data ? <ScrapeShieldSubcategories data={data} /> : <LoadingBox />}
+        {data ? (
+          <ScrapeShieldSubcategories
+            id="scrape_shield_subcategories"
+            data={data}
+          />
+        ) : (
+          <LoadingBox />
+        )}
       </Stack>
     </Container>
   );

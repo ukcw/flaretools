@@ -46,27 +46,37 @@ const SslTlsViewer = (props) => {
       >
         <Heading size="xl">SSL</Heading>
         {sslTlsData?.ssl_setting !== undefined ? (
-          <SslSetting data={sslTlsData.ssl_setting} />
+          <SslSetting id="ssl_setting" data={sslTlsData.ssl_setting} />
         ) : (
           <LoadingBox />
         )}
         {sslTlsData?.ssl_certificate_packs !== undefined ? (
-          <EdgeCertificates data={sslTlsData.ssl_certificate_packs} />
+          <EdgeCertificates
+            id="edge_certificates"
+            data={sslTlsData.ssl_certificate_packs}
+          />
         ) : (
           <LoadingBox />
         )}
         {sslTlsData?.security_header !== undefined ? (
-          <HttpStrictTransportSecurity data={sslTlsData.security_header} />
+          <HttpStrictTransportSecurity
+            id="http_strict_transport_security"
+            data={sslTlsData.security_header}
+          />
         ) : (
           <LoadingBox />
         )}
         {sslTlsData?.custom_hostnames !== undefined ? (
-          <CustomHostnames data={sslTlsData.custom_hostnames} />
+          <CustomHostnames
+            id="custom_hostnames"
+            data={sslTlsData.custom_hostnames}
+          />
         ) : (
           <LoadingBox />
         )}
         {sslTlsData ? (
           <SslSubcategories
+            id="ssl_subcategories"
             data={{
               ssl_recommendation: sslTlsData.ssl_recommendation,
               always_use_https: sslTlsData.always_use_https,

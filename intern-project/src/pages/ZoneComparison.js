@@ -100,7 +100,7 @@ function ZoneComparison() {
       }
       justifyContent="center"
     >
-      {successfulSearch && <LeftSidebar />}
+      {successfulSearch && <LeftSidebar app="compare" />}
       <Container maxW="container.xl" p={8}>
         {!successfulSearch && (
           <Stack

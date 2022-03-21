@@ -43,7 +43,7 @@ const WorkersViewer = (props) => {
       >
         <Heading size="xl">Workers</Heading>
         {workersData ? (
-          <HttpRoutes data={workersData.workers_routes} />
+          <HttpRoutes id="http_routes" data={workersData.workers_routes} />
         ) : (
           <LoadingBox />
         )}

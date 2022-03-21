@@ -43,7 +43,7 @@ const CachingViewer = (props) => {
       >
         <Heading size="xl">Caching</Heading>
         {cachingData ? (
-          <CachingSubcategories data={cachingData} />
+          <CachingSubcategories id="caching_subcategories" data={cachingData} />
         ) : (
           <LoadingBox />
         )}

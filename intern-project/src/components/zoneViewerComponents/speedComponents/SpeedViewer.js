@@ -49,6 +49,7 @@ const SpeedViewer = (props) => {
         <Heading size="xl">Speed</Heading>
         {speedData ? (
           <SpeedSubcategories
+            id="speed_subcategories"
             data={{
               mirage: speedData.mirage,
               image_resizing: speedData.image_resizing,
@@ -65,18 +66,30 @@ const SpeedViewer = (props) => {
         )}
         {speedData ? (
           <AutomaticPlatformOptimization
+            id="automatic_platform_optimization"
             data={speedData.automatic_platform_optimization}
           />
         ) : (
           <LoadingBox />
         )}
         {speedData ? (
-          <MobileRedirect data={speedData.mobile_redirect} />
+          <MobileRedirect
+            id="mobile_redirect"
+            data={speedData.mobile_redirect}
+          />
         ) : (
           <LoadingBox />
         )}
-        {speedData ? <Minify data={speedData.minify} /> : <LoadingBox />}
-        {speedData ? <Railgun data={speedData.railguns} /> : <LoadingBox />}
+        {speedData ? (
+          <Minify id="minify" data={speedData.minify} />
+        ) : (
+          <LoadingBox />
+        )}
+        {speedData ? (
+          <Railgun id="railguns" data={speedData.railguns} />
+        ) : (
+          <LoadingBox />
+        )}
       </Stack>
     </Container>
   );

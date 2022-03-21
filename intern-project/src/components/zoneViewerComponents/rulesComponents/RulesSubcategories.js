@@ -5,7 +5,9 @@ import React from "react";
 const RulesSubcategories = (props) => {
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Normalization Rules</Heading>
+      <Heading size="md" id={props.id}>
+        Normalization Rules
+      </Heading>
       <Table>
         <Tbody>
           <Tr>

@@ -51,7 +51,9 @@ const NameServers = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md">Cloudflare Nameservers</Heading>
+      <Heading size="md" id={props.id}>
+        Cloudflare Nameservers
+      </Heading>
       {props.data.result?.name_servers === undefined && (
         <UnsuccessfulDefault setting="Cloudflare Nameservers" />
       )}

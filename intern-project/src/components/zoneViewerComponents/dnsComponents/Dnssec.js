@@ -19,7 +19,9 @@ const Dnssec = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">DNSSEC</Heading>
+        <Heading size="md" id={props.id}>
+          DNSSEC
+        </Heading>
         {/*props.data.result.status === "disabled" && (
           <Switch isReadOnly isChecked={false} />
         )*/}

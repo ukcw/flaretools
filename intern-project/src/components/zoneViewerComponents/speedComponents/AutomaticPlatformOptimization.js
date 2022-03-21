@@ -17,7 +17,7 @@ const AutomaticPlatformOptimization = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">
+        <Heading size="md" id={props.id}>
           Automatic Platform Optimization for WordPress
         </Heading>
         {/*props.data.result.value === "off" && (

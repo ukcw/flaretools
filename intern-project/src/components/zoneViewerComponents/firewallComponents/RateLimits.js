@@ -93,7 +93,9 @@ const RateLimiting = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Rate Limiting</Heading>
+        <Heading size="md" id={props.id}>
+          Rate Limiting
+        </Heading>
         {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!props.data.result.length && (

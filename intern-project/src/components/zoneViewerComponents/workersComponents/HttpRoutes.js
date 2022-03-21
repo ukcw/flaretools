@@ -50,7 +50,9 @@ const HttpRoutes = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">HTTP Routes</Heading>
+        <Heading size="md" id={props.id}>
+          HTTP Routes
+        </Heading>
         {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!props.data.result.length && (

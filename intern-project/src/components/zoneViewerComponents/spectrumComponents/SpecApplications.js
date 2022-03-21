@@ -97,7 +97,9 @@ const SpecApplications = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Spectrum Applications</Heading>
+        <Heading size="md" id={props.id}>
+          Spectrum Applications
+        </Heading>
         {/*!props.data.result.length && <Switch isReadOnly isChecked={false} />*/}
       </HStack>
       {!props.data.result.length && (

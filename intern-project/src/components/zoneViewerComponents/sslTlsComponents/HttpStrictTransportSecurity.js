@@ -29,7 +29,9 @@ const HttpStrictTransportSecurity = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">HTTP Strict Transport Security (HSTS)</Heading>
+        <Heading size="md" id={props.id}>
+          HTTP Strict Transport Security (HSTS)
+        </Heading>
         {/*props.data.result.value.strict_transport_security.enabled === false ? (
           <Switch isReadOnly isChecked={false} />
         ) : (

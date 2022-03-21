@@ -42,12 +42,34 @@ const DnsViewer = (props) => {
         <Heading size="xl" id="DNS">
           DNS
         </Heading>
-        {dnsData ? <DnsRecords data={dnsData.dns_records} /> : <LoadingBox />}
-        {dnsData ? <NameServers data={dnsData.name_servers} /> : <LoadingBox />}
-        {dnsData ? <CustomNs data={dnsData.custom_ns} /> : <LoadingBox />}
-        {dnsData ? <Dnssec data={dnsData.dnssec} /> : <LoadingBox />}
         {dnsData ? (
-          <CnameFlattening data={dnsData.cname_flattening} />
+          <DnsRecords id="dns_management" data={dnsData.dns_records} />
+        ) : (
+          <LoadingBox />
+        )}
+        {dnsData ? (
+          <NameServers
+            id="cloudflare_nameservers"
+            data={dnsData.name_servers}
+          />
+        ) : (
+          <LoadingBox />
+        )}
+        {dnsData ? (
+          <CustomNs id="custom_nameservers" data={dnsData.custom_ns} />
+        ) : (
+          <LoadingBox />
+        )}
+        {dnsData ? (
+          <Dnssec id="dnssec" data={dnsData.dnssec} />
+        ) : (
+          <LoadingBox />
+        )}
+        {dnsData ? (
+          <CnameFlattening
+            id="cname_flattening"
+            data={dnsData.cname_flattening}
+          />
         ) : (
           <LoadingBox />
         )}

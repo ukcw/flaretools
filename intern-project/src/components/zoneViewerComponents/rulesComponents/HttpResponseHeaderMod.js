@@ -165,7 +165,9 @@ const HttpResponseHeaderMod = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">HTTP Response Header Modification</Heading>
+        <Heading size="md" id={props.id}>
+          HTTP Response Header Modification
+        </Heading>
         {/*props.data.result?.rules === undefined && (
           <Switch isReadOnly isChecked={false} />
         )*/}

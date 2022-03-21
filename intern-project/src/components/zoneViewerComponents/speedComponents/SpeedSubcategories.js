@@ -27,7 +27,9 @@ const SpeedSubcategories = (props) => {
   return (
     <Stack w="100%" spacing={4}>
       <HStack w="100%" spacing={4}>
-        <Heading size="md">Speed Subcategories</Heading>
+        <Heading size="md" id={props.id}>
+          Speed Subcategories
+        </Heading>
       </HStack>
       <Table>
         <Tbody>
