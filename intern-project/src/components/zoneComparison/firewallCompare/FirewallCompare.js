@@ -3,6 +3,8 @@ import React from "react";
 import CustomRulesFirewall from "./CustomRulesFirewall";
 import CustomRulesRateLimits from "./CustomRulesRateLimits";
 import DdosProtection from "./DdosProtection";
+import DeprecatedFirewallCfRules from "./DeprecatedFirewallCfRules";
+import DeprecatedFirewallOwaspRules from "./DeprecatedFirewallOwaspRules";
 import FirewallRules from "./FirewallRules";
 import FirewallSubcategories from "./FirewallSubcategories";
 import IpAccessRules from "./IpAccessRules";
@@ -90,6 +92,8 @@ const FirewallViewer = (props) => {
           <LoadingBox />
         )} */}
         <ManagedRules />
+        <DeprecatedFirewallCfRules id="cloudflare_managed_ruleset" />
+        <DeprecatedFirewallOwaspRules id="owasp_modsecurity_core_ruleset" />
         <CustomRulesFirewall id="custom_rules_firewall" />
         <CustomRulesRateLimits id="custom_rules_rate_limits" />
         <FirewallRules id="firewall_rules" />
