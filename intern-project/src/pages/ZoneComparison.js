@@ -95,7 +95,7 @@ function ZoneComparison() {
     <Grid
       gridTemplateColumns={
         successfulSearch
-          ? "minmax(0,0.8fr) minmax(0,3.5fr) minmax(0,15rem)"
+          ? "minmax(0,0.5fr) minmax(0,2.5fr) minmax(0,0.5fr)"
           : "minmax(0,5fr)"
       }
       justifyContent="center"

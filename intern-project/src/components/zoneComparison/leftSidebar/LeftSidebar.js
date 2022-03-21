@@ -22,8 +22,17 @@ const LeftSidebar = (props) => {
       //   borderWidth={0.1}
       borderRadius={10}
       //   boxShadow="0 0 3px #ccc"
+      display="flex"
     >
-      <Accordion allowMultiple allowToggle w="100%">
+      <Accordion
+        allowMultiple
+        allowToggle
+        w="100%"
+        style={{
+          position: "sticky",
+          top: "2rem",
+        }}
+      >
         {Object.keys(ZoneComparisonLeftSidebarData).map((key) => {
           return (
             <AccordionItem key={key}>
