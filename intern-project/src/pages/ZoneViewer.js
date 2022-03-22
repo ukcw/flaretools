@@ -21,7 +21,6 @@ import ScrapeShieldViewer from "../components/zoneViewerComponents/scrapeShieldC
 import SpectrumViewer from "../components/zoneViewerComponents/spectrumComponents/SpectrumViewer";
 import SslTlsViewer from "../components/zoneViewerComponents/sslTlsComponents/SslTlsViewer";
 import DnsViewer from "../components/zoneViewerComponents/dnsComponents/DnsViewer";
-import AfterSearch from "../components/zoneComparison/credentialsInputCompare/AfterSearch";
 import LeftSidebar from "../components/zoneComparison/leftSidebar/LeftSidebar";
 import RightSidebar from "../components/zoneViewerComponents/rightSidebar/RightSidebar";
 
