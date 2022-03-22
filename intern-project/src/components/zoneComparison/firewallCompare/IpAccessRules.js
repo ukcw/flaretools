@@ -29,11 +29,11 @@ import LoadingBox from "../../LoadingBox";
 
 const conditionsToMatch = (base, toCompare) => {
   return (
-    _.isEqual(base.configuration === toCompare.configuration) &&
+    _.isEqual(base.configuration, toCompare.configuration) &&
     base.mode === toCompare.mode &&
-    base.paused === toCompare.paused &&
-    _.isEqual(base.scope, toCompare.scope)
+    base.paused === toCompare.paused
   );
+  // _.isEqual(base.scope, toCompare.scope)
 };
 
 const ActionName = (action) => {
@@ -56,6 +56,7 @@ const IpAccessRules = (props) => {
         "/firewall/access_rules/rules"
       );
       const processedResp = resp.map((zone) => zone.resp);
+      console.log(processedResp);
       setIpAccessRulesData(processedResp);
     }
     setIpAccessRulesData();
