@@ -5,7 +5,6 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Link,
   List,
   ListItem,
   VStack,
@@ -16,6 +15,7 @@ import {
   ZoneComparisonLeftSidebarData,
   ZoneViewerLeftSidebarData,
 } from "../../../utils/utils";
+import { HashLink } from "react-router-hash-link";
 
 const LeftSidebar = (props) => {
   return (
@@ -54,9 +54,9 @@ const LeftSidebar = (props) => {
                     {ZoneComparisonLeftSidebarData[key].map((subcategory) => {
                       return (
                         <ListItem key={subcategory}>
-                          <Link href={`/zone-comparison/#${subcategory}`}>
+                          <HashLink to={`/zone-comparison/#${subcategory}`}>
                             {Humanize(subcategory)}
-                          </Link>
+                          </HashLink>
                         </ListItem>
                       );
                     })}
@@ -82,9 +82,10 @@ const LeftSidebar = (props) => {
                     {ZoneViewerLeftSidebarData[key].map((subcategory) => {
                       return (
                         <ListItem key={subcategory}>
-                          <Link href={`/zone-viewer/#${subcategory}`}>
+                          <HashLink to={`/zone-viewer/#${subcategory}`}>
+                            {/* <Link href={`/zone-viewer/#${subcategory}`}> */}
                             {Humanize(subcategory)}
-                          </Link>
+                          </HashLink>
                         </ListItem>
                       );
                     })}

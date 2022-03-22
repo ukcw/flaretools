@@ -129,7 +129,6 @@ function ZoneViewer() {
       </Container>
       {successfulSearch && (
         <>
-          {console.log(zoneDetails)}
           <RightSidebar
             zoneName={zoneDetails.name}
             style={{ float: "right" }}
