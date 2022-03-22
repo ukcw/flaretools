@@ -75,7 +75,7 @@ const RulesViewer = (props) => {
         {rulesData ? (
           <RulesSubcategories
             id="normalization_settings"
-            data={rulesData.normalization_settings}
+            // data={rulesData.normalization_settings}
           />
         ) : (
           <LoadingBox />
