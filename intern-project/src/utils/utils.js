@@ -89,6 +89,8 @@ export const Humanize = (str) => {
         frags[i] = "ModSecurity";
       } else if (frags[i] === "dns") {
         frags[i] = "DNS";
+      } else if (frags[i] === "dnssec") {
+        frags[i] = "DNSSEC";
       } else {
         frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
       }

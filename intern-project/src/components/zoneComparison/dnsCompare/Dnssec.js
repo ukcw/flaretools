@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
@@ -75,11 +76,7 @@ const Dnssec = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md" id={props.id}>
-          DNSSEC
-        </Heading>
-      </HStack>
+      {<CategoryTitle id={props.id} copyable={false} />}
       {!dnssec && <LoadingBox />}
       {dnssec && (
         <Table {...getTableProps}>
