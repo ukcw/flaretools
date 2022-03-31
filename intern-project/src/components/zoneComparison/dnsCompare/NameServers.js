@@ -1,13 +1,4 @@
-import {
-  Heading,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Stack, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
