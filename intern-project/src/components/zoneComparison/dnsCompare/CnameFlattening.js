@@ -11,16 +11,19 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
   HeaderFactory,
   Humanize,
+  patchZoneSetting,
   UnsuccessfulHeaders,
 } from "../../../utils/utils";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
+import _ from "lodash";
 
 const conditionsToMatch = (base, toCompare) => {
   return base.value === toCompare.value;
@@ -89,11 +92,8 @@ const CnameFlattening = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md" id={props.id}>
-          CNAME Flattening
-        </Heading>
-      </HStack>
+      {console.log(cnameFlatteningData)}
+      {<CategoryTitle id={props.id} copyable={false} />}
       {!cnameFlatteningData && <LoadingBox />}
       {cnameFlatteningData && (
         <Table {...getTableProps}>
