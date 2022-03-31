@@ -13,6 +13,7 @@ import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
@@ -118,11 +119,7 @@ const CustomNs = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md" id={props.id}>
-          Custom Nameservers
-        </Heading>
-      </HStack>
+      {<CategoryTitle id={props.id} copyable={false} />}
       {!customNs && <LoadingBox />}
       {customNs && (
         <Table {...getTableProps}>
