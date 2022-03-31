@@ -1,14 +1,4 @@
-import {
-  Heading,
-  HStack,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Stack, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
   CategoryTitle,
@@ -17,13 +7,11 @@ import {
   getMultipleZoneSettings,
   HeaderFactory,
   Humanize,
-  patchZoneSetting,
   UnsuccessfulHeaders,
 } from "../../../utils/utils";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
-import _ from "lodash";
 
 const conditionsToMatch = (base, toCompare) => {
   return base.value === toCompare.value;
