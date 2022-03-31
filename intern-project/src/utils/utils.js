@@ -1,5 +1,14 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
-import { Tag } from "@chakra-ui/react";
+import { CheckIcon, CloseIcon, CopyIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  Heading,
+  HStack,
+  Spacer,
+  Stack,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+} from "@chakra-ui/react";
 
 export const Humanize = (str) => {
   if (str === "js_challenge") {
@@ -78,6 +87,8 @@ export const Humanize = (str) => {
         frags[i] = "OWASP";
       } else if (frags[i] === "modsecurity") {
         frags[i] = "ModSecurity";
+      } else if (frags[i] === "dns") {
+        frags[i] = "DNS";
       } else {
         frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
       }
@@ -437,6 +448,31 @@ export const DisabledOrEnabled = (value) => {
   }
 };
 
+/**
+ * A POST request containing the data required to create a resource at the specified endpoint
+ * @param {*} query
+ * @param {*} endpoint
+ * @returns
+ */
+export const createZoneSetting = async (query, endpoint) => {
+  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  return resp.json();
+};
+
+/**
+ *
+ * @param {*} query
+ * @param {*} endpoint
+ * @returns
+ */
 export const getZoneSetting = async (query, endpoint) => {
   const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
   const resp = await fetch(url, {
@@ -450,6 +486,24 @@ export const getZoneSetting = async (query, endpoint) => {
   return resp.json();
 };
 
+/**
+ *
+ * @param {*} query
+ * @param {*} endpoint
+ * @returns
+ */
+export const deleteZoneSetting = async (query, endpoint) => {
+  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  return resp.json();
+};
 /**
  * Returns an array with the results of the same API call for different zones
  *
@@ -837,4 +891,38 @@ export const ZoneViewerLeftSidebarData = {
   Traffic: ["load_balancers"],
   "Scrape Shield": ["scrape_shield_subcategories"],
   Spectrum: ["spectrum_applications"],
+};
+
+/**
+ * Factory component used to create a Category Title for Zone Comparison
+ * @param {*} props
+ * @returns
+ */
+export const CategoryTitle = (props) => {
+  return (
+    <Stack w="100%">
+      <HStack>
+        <Heading size="md" id={props.id}>
+          {Humanize(props.id)}
+        </Heading>
+        <Spacer />
+        {props.copyable ? (
+          <Button size={"sm"} onClick={props.copy}>
+            {`Copy ${Humanize(props.id)}`}
+          </Button>
+        ) : null}
+      </HStack>
+      {props.copyable ? (
+        <Tag w="20%" colorScheme={"green"}>
+          <TagLeftIcon as={CopyIcon}></TagLeftIcon>
+          <TagLabel>Can be copied</TagLabel>
+        </Tag>
+      ) : (
+        <Tag w="20%" colorScheme={"red"}>
+          <TagLeftIcon as={CopyIcon}></TagLeftIcon>
+          <TagLabel>Cannot be copied</TagLabel>
+        </Tag>
+      )}
+    </Stack>
+  );
 };

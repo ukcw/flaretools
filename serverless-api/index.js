@@ -1770,6 +1770,140 @@ router.post('/spectrum/apps', async request => {
 })
 
 /**
+ *
+ *
+ *
+ * Zone Copier
+ *
+ *
+ */
+
+async function createZoneSetting(zoneId, apiToken, endpoint, data) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    redirect: 'follow',
+    body: JSON.stringify(data),
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/zones/${zoneId}${endpoint}`,
+    requestOptions,
+  )
+
+  const respJSON = await resp.json()
+
+  return respJSON
+}
+
+async function PostRequest(zoneId, apiToken, endpoint, data) {
+  try {
+    const resp = await createZoneSetting(zoneId, apiToken, endpoint, data)
+
+    return new Response(
+      JSON.stringify({
+        resp,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+}
+
+async function deleteZoneSetting(zoneId, apiToken, endpoint, identifier) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'DELETE',
+    headers: myHeaders,
+    redirect: 'follow',
+    // body: JSON.stringify(data),
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/zones/${zoneId}${endpoint}/${identifier}`,
+    requestOptions,
+  )
+
+  const respJSON = await resp.json()
+
+  return respJSON
+}
+
+async function DeleteRequest(zoneId, apiToken, endpoint, identifier) {
+  try {
+    const resp = await deleteZoneSetting(zoneId, apiToken, endpoint, identifier)
+
+    return new Response(
+      JSON.stringify({
+        resp,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+}
+/**
+ * DNS Records
+ */
+
+router.post('/copy/dns_records', async request => {
+  const { query } = await request.json()
+  return PostRequest(query.zoneId, query.apiToken, '/dns_records', query.data)
+})
+
+router.post('/delete/dns_records', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/dns_records',
+    query.identifier,
+  )
+})
+// router.post('/dnssec', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/dnssec')
+// })
+
+// router.post('/settings/cname_flattening', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(
+//     query.zoneId,
+//     query.apiToken,
+//     '/settings/cname_flattening',
+//   )
+// })
+
+/**
  * Respond with hello worker text
  * @param {Request} request
  */
