@@ -1871,6 +1871,54 @@ async function DeleteRequest(zoneId, apiToken, endpoint, identifier) {
     })
   }
 }
+
+async function patchZoneSetting(zoneId, apiToken, endpoint, data) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'PATCH',
+    headers: myHeaders,
+    redirect: 'follow',
+    body: JSON.stringify(data),
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/zones/${zoneId}${endpoint}`,
+    requestOptions,
+  )
+
+  const respJSON = await resp.json()
+
+  return respJSON
+}
+
+async function PatchRequest(zoneId, apiToken, endpoint, data) {
+  try {
+    const resp = await patchZoneSetting(zoneId, apiToken, endpoint, data)
+
+    return new Response(
+      JSON.stringify({
+        resp,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+}
+
 /**
  * DNS Records
  */
@@ -1889,6 +1937,20 @@ router.post('/delete/dns_records', async request => {
     query.identifier,
   )
 })
+
+/**
+ * CNAME Flattening -- does not accept PATCH requests
+ */
+
+/**
+ * SSL Setting
+ */
+
+router.post('/patch/settings/ssl', async request => {
+  const { query } = await request.json()
+  return PatchRequest(query.zoneId, query.apiToken, '/settings/ssl', query.data)
+})
+
 // router.post('/dnssec', async request => {
 //   const { query } = await request.json()
 //   return FetchRequest(query.zoneId, query.apiToken, '/dnssec')

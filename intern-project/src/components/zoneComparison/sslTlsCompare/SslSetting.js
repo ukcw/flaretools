@@ -9,15 +9,18 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
   HeaderFactory,
   Humanize,
+  patchZoneSetting,
   UnsuccessfulHeaders,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
@@ -107,13 +110,68 @@ const SslSetting = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const patchDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/ssl"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj["result"] = [newObj.result];
+        return newObj;
+      });
+      setSslSettingData(processedResp);
+    }
+    // if data for base zone hasn't loaded, user clicked the button prior to data loading, prevent
+    // the copy function for moving any further
+    const baseZoneData = data ? data[0] : [];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    for (const record of baseZoneData.result) {
+      const createData = {
+        value: record.value,
+      };
+      for (const key of otherZoneKeys) {
+        const dataToCreate = _.cloneDeep(createData);
+        const authObj = {
+          zoneId: credentials[key].zoneId,
+          apiToken: `Bearer ${credentials[key].apiToken}`,
+        };
+        const dataWithAuth = { ...authObj, data: dataToCreate };
+        const { resp: postRequestResp } = await sendPostRequest(
+          dataWithAuth,
+          "/patch/settings/ssl"
+        );
+        console.log(
+          "postRequest",
+          postRequestResp,
+          postRequestResp.success,
+          postRequestResp.result
+        );
+      }
+    }
+    setSslSettingData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md" id={props.id}>
-          SSL Setting
-        </Heading>
-      </HStack>
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          copy={() =>
+            patchDataFromBaseToOthers(sslSettingData, zoneKeys, credentials)
+          }
+        />
+      }
       {!sslSettingData && <LoadingBox />}
       {sslSettingData && (
         <Table {...getTableProps}>

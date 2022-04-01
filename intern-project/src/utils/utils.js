@@ -470,6 +470,25 @@ export const createZoneSetting = async (query, endpoint) => {
 };
 
 /**
+ * A POST request containing the data required to patch a resource at the specified endpoint
+ * @param {*} query
+ * @param {*} endpoint
+ * @returns
+ */
+export const patchZoneSetting = async (query, endpoint) => {
+  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  return resp.json();
+};
+
+/**
  *
  * @param {*} query
  * @param {*} endpoint
@@ -908,7 +927,7 @@ export const CategoryTitle = (props) => {
           {Humanize(props.id)}
         </Heading>
         <Spacer />
-        {props.copyable ? (
+        {props.copyable && props.showCopyButton ? (
           <Button size={"sm"} onClick={props.copy}>
             {`Copy ${Humanize(props.id)}`}
           </Button>

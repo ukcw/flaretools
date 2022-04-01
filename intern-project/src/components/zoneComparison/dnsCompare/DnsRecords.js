@@ -10,7 +10,7 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import _ from "lodash";
+import _, { set } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
@@ -18,7 +18,7 @@ import {
   CategoryTitle,
   CompareBaseToOthers,
   CompareData,
-  CountDeltaDifferences,
+  // CountDeltaDifferences,
   createZoneSetting,
   deleteZoneSetting,
   getMultipleZoneSettings,
@@ -30,6 +30,7 @@ import {
 import LoadingBox from "../../LoadingBox";
 import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
+import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) =>
@@ -57,7 +58,21 @@ const DnsRecords = (props) => {
     onOpen: SuccessPromptOnOpen,
     onClose: SuccessPromptOnClose,
   } = useDisclosure(); // SuccessPromptModal;
+  const {
+    isOpen: DeletionProgressBarIsOpen,
+    onOpen: DeletionProgressBarOnOpen,
+    onClose: DeletionProgressBarOnClose,
+  } = useDisclosure(); // ProgressBarModal -- Deletion;
+  const {
+    isOpen: CopyingProgressBarIsOpen,
+    onOpen: CopyingProgressBarOnOpen,
+    onClose: CopyingProgressBarOnClose,
+  } = useDisclosure(); // ProgressBarModal -- Copying;
   const [currentZone, setCurrentZone] = useState();
+  const [numberOfRecordsToDelete, setNumberOfRecordsToDelete] = useState(0);
+  const [numberOfRecordsDeleted, setNumberOfRecordsDeleted] = useState(0);
+  const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
+  const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
 
   useEffect(() => {
     async function getData() {
@@ -124,13 +139,28 @@ const DnsRecords = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
-  const delta = React.useMemo(
-    () => (dnsRecords ? CountDeltaDifferences(zoneKeys, data, dnsRecords) : []),
-    [data, dnsRecords, zoneKeys]
-  );
+  // const delta = React.useMemo(
+  //   () => (dnsRecords ? CountDeltaDifferences(zoneKeys, data, dnsRecords) : []),
+  //   [data, dnsRecords, zoneKeys]
+  // );
 
   const handleDelete = async (data, zoneKeys, credentials) => {
+    if (NonEmptyErrorIsOpen) {
+      NonEmptyErrorOnClose();
+    }
+
     const otherZoneKeys = zoneKeys.slice(1);
+
+    setNumberOfRecordsDeleted(0);
+    setNumberOfRecordsToDelete(0);
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].success === true && data[i].result.length) {
+        setNumberOfRecordsToDelete((prev) => prev + data[i].result.length);
+      }
+    }
+
+    DeletionProgressBarOnOpen();
 
     for (const key of otherZoneKeys) {
       const authObj = {
@@ -152,13 +182,15 @@ const DnsRecords = (props) => {
             "/delete/dns_records"
           );
           if (resp.success === false) {
-            NonEmptyErrorOnClose();
+            // NonEmptyErrorOnClose();
             ErrorPromptOnOpen();
           }
+          setNumberOfRecordsDeleted((prev) => prev + 1);
         }
-        copyDataFromBaseToOthers(data, zoneKeys, credentials);
       }
     }
+    DeletionProgressBarOnClose();
+    copyDataFromBaseToOthers(data, zoneKeys, credentials);
   };
 
   const copyDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
@@ -167,6 +199,17 @@ const DnsRecords = (props) => {
       return resp;
     }
 
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/dns_records"
+      );
+      const processedResp = resp.map((zone) => zone.resp);
+      setDnsRecords(processedResp);
+    }
+
+    SuccessPromptOnClose();
     // if data for base zone hasn't loaded, user clicked the button prior to data loading, prevent
     // the copy function for moving any further
     const baseZoneData = data ? data[0] : [];
@@ -191,6 +234,11 @@ const DnsRecords = (props) => {
       }
     }
 
+    setNumberOfRecordsCopied(0);
+    setNumberOfRecordsToCopy(data[0].result.length * data.slice(1).length);
+
+    CopyingProgressBarOnOpen();
+
     for (const record of baseZoneData.result) {
       const exp = new RegExp("(.*)?." + zoneDetails.zone_1.name);
       const createData = {
@@ -211,6 +259,7 @@ const DnsRecords = (props) => {
           zoneId: credentials[key].zoneId,
           apiToken: `Bearer ${credentials[key].apiToken}`,
         };
+        setCurrentZone(key);
         if (dataToCreate.name === null) {
           const { zone_details: otherZoneDetails } = await getZoneSetting(
             authObj,
@@ -229,6 +278,7 @@ const DnsRecords = (props) => {
           dataWithAuth,
           "/copy/dns_records"
         );
+        setNumberOfRecordsCopied((prev) => prev + 1);
         console.log(
           "postRequest",
           postRequestResp.success,
@@ -236,10 +286,10 @@ const DnsRecords = (props) => {
         );
       }
     }
-    if (NonEmptyErrorIsOpen) {
-      NonEmptyErrorOnClose();
-    }
+    CopyingProgressBarOnClose();
     SuccessPromptOnOpen();
+    setDnsRecords();
+    getData();
   };
 
   return (
@@ -248,6 +298,9 @@ const DnsRecords = (props) => {
         <CategoryTitle
           id={props.id}
           copyable={true}
+          showCopyButton={
+            dnsRecords && dnsRecords[0].success && dnsRecords[0].result.length
+          }
           copy={() =>
             copyDataFromBaseToOthers(dnsRecords, zoneKeys, credentials)
           }
@@ -286,26 +339,30 @@ const DnsRecords = (props) => {
           from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
         />
       )}
-      {/* <Stack w="100%">
-        <HStack>
-          <Heading size="md" id={props.id}>
-            DNS Management
-          </Heading>
-          <Spacer />
-          <Button
-            size={"sm"}
-            onClick={() =>
-              copyDataFromBaseToOther(dnsRecords, zoneKeys, credentials)
-            }
-          >
-            Copy DNS Records
-          </Button>
-        </HStack>
-        <Tag w="20%" colorScheme={"green"}>
-          <TagLeftIcon as={CopyIcon}></TagLeftIcon>
-          <TagLabel>Can be copied</TagLabel>
-        </Tag>
-      </Stack> */}
+      {DeletionProgressBarIsOpen && (
+        <ProgressBarModal
+          isOpen={DeletionProgressBarIsOpen}
+          onOpen={DeletionProgressBarOnOpen}
+          onClose={DeletionProgressBarOnClose}
+          title={`${Humanize(props.id)} records from ${
+            zoneDetails[currentZone].name
+          } are being deleted`}
+          progress={numberOfRecordsDeleted}
+          total={numberOfRecordsToDelete}
+        />
+      )}
+      {CopyingProgressBarIsOpen && (
+        <ProgressBarModal
+          isOpen={CopyingProgressBarIsOpen}
+          onOpen={CopyingProgressBarOnOpen}
+          onClose={CopyingProgressBarOnClose}
+          title={`${Humanize(props.id)} records are being copied from ${
+            zoneDetails.zone_1.name
+          } to ${zoneDetails[currentZone].name}`}
+          progress={numberOfRecordsCopied}
+          total={numberOfRecordsToCopy}
+        />
+      )}
       {!dnsRecords && <LoadingBox />}
       {dnsRecords && (
         <Table style={{ tableLayout: "fixed" }} {...getTableProps}>
