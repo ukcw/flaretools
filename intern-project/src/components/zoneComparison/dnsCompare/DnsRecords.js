@@ -210,9 +210,8 @@ const DnsRecords = (props) => {
     }
 
     SuccessPromptOnClose();
-    // if data for base zone hasn't loaded, user clicked the button prior to data loading, prevent
-    // the copy function for moving any further
-    const baseZoneData = data ? data[0] : [];
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
     const otherZoneKeys = zoneKeys.slice(1);
 
     // check if other zone has any data prior to create records
@@ -279,11 +278,11 @@ const DnsRecords = (props) => {
           "/copy/dns_records"
         );
         setNumberOfRecordsCopied((prev) => prev + 1);
-        console.log(
-          "postRequest",
-          postRequestResp.success,
-          postRequestResp.result
-        );
+        // console.log(
+        //   "postRequest",
+        //   postRequestResp.success,
+        //   postRequestResp.result
+        // );
       }
     }
     CopyingProgressBarOnClose();
