@@ -275,8 +275,10 @@ const SslSubcategories = (props) => {
               dataWithAuth,
               subcategoriesEndpoints[currentSubcategory.result.id]
             );
+            if (postRequestResp.success === true) {
+              subcategories[currentSubcategory.result.id] = true;
+            }
           }
-          subcategories[currentSubcategory.result.id] = true;
         } else if (
           currentSubcategory.result?.certificate_authority !== undefined
         ) {
@@ -296,8 +298,10 @@ const SslSubcategories = (props) => {
               dataWithAuth,
               subcategoriesEndpoints.ssl_universal
             );
+            if (postRequestResp.success === true) {
+              subcategories.ssl_universal = true;
+            }
           }
-          subcategories.ssl_universal = true;
         } else {
         }
       } else {

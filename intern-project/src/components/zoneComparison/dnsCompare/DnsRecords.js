@@ -278,11 +278,6 @@ const DnsRecords = (props) => {
           "/copy/dns_records"
         );
         setNumberOfRecordsCopied((prev) => prev + 1);
-        // console.log(
-        //   "postRequest",
-        //   postRequestResp.success,
-        //   postRequestResp.result
-        // );
       }
     }
     CopyingProgressBarOnClose();
