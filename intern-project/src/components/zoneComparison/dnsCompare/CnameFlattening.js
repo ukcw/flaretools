@@ -80,7 +80,6 @@ const CnameFlattening = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      {console.log(cnameFlatteningData)}
       {<CategoryTitle id={props.id} copyable={false} />}
       {!cnameFlatteningData && <LoadingBox />}
       {cnameFlatteningData && (

@@ -947,3 +947,28 @@ export const CategoryTitle = (props) => {
     </Stack>
   );
 };
+
+export const SubcategoriesSuccessMessage = (
+  subcategories,
+  baseZone,
+  otherZone
+) => {
+  return `
+  Your settings for ${Object.keys(subcategories)
+    .filter((subcat) => subcategories[subcat] !== undefined)
+    .map((subcat) => Humanize(subcat))
+    .join(", ")} have been successfully copied
+  from ${baseZone} to ${otherZone}.
+  ${
+    Object.keys(subcategories).filter(
+      (subcat) => subcategories[subcat] === undefined
+    ).length > 0
+      ? `Your settings for ${Object.keys(subcategories)
+          .filter((subcat) => subcategories[subcat] === undefined)
+          .map((subcat) => Humanize(subcat))
+          .join(", ")} could not be copied
+  from ${baseZone} to ${otherZone}.`
+      : ""
+  }
+  `;
+};

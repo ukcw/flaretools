@@ -1975,19 +1975,109 @@ router.post('/delete/custom_hostnames', async request => {
   )
 })
 
-// router.post('/dnssec', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(query.zoneId, query.apiToken, '/dnssec')
-// })
+/**
+ * SSL Recommendation
+ */
+router.post('/patch/ssl/recommendation', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/ssl/recommendation',
+    query.data,
+  )
+})
 
-// router.post('/settings/cname_flattening', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(
-//     query.zoneId,
-//     query.apiToken,
-//     '/settings/cname_flattening',
-//   )
-// })
+/**
+ * Always Use HTTPS
+ */
+router.post('/patch/settings/always_use_https', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/always_use_https',
+    query.data,
+  )
+})
+
+/**
+ * Minimum TLS Version
+ */
+router.post('/patch/settings/min_tls_version', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/min_tls_version',
+    query.data,
+  )
+})
+
+/**
+ * Opportunistic Encryption
+ */
+router.post('/patch/settings/opportunistic_encryption', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/opportunistic_encryption',
+    query.data,
+  )
+})
+
+/**
+ * TLS 1.3
+ */
+router.post('/patch/settings/tls_1_3', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/tls_1_3',
+    query.data,
+  )
+})
+
+/**
+ * Automatic HTTPS Rewrites
+ */
+router.post('/patch/settings/automatic_https_rewrites', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/automatic_https_rewrites',
+    query.data,
+  )
+})
+
+/**
+ * Universal SSL Certificate Authority
+ */
+router.post('/patch/ssl/universal/settings', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/ssl/universal/settings',
+    query.data,
+  )
+})
+
+/**
+ * Authenticated Origin Pulls
+ */
+router.post('/patch/settings/tls_client_auth', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/tls_client_auth',
+    query.data,
+  )
+})
 
 /**
  * Respond with hello worker text
