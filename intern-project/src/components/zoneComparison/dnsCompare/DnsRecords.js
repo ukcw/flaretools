@@ -10,7 +10,7 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import _, { set } from "lodash";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
