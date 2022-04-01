@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   DisabledOrEnabled,
@@ -92,9 +93,7 @@ const HttpStrictTransportSecurity = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md" id={props.id}>
-        HTTP Strict Transport Security
-      </Heading>
+      {<CategoryTitle id={props.id} copyable={false} />}
       {!hstsData && <LoadingBox />}
       {hstsData && (
         <Table {...getTableProps}>

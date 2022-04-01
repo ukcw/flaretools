@@ -8,6 +8,7 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
@@ -24,6 +25,8 @@ import {
   UnsuccessfulHeaders,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
+import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const ValueName = (name) => {
   switch (name) {
@@ -50,8 +53,19 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const SslSetting = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [sslSettingData, setSslSettingData] = useState();
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // ErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const [currentZone, setCurrentZone] = useState();
 
   useEffect(() => {
     async function getData() {
@@ -129,9 +143,10 @@ const SslSetting = (props) => {
       });
       setSslSettingData(processedResp);
     }
-    // if data for base zone hasn't loaded, user clicked the button prior to data loading, prevent
-    // the copy function for moving any further
-    const baseZoneData = data ? data[0] : [];
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
     const otherZoneKeys = zoneKeys.slice(1);
 
     for (const record of baseZoneData.result) {
@@ -144,19 +159,21 @@ const SslSetting = (props) => {
           zoneId: credentials[key].zoneId,
           apiToken: `Bearer ${credentials[key].apiToken}`,
         };
+        setCurrentZone(key);
         const dataWithAuth = { ...authObj, data: dataToCreate };
         const { resp: postRequestResp } = await sendPostRequest(
           dataWithAuth,
           "/patch/settings/ssl"
         );
-        console.log(
-          "postRequest",
-          postRequestResp,
-          postRequestResp.success,
-          postRequestResp.result
-        );
+        // console.log(
+        //   "postRequest",
+        //   postRequestResp,
+        //   postRequestResp.success,
+        //   postRequestResp.result
+        // );
       }
     }
+    SuccessPromptOnOpen();
     setSslSettingData();
     getData();
   };
@@ -167,11 +184,37 @@ const SslSetting = (props) => {
         <CategoryTitle
           id={props.id}
           copyable={true}
+          showCopyButton={
+            sslSettingData &&
+            sslSettingData[0].success &&
+            sslSettingData[0].result.length
+          }
           copy={() =>
             patchDataFromBaseToOthers(sslSettingData, zoneKeys, credentials)
           }
         />
       }
+      {ErrorPromptIsOpen && (
+        <ErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorMessage={`An error has occurred, please close this window and try again.`}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={`Your ${Humanize(
+            props.id
+          )} settings have been successfully copied
+          from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
+        />
+      )}
       {!sslSettingData && <LoadingBox />}
       {sslSettingData && (
         <Table {...getTableProps}>

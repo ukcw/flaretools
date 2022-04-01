@@ -13,6 +13,7 @@ import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
@@ -149,9 +150,7 @@ const EdgeCertificates = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md" id={props.id}>
-        Edge Certificates
-      </Heading>
+      {<CategoryTitle id={props.id} copyable={false} />}
       {!edgeCertificatesData && <LoadingBox />}
       {edgeCertificatesData && (
         <Table {...getTableProps}>
