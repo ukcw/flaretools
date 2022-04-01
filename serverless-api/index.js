@@ -1951,6 +1951,30 @@ router.post('/patch/settings/ssl', async request => {
   return PatchRequest(query.zoneId, query.apiToken, '/settings/ssl', query.data)
 })
 
+/**
+ * Custom Hostnames
+ */
+
+router.post('/copy/custom_hostnames', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/custom_hostnames',
+    query.data,
+  )
+})
+
+router.post('/delete/custom_hostnames', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/dns_records',
+    query.identifier,
+  )
+})
+
 // router.post('/dnssec', async request => {
 //   const { query } = await request.json()
 //   return FetchRequest(query.zoneId, query.apiToken, '/dnssec')

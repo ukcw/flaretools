@@ -312,9 +312,13 @@ const DnsRecords = (props) => {
           onClose={NonEmptyErrorOnClose}
           handleDelete={() => handleDelete(dnsRecords, zoneKeys, credentials)}
           title={`There are some existing records in ${zoneDetails[currentZone].name}`}
-          errorMessage={`To proceed with copying DNS Records from ${zoneDetails.zone_1.name} 
+          errorMessage={`To proceed with copying ${Humanize(props.id)} from ${
+            zoneDetails.zone_1.name
+          } 
           to ${zoneDetails[currentZone].name}, the existing records 
-          in ${zoneDetails[currentZone].name} need to be deleted. This action is irreversible.`}
+          in ${
+            zoneDetails[currentZone].name
+          } need to be deleted. This action is irreversible.`}
         />
       )}
       {ErrorPromptIsOpen && (
