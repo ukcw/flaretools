@@ -2304,6 +2304,124 @@ router.post('/patch/settings/mobile_redirect', async request => {
 })
 
 /**
+ *
+ *
+ *
+ * Caching
+ *
+ *
+ *
+ */
+
+/**
+ * Argo Tiered Caching
+ */
+router.post('/patch/argo/tiered_caching', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/argo/tiered_caching',
+    query.data,
+  )
+})
+
+/**
+ * Tiered Cache Topology
+ */
+router.post(
+  '/patch/cache/tiered_cache_smart_topology_enable',
+  async request => {
+    const { query } = await request.json()
+    return PatchRequest(
+      query.zoneId,
+      query.apiToken,
+      '/cache/tiered_cache_smart_topology_enable',
+      query.data,
+    )
+  },
+)
+
+/**
+ * Cache Level
+ */
+router.post('/patch/settings/cache_level', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/cache_level',
+    query.data,
+  )
+})
+
+/**
+ * Browser Cache TTL
+ */
+router.post('/patch/settings/browser_cache_ttl', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/browser_cache_ttl',
+    query.data,
+  )
+})
+
+// Crawlhints => "cache": "crawlhints_enabled"
+/**
+ * Crawlhints
+ */
+router.post('/post/flags/products/cache/changes', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/flags/products/cache/changes',
+    query.data,
+  )
+})
+
+/**
+ * Always Online
+ */
+router.post('/patch/settings/always_online', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/always_online',
+    query.data,
+  )
+})
+
+/**
+ * Development Mode
+ */
+router.post('/patch/settings/development_mode', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/development_mode',
+    query.data,
+  )
+})
+
+/**
+ * Query String Sort
+ */
+router.post('/patch/settings/sort_query_string_for_cache', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/sort_query_string_for_cache',
+    query.data,
+  )
+})
+
+/**
  * Respond with hello worker text
  * @param {Request} request
  */

@@ -260,8 +260,6 @@ const SpeedSubcategories = (props) => {
           }
         }
       } else {
-        CopyingProgressBarOnClose();
-        ErrorPromptOnOpen();
       }
       setNumberOfSubcategoriesCopied((prev) => prev + 1);
     }
