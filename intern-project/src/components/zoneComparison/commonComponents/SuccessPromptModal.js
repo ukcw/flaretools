@@ -23,9 +23,7 @@ const SuccessPromptModal = ({
         <ModalContent>
           <ModalHeader>{title}</ModalHeader>
           {/* <ModalCloseButton /> */}
-          <ModalBody pb={6}>
-            <Text>{successMessage}</Text>
-          </ModalBody>
+          <ModalBody pb={6}>{successMessage}</ModalBody>
 
           <ModalFooter>
             <Button onClick={onClose} mr={3}>

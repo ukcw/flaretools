@@ -2080,6 +2080,168 @@ router.post('/patch/settings/tls_client_auth', async request => {
 })
 
 /**
+ * FIREWALL GOES HERE
+ */
+
+/**
+ * Speed
+ */
+
+/**
+ * Mirage
+ */
+router.post('/patch/settings/mirage', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/mirage',
+    query.data,
+  )
+})
+
+/**
+ * Image Resizing
+ */
+router.post('/patch/settings/image_resizing', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/image_resizing',
+    query.data,
+  )
+})
+
+/**
+ * Polish
+ */
+router.post('/patch/settings/polish', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/polish',
+    query.data,
+  )
+})
+
+/**
+ * Minify
+ */
+router.post('/patch/settings/minify', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/minify',
+    query.data,
+  )
+})
+
+/**
+ * Brotli
+ */
+router.post('/patch/settings/brotli', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/brotli',
+    query.data,
+  )
+})
+
+/**
+ * Early Hints
+ */
+router.post('/patch/settings/early_hints', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/early_hints',
+    query.data,
+  )
+})
+
+/**
+ * Automatic Platform Optimization
+ */
+router.post(
+  '/patch/settings/automatic_platform_optimization',
+  async request => {
+    const { query } = await request.json()
+    return PatchRequest(
+      query.zoneId,
+      query.apiToken,
+      '/settings/automatic_platform_optimization',
+      query.data,
+    )
+  },
+)
+
+/**
+ * H2 Prioritization
+ */
+router.post('/patch/settings/h2_prioritization', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/h2_prioritization',
+    query.data,
+  )
+})
+
+/**
+ * Rocket Loader
+ */
+router.post('/patch/settings/rocket_loader', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/rocket_loader',
+    query.data,
+  )
+})
+
+/**
+ * Railguns
+ */
+router.post('/patch/railguns', async request => {
+  const { query } = await request.json()
+  return PatchRequest(query.zoneId, query.apiToken, '/railguns', query.data)
+})
+
+/**
+ * Prefetch Preload
+ */
+router.post('/patch/settings/prefetch_preload', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/prefetch_preload',
+    query.data,
+  )
+})
+
+/**
+ * Mobile Redirect
+ */
+router.post('/patch/settings/mobile_redirect', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/mobile_redirect',
+    query.data,
+  )
+})
+
+/**
  * Respond with hello worker text
  * @param {Request} request
  */

@@ -8,19 +8,25 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
+  CategoryTitle,
   CompareBaseToOthersCategorical,
   CompareData,
   getMultipleZoneSettings,
   HeaderFactoryOverloaded,
   Humanize,
+  patchZoneSetting,
 } from "../../../utils/utils";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
+import _ from "lodash";
+import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const convertOutput = (value) => {
   return value === true ? (
@@ -39,7 +45,7 @@ const returnConditions = (data) => {
     data.result.id === "enabled" &&
     typeof data.result.value === "object"
   ) {
-    return true;
+    return data.result.value.enabled ? true : false;
   } else if (data.result.value === "off") {
     return false;
   } else if (
@@ -58,11 +64,22 @@ const returnConditions = (data) => {
 };
 
 const AutomaticPlatformOptimization = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [
     automaticPlatformOptimizationData,
     setAutomaticPlatformOptimizationData,
   ] = useState();
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // ErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const [currentZone, setCurrentZone] = useState();
 
   useEffect(() => {
     async function getData() {
@@ -147,11 +164,114 @@ const AutomaticPlatformOptimization = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const patchDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/automatic_platform_optimization"
+      );
+      const resp2 = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/automatic_platform_optimization"
+      );
+      const valueResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result.id = "enabled";
+        return newObj;
+      });
+      const cacheByDeviceTypeResp = resp2.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result.id = "cache_by_device_type";
+        return newObj;
+      });
+      const secondaryProcessedResp = [
+        [...valueResp],
+        [...cacheByDeviceTypeResp],
+      ];
+      setAutomaticPlatformOptimizationData(secondaryProcessedResp);
+    }
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0][0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    const createData = {
+      value: baseZoneData.result.value,
+    };
+
+    for (const key of otherZoneKeys) {
+      const dataToCreate = _.cloneDeep(createData);
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      setCurrentZone(key);
+      const dataWithAuth = { ...authObj, data: dataToCreate };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/patch/settings/automatic_platform_optimization"
+      );
+      // console.log(
+      //   "postRequest",
+      //   postRequestResp,
+      //   postRequestResp.success,
+      //   postRequestResp.result
+      // );
+    }
+    SuccessPromptOnOpen();
+    setAutomaticPlatformOptimizationData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md" id={props.id}>
-        Automatic Platform Optimization
-      </Heading>
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          showCopyButton={
+            automaticPlatformOptimizationData &&
+            automaticPlatformOptimizationData[0][0].success &&
+            automaticPlatformOptimizationData[0][0].result
+          }
+          copy={() =>
+            patchDataFromBaseToOthers(
+              automaticPlatformOptimizationData,
+              zoneKeys,
+              credentials
+            )
+          }
+        />
+      }
+      {ErrorPromptIsOpen && (
+        <ErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorMessage={`An error has occurred, please close this window and try again.`}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={`Your ${Humanize(
+            props.id
+          )} settings have been successfully copied
+          from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
+        />
+      )}
       {!automaticPlatformOptimizationData && <LoadingBox />}
       {automaticPlatformOptimizationData && (
         <Table {...getTableProps}>
