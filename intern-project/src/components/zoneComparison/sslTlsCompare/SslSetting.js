@@ -165,6 +165,9 @@ const SslSetting = (props) => {
           dataWithAuth,
           "/patch/settings/ssl"
         );
+        if (postRequestResp.success === false) {
+          ErrorPromptOnOpen();
+        }
         // console.log(
         //   "postRequest",
         //   postRequestResp,

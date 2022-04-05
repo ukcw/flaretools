@@ -209,6 +209,9 @@ const MobileRedirect = (props) => {
         dataWithAuth,
         "/patch/settings/mobile_redirect"
       );
+      if (postRequestResp.success === false) {
+        ErrorPromptOnOpen();
+      }
       // console.log(
       //   "postRequest",
       //   postRequestResp,

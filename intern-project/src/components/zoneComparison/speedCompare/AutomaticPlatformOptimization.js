@@ -1,5 +1,4 @@
 import {
-  Heading,
   Stack,
   Table,
   Tag,
@@ -219,6 +218,9 @@ const AutomaticPlatformOptimization = (props) => {
         dataWithAuth,
         "/patch/settings/automatic_platform_optimization"
       );
+      if (postRequestResp.success === false) {
+        ErrorPromptOnOpen();
+      }
       // console.log(
       //   "postRequest",
       //   postRequestResp,

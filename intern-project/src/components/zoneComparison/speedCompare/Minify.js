@@ -203,6 +203,9 @@ const Minify = (props) => {
         dataWithAuth,
         "/patch/settings/minify"
       );
+      if (postRequestResp.success === false) {
+        ErrorPromptOnOpen();
+      }
       // console.log(
       //   "postRequest",
       //   postRequestResp,

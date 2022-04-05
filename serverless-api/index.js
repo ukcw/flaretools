@@ -2208,12 +2208,74 @@ router.post('/patch/settings/rocket_loader', async request => {
 })
 
 /**
- * Railguns
+ * Railguns - "API Tokens are not supported by this API for now"
+ * When the API is supported then all these router functions need to be updated
  */
 router.post('/patch/railguns', async request => {
   const { query } = await request.json()
   return PatchRequest(query.zoneId, query.apiToken, '/railguns', query.data)
 })
+
+router.post('/copy/railguns', async request => {
+  const { query } = await request.json()
+  return PostRequestSetting(query.apiToken, '/railguns', query.data)
+})
+
+router.post('/delete/railguns', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/railguns',
+    query.identifier,
+  )
+})
+
+async function createSetting(apiToken, endpoint, data) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    redirect: 'follow',
+    body: JSON.stringify(data),
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/${endpoint}`,
+    requestOptions,
+  )
+
+  const respJSON = await resp.json()
+
+  return respJSON
+}
+
+async function PostRequestSetting(apiToken, endpoint, data) {
+  try {
+    const resp = await createSetting(apiToken, endpoint, data)
+    return new Response(
+      JSON.stringify({
+        resp,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+}
 
 /**
  * Prefetch Preload

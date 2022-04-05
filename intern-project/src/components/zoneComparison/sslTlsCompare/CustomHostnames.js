@@ -325,6 +325,9 @@ const CustomHostnames = (props) => {
           dataWithAuth,
           "/copy/custom_hostnames"
         );
+        if (postRequestResp.success === false) {
+          ErrorPromptOnOpen();
+        }
         setNumberOfRecordsCopied((prev) => prev + 1);
         // console.log(
         //   "postRequest",
