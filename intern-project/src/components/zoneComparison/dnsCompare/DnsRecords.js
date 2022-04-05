@@ -236,8 +236,6 @@ const DnsRecords = (props) => {
     setNumberOfRecordsCopied(0);
     setNumberOfRecordsToCopy(data[0].result.length * data.slice(1).length);
 
-    CopyingProgressBarOnOpen();
-
     for (const record of baseZoneData.result) {
       const exp = new RegExp("(.*)?." + zoneDetails.zone_1.name);
       const createData = {
@@ -259,6 +257,10 @@ const DnsRecords = (props) => {
           apiToken: `Bearer ${credentials[key].apiToken}`,
         };
         setCurrentZone(key);
+        if (CopyingProgressBarIsOpen) {
+        } else {
+          CopyingProgressBarOnOpen();
+        }
         if (dataToCreate.name === null) {
           const { zone_details: otherZoneDetails } = await getZoneSetting(
             authObj,
@@ -277,6 +279,11 @@ const DnsRecords = (props) => {
           dataWithAuth,
           "/copy/dns_records"
         );
+        if (postRequestResp.success === false) {
+          CopyingProgressBarOnClose();
+          ErrorPromptOnOpen();
+          return;
+        }
         setNumberOfRecordsCopied((prev) => prev + 1);
       }
     }

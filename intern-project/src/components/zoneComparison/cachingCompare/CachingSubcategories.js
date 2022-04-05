@@ -306,7 +306,6 @@ const CachingSubcategories = (props) => {
               dataWithAuth,
               subcategoriesEndpoints.crawlhints
             );
-            console.log(postRequestResp);
             if (postRequestResp.success === true) {
               subcategories.crawlhints = true;
             }

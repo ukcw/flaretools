@@ -306,8 +306,6 @@ const CustomHostnames = (props) => {
     setNumberOfRecordsCopied(0);
     setNumberOfRecordsToCopy(data[0].result.length * data.slice(1).length);
 
-    CopyingProgressBarOnOpen();
-
     for (const record of baseZoneData.result) {
       const createData = {
         hostname: record.hostname,
@@ -320,13 +318,19 @@ const CustomHostnames = (props) => {
           apiToken: `Bearer ${credentials[key].apiToken}`,
         };
         setCurrentZone(key);
+        if (CopyingProgressBarIsOpen) {
+        } else {
+          CopyingProgressBarOnOpen();
+        }
         const dataWithAuth = { ...authObj, data: dataToCreate };
         const { resp: postRequestResp } = await sendPostRequest(
           dataWithAuth,
           "/copy/custom_hostnames"
         );
         if (postRequestResp.success === false) {
+          CopyingProgressBarOnClose();
           ErrorPromptOnOpen();
+          return;
         }
         setNumberOfRecordsCopied((prev) => prev + 1);
         // console.log(

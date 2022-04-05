@@ -2422,6 +2422,41 @@ router.post('/patch/settings/sort_query_string_for_cache', async request => {
 })
 
 /**
+ *
+ *
+ *
+ *
+ * Workers
+ *
+ *
+ *
+ */
+
+/**
+ * Workers Routes
+ */
+
+router.post('/copy/workers/routes', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/workers/routes',
+    query.data,
+  )
+})
+
+router.post('/delete/workers/routes', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/workers/routes',
+    query.identifier,
+  )
+})
+
+/**
  * Respond with hello worker text
  * @param {Request} request
  */

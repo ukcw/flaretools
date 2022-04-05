@@ -211,6 +211,7 @@ const MobileRedirect = (props) => {
       );
       if (postRequestResp.success === false) {
         ErrorPromptOnOpen();
+        return;
       }
       // console.log(
       //   "postRequest",
