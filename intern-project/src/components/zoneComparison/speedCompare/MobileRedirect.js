@@ -1,5 +1,4 @@
 import {
-  Heading,
   Stack,
   Table,
   Tag,
@@ -8,19 +7,25 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
+  CategoryTitle,
   CompareBaseToOthersCategorical,
   CompareData,
   getMultipleZoneSettings,
   HeaderFactoryOverloaded,
   Humanize,
+  patchZoneSetting,
 } from "../../../utils/utils";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
+import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
+import _ from "lodash";
 
 const convertOutput = (value) => {
   return value === true ? (
@@ -52,8 +57,19 @@ const returnConditions = (data) => {
 };
 
 const MobileRedirect = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [mobileRedirectData, setMobileRedirectData] = useState();
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // ErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const [currentZone, setCurrentZone] = useState();
 
   useEffect(() => {
     async function getData() {
@@ -135,11 +151,113 @@ const MobileRedirect = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const patchDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/mobile_redirect"
+      );
+      const processedResp = resp.map((zone) => zone.resp);
+      const secondaryProcessedResp = [
+        [JSON.parse(JSON.stringify(processedResp))], // this method does a deep copy of the objects
+        [JSON.parse(JSON.stringify(processedResp))],
+        [JSON.parse(JSON.stringify(processedResp))],
+      ];
+
+      secondaryProcessedResp[0] = secondaryProcessedResp[0][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result.id = "status";
+        return newObj;
+      });
+      secondaryProcessedResp[1] = secondaryProcessedResp[1][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result.id = "mobile_subdomain";
+        return newObj;
+      });
+      secondaryProcessedResp[2] = secondaryProcessedResp[2][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result.id = "strip_uri";
+        return newObj;
+      });
+      setMobileRedirectData(secondaryProcessedResp);
+    }
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0][0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    const createData = {
+      value: baseZoneData.result.value,
+    };
+
+    for (const key of otherZoneKeys) {
+      const dataToCreate = _.cloneDeep(createData);
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      setCurrentZone(key);
+      const dataWithAuth = { ...authObj, data: dataToCreate };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/patch/settings/mobile_redirect"
+      );
+      // console.log(
+      //   "postRequest",
+      //   postRequestResp,
+      //   postRequestResp.success,
+      //   postRequestResp.result
+      // );
+    }
+    SuccessPromptOnOpen();
+    setMobileRedirectData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md" id={props.id}>
-        Mobile Redirect
-      </Heading>
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          showCopyButton={
+            mobileRedirectData &&
+            mobileRedirectData[0][0].success &&
+            mobileRedirectData[0][0].result
+          }
+          copy={() =>
+            patchDataFromBaseToOthers(mobileRedirectData, zoneKeys, credentials)
+          }
+        />
+      }
+      {ErrorPromptIsOpen && (
+        <ErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorMessage={`An error has occurred, please close this window and try again.`}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={`Your ${Humanize(
+            props.id
+          )} settings have been successfully copied
+          from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
+        />
+      )}
       {!mobileRedirectData && <LoadingBox />}
       {mobileRedirectData && (
         <Table {...getTableProps}>
