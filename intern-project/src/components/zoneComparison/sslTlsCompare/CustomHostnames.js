@@ -1,6 +1,5 @@
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Text,
@@ -31,9 +30,9 @@ import {
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
-import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
+import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) => {
@@ -88,7 +87,7 @@ const CustomHostnames = (props) => {
   const [numberOfRecordsDeleted, setNumberOfRecordsDeleted] = useState(0);
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
-  const [errorPromptMessage, setErrorPromptMessage] = useState("");
+  const [errorPromptList, setErrorPromptList] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -231,9 +230,12 @@ const CustomHostnames = (props) => {
       const { resp } = await getZoneSetting(authObj, "/custom_hostnames");
 
       if (resp.success === false || resp.result.length === 0) {
-        const errorStr = `Code: ${resp.errors[0].code} 
-        Message: ${resp.errors[0].message}`;
-        setErrorPromptMessage(errorStr);
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setErrorPromptList((prev) => [...prev, errorObj]);
         ErrorPromptOnOpen();
         return;
       } else {
@@ -245,7 +247,14 @@ const CustomHostnames = (props) => {
             "/delete/custom_hostnames"
           );
           if (resp.success === false) {
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setErrorPromptList((prev) => [...prev, errorObj]);
             ErrorPromptOnOpen();
+            return;
           }
           setNumberOfRecordsDeleted((prev) => prev + 1);
         }
@@ -289,9 +298,12 @@ const CustomHostnames = (props) => {
       );
 
       if (checkIfEmpty.success === false) {
-        const errorStr = `Code: ${checkIfEmpty.errors[0].code} 
-        Message: ${checkIfEmpty.errors[0].message}`;
-        setErrorPromptMessage(errorStr);
+        const errorObj = {
+          code: checkIfEmpty.errors[0].code,
+          message: checkIfEmpty.errors[0].message,
+          data: "",
+        };
+        setErrorPromptList((prev) => [...prev, errorObj]);
         ErrorPromptOnOpen();
         return;
       }
@@ -328,20 +340,25 @@ const CustomHostnames = (props) => {
           "/copy/custom_hostnames"
         );
         if (postRequestResp.success === false) {
-          CopyingProgressBarOnClose();
-          ErrorPromptOnOpen();
-          return;
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: dataToCreate.hostname,
+          };
+          setErrorPromptList((prev) => [...prev, errorObj]);
         }
         setNumberOfRecordsCopied((prev) => prev + 1);
-        // console.log(
-        //   "postRequest",
-        //   postRequestResp.success,
-        //   postRequestResp.result
-        // );
       }
     }
     CopyingProgressBarOnClose();
-    SuccessPromptOnOpen();
+
+    // if there is some error at the end of copying, show the records that
+    // were not copied
+    if (errorPromptList.length > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
     setCustomHostnamesData();
     getData();
   };
@@ -381,14 +398,12 @@ const CustomHostnames = (props) => {
         />
       )}
       {ErrorPromptIsOpen && (
-        <ErrorPromptModal
+        <RecordsErrorPromptModal
           isOpen={ErrorPromptIsOpen}
           onOpen={ErrorPromptOnOpen}
           onClose={ErrorPromptOnClose}
           title={`Error`}
-          errorMessage={`An error has occurred, please close this window and try again. ${
-            errorPromptMessage ? errorPromptMessage : ""
-          }`}
+          errorList={errorPromptList}
         />
       )}
       {SuccessPromptIsOpen && (

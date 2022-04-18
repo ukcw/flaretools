@@ -120,7 +120,8 @@ function ZoneComparison() {
                 <Input
                   type="text"
                   placeholder="Zone ID"
-                  defaultValue={process.env.REACT_APP_PERSONAL_ZONE_ID}
+                  defaultValue={process.env.REACT_APP_BURRITO_BOT_ZONE_ID}
+                  // defaultValue={process.env.REACT_APP_PERSONAL_ZONE_ID}
                   onChange={(e) => handleChange(e, "zone_1", "zoneId")}
                   onBlur={(e) => handleChange(e, "zone_1", "zoneId")} // for testing
                 />
@@ -130,7 +131,10 @@ function ZoneComparison() {
                 <Input
                   type="text"
                   placeholder="API Token"
-                  defaultValue={process.env.REACT_APP_READ_ONLY_ALL_API_TOKEN}
+                  defaultValue={
+                    process.env.REACT_APP_BURRITO_BOT_READ_ONLY_API_TOKEN
+                  }
+                  // defaultValue={process.env.REACT_APP_READ_ONLY_ALL_API_TOKEN}
                   onChange={(e) => handleChange(e, "zone_1", "apiToken")}
                   onBlur={(e) => handleChange(e, "zone_1", "apiToken")} // for testing
                 />

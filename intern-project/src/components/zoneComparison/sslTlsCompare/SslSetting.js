@@ -1,6 +1,4 @@
 import {
-  Heading,
-  HStack,
   Stack,
   Table,
   Tbody,
@@ -66,6 +64,7 @@ const SslSetting = (props) => {
     onClose: SuccessPromptOnClose,
   } = useDisclosure(); // SuccessPromptModal;
   const [currentZone, setCurrentZone] = useState();
+  const [errorPromptMessage, setErrorPromptMessage] = useState("");
 
   useEffect(() => {
     async function getData() {
@@ -166,14 +165,11 @@ const SslSetting = (props) => {
           "/patch/settings/ssl"
         );
         if (postRequestResp.success === false) {
+          setErrorPromptMessage(
+            `An error has occurred, please close this window and try again.`
+          );
           ErrorPromptOnOpen();
         }
-        // console.log(
-        //   "postRequest",
-        //   postRequestResp,
-        //   postRequestResp.success,
-        //   postRequestResp.result
-        // );
       }
     }
     SuccessPromptOnOpen();
@@ -203,7 +199,7 @@ const SslSetting = (props) => {
           onOpen={ErrorPromptOnOpen}
           onClose={ErrorPromptOnClose}
           title={`Error`}
-          errorMessage={`An error has occurred, please close this window and try again.`}
+          errorMessage={errorPromptMessage}
         />
       )}
       {SuccessPromptIsOpen && (

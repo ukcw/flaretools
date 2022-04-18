@@ -2457,6 +2457,33 @@ router.post('/delete/workers/routes', async request => {
 })
 
 /**
+ *
+ *
+ *
+ * Spectrum
+ *
+ *
+ *
+ */
+
+/**
+ * Spectrum Applications
+ */
+router.post('/copy/spectrum/apps', async request => {
+  const { query } = await request.json()
+  return PostRequest(query.zoneId, query.apiToken, '/spectrum/apps', query.data)
+})
+
+router.post('/delete/spectrum/apps', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/spectrum/apps',
+    query.identifier,
+  )
+})
+/**
  * Respond with hello worker text
  * @param {Request} request
  */

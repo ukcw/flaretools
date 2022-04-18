@@ -28,9 +28,9 @@ import {
   UnsuccessfulHeaders,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
-import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
+import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) =>
@@ -52,7 +52,7 @@ const DnsRecords = (props) => {
     isOpen: ErrorPromptIsOpen,
     onOpen: ErrorPromptOnOpen,
     onClose: ErrorPromptOnClose,
-  } = useDisclosure(); // ErrorPromptModal;
+  } = useDisclosure(); // RecordsBasedErrorPromptModal;
   const {
     isOpen: SuccessPromptIsOpen,
     onOpen: SuccessPromptOnOpen,
@@ -73,6 +73,7 @@ const DnsRecords = (props) => {
   const [numberOfRecordsDeleted, setNumberOfRecordsDeleted] = useState(0);
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
+  const [errorPromptList, setErrorPromptList] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -280,15 +281,25 @@ const DnsRecords = (props) => {
           "/copy/dns_records"
         );
         if (postRequestResp.success === false) {
-          CopyingProgressBarOnClose();
-          ErrorPromptOnOpen();
-          return;
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: dataToCreate.name,
+          };
+          setErrorPromptList((prev) => [...prev, errorObj]);
         }
         setNumberOfRecordsCopied((prev) => prev + 1);
       }
     }
     CopyingProgressBarOnClose();
-    SuccessPromptOnOpen();
+
+    // if there is some error at the end of copying, show the records that
+    // were not copied
+    if (errorPromptList.length > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
     setDnsRecords();
     getData();
   };
@@ -324,12 +335,12 @@ const DnsRecords = (props) => {
         />
       )}
       {ErrorPromptIsOpen && (
-        <ErrorPromptModal
+        <RecordsErrorPromptModal
           isOpen={ErrorPromptIsOpen}
           onOpen={ErrorPromptOnOpen}
           onClose={ErrorPromptOnClose}
           title={`Error`}
-          errorMessage={`An error has occurred, please close this window and try again.`}
+          errorMessage={errorPromptList}
         />
       )}
       {SuccessPromptIsOpen && (

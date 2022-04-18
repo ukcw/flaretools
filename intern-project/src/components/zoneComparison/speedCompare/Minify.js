@@ -207,12 +207,6 @@ const Minify = (props) => {
         ErrorPromptOnOpen();
         return;
       }
-      // console.log(
-      //   "postRequest",
-      //   postRequestResp,
-      //   postRequestResp.success,
-      //   postRequestResp.result
-      // );
     }
     SuccessPromptOnOpen();
     setMinifyData();

@@ -222,12 +222,6 @@ const AutomaticPlatformOptimization = (props) => {
         ErrorPromptOnOpen();
         return;
       }
-      // console.log(
-      //   "postRequest",
-      //   postRequestResp,
-      //   postRequestResp.success,
-      //   postRequestResp.result
-      // );
     }
     SuccessPromptOnOpen();
     setAutomaticPlatformOptimizationData();

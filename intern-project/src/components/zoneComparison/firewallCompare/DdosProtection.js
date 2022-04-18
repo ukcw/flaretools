@@ -42,6 +42,7 @@ const isOverridden = (index, overrideArray, ruleId) => {
   ) {
     return false;
   } else {
+    console.log(overrideArray[index].result.rules[0]);
     for (
       let i = 0;
       i <
