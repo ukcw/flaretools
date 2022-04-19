@@ -330,9 +330,11 @@ const HttpRequestHeaderMod = (props) => {
     setNumberOfZonesCopied(0);
     setNumberOfZonesToCopy(otherZoneKeys.length);
 
-    CopyingProgressBarOnOpen();
     for (const key of otherZoneKeys) {
       setCurrentZone(key);
+      if (!CopyingProgressBarIsOpen) {
+        CopyingProgressBarOnOpen();
+      }
       const authObj = {
         zoneId: credentials[key].zoneId,
         apiToken: `Bearer ${credentials[key].apiToken}`,
@@ -428,9 +430,11 @@ const HttpRequestHeaderMod = (props) => {
     setNumberOfZonesCopied(0);
     setNumberOfZonesToCopy(otherZoneKeys.length);
 
-    CopyingProgressBarOnOpen();
     for (const key of otherZoneKeys) {
       setCurrentZone(key);
+      if (!CopyingProgressBarIsOpen) {
+        CopyingProgressBarOnOpen();
+      }
       const authObj = {
         zoneId: credentials[key].zoneId,
         apiToken: `Bearer ${credentials[key].apiToken}`,

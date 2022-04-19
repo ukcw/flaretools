@@ -2563,15 +2563,18 @@ router.post(
   },
 )
 
-// HTTP Response Headers Modification
+/**
+ * HTTP Response Headers Modification
+ */
 router.post(
-  '/rulesets/phases/http_response_headers_transform/entrypoint',
+  '/put/rulesets/phases/http_response_headers_transform/entrypoint',
   async request => {
     const { query } = await request.json()
-    return FetchRequest(
+    return PutRequest(
       query.zoneId,
       query.apiToken,
       '/rulesets/phases/http_response_headers_transform/entrypoint',
+      query.data,
     )
   },
 )
