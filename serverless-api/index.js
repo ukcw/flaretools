@@ -1546,7 +1546,7 @@ router.post('/settings/response_buffering', async request => {
   )
 })
 
-// Response Buffering
+// true_client_ip_header
 router.post('/settings/true_client_ip_header', async request => {
   const { query } = await request.json()
   return FetchRequest(
@@ -2453,6 +2453,174 @@ router.post('/delete/workers/routes', async request => {
     query.apiToken,
     '/workers/routes',
     query.identifier,
+  )
+})
+
+/**
+ *
+ *
+ *
+ *
+ *
+ * Network
+ *
+ *
+ *
+ *
+ */
+
+/**
+ * HTTP/2
+ */
+router.post('/patch/settings/http2', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/http2',
+    query.data,
+  )
+})
+
+/**
+ * HTTP/3 (with QUIC)
+ */
+router.post('/patch/settings/http3', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/http3',
+    query.data,
+  )
+})
+
+/**
+ * 0-RTT Connection Resumption
+ */
+router.post('/patch/settings/0rtt', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/0rtt',
+    query.data,
+  )
+})
+
+/**
+ * IPv6 Compatibility
+ */
+router.post('/patch/settings/ipv6', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/ipv6',
+    query.data,
+  )
+})
+
+//gRPC ==> /flags "protocol": { "gRPC": boolean }
+router.post('/post/flags/products/protocols/changes', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/flags/products/protocols/changes',
+    query.data,
+  )
+})
+
+/**
+ * WebSockets
+ */
+router.post('/patch/settings/websockets', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/websockets',
+    query.data,
+  )
+})
+
+/**
+ * Onion Routing
+ */
+router.post('/patch/settings/opportunistic_onion', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/opportunistic_onion',
+    query.data,
+  )
+})
+
+/**
+ * Psuedo IPv4
+ */
+router.post('/patch/settings/pseudo_ipv4', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/pseudo_ipv4',
+    query.data,
+  )
+})
+
+/**
+ * IP Geolocation
+ */
+router.post('/patch/settings/ip_geolocation', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/ip_geolocation',
+    query.data,
+  )
+})
+
+/**
+ * Maximum Upload Size
+ */
+router.post('/patch/settings/max_upload', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/max_upload',
+    query.data,
+  )
+})
+
+/**
+ * Response Buffering
+ */
+router.post('/patch/settings/response_buffering', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/response_buffering',
+    query.data,
+  )
+})
+
+/**
+ * True Client IP Header
+ */
+
+router.post('/patch/settings/true_client_ip_header', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/true_client_ip_header',
+    query.data,
   )
 })
 
