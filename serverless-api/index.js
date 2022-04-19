@@ -2582,12 +2582,18 @@ router.post(
   },
 )
 
-// // Normalization Settings (ENDPOINT HAS BEEN UPDATED BY CLOUDFLARE last checked 10/03/2022)
-// router.post('/url_normalization', async request => {
-//   const { query } = await request.json()
-
-//   return FetchRequest(query.zoneId, query.apiToken, '/url_normalization')
-// })
+/**
+ * Normalization Settings (ENDPOINT HAS BEEN UPDATED BY CLOUDFLARE last checked 10/03/2022)
+ */
+router.post('/put/url_normalization', async request => {
+  const { query } = await request.json()
+  return PutRequest(
+    query.zoneId,
+    query.apiToken,
+    '/url_normalization',
+    query.data,
+  )
+})
 
 /**
  *

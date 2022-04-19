@@ -8,19 +8,25 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
+  CategoryTitle,
   CompareBaseToOthersCategorical,
   CompareData,
   getMultipleZoneSettings,
   HeaderFactoryOverloaded,
   Humanize,
+  putZoneSetting,
 } from "../../../utils/utils";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
+import _ from "lodash";
+import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const convertOutput = (value) => {
   return value === true ? (
@@ -63,8 +69,19 @@ const returnConditions = (data) => {
 };
 
 const NormalizationRules = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [normalizationRulesData, setNormalizationRulesData] = useState();
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // ErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const [currentZone, setCurrentZone] = useState();
 
   useEffect(() => {
     async function getData() {
@@ -154,11 +171,121 @@ const NormalizationRules = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const putDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await putZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/url_normalization"
+      );
+      const processedResp = resp.map((zone) => zone.resp);
+      const secondaryProcessedResp = [
+        [JSON.parse(JSON.stringify(processedResp))], // this method does a deep copy of the objects
+        [JSON.parse(JSON.stringify(processedResp))], // use this for as many times as unique setting values required
+        [JSON.parse(JSON.stringify(processedResp))],
+      ];
+
+      // NORMALIZE TYPE
+      secondaryProcessedResp[0] = secondaryProcessedResp[0][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result["id"] = "normalization_type";
+        return newObj;
+      });
+
+      // NORMALIZE INCOMING URLS
+      secondaryProcessedResp[1] = secondaryProcessedResp[1][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result["id"] = "incoming_urls";
+        return newObj;
+      });
+
+      // NORMALIZE URLS TO ORIGIN
+      secondaryProcessedResp[2] = secondaryProcessedResp[2][0].map((res) => {
+        let newObj = { ...res };
+        newObj.result["id"] = "urls_to_origin";
+        return newObj;
+      });
+      setNormalizationRulesData(secondaryProcessedResp);
+    }
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0][0].result;
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    const createData = {
+      type: baseZoneData.type,
+      scope: baseZoneData.scope,
+    };
+
+    for (const key of otherZoneKeys) {
+      const dataToCreate = _.cloneDeep(createData);
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      setCurrentZone(key);
+      const dataWithAuth = { ...authObj, data: dataToCreate };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/put/url_normalization"
+      );
+      if (postRequestResp.success === false) {
+        ErrorPromptOnOpen();
+        return;
+      }
+    }
+    SuccessPromptOnOpen();
+    setNormalizationRulesData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md" id={props.id}>
-        Normalization Settings
-      </Heading>
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          showCopyButton={
+            normalizationRulesData &&
+            normalizationRulesData[0][0].success &&
+            normalizationRulesData[0][0].result
+          }
+          copy={() =>
+            putDataFromBaseToOthers(
+              normalizationRulesData,
+              zoneKeys,
+              credentials
+            )
+          }
+        />
+      }
+      {ErrorPromptIsOpen && (
+        <ErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorMessage={`An error has occurred, please close this window and try again.`}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={`Your ${Humanize(
+            props.id
+          )} settings have been successfully copied
+          from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
+        />
+      )}
       {!normalizationRulesData && <LoadingBox />}
       {normalizationRulesData && (
         <Table {...getTableProps}>
