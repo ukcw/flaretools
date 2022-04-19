@@ -355,7 +355,7 @@ const DnsRecords = (props) => {
           onOpen={ErrorPromptOnOpen}
           onClose={ErrorPromptOnClose}
           title={`Error`}
-          errorMessage={errorPromptList}
+          errorList={errorPromptList}
         />
       )}
       {SuccessPromptIsOpen && (

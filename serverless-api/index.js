@@ -2461,6 +2461,37 @@ router.post('/delete/workers/routes', async request => {
  *
  *
  *
+ * Rules
+ *
+ *
+ *
+ *
+ */
+
+/**
+ * Page Rules
+ */
+
+router.post('/copy/pagerules', async request => {
+  const { query } = await request.json()
+  return PostRequest(query.zoneId, query.apiToken, '/pagerules', query.data)
+})
+
+router.post('/delete/pagerules', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/pagerules',
+    query.identifier,
+  )
+})
+
+/**
+ *
+ *
+ *
+ *
  *
  * Network
  *
