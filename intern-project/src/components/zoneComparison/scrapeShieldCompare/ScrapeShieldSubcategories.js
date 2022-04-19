@@ -8,19 +8,27 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
+  CategoryTitle,
   CompareBaseToOthersCategorical,
   CompareData,
   getMultipleZoneSettings,
   HeaderFactoryOverloaded,
   Humanize,
+  patchZoneSetting,
+  SubcategoriesSuccessMessage,
 } from "../../../utils/utils";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useCompareContext } from "../../../lib/contextLib";
 import { useTable } from "react-table";
 import LoadingBox from "../../LoadingBox";
+import _ from "lodash";
+import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
+import ProgressBarModal from "../commonComponents/ProgressBarModal";
 
 const convertOutput = (value) => {
   return value === true ? (
@@ -45,9 +53,33 @@ const returnConditions = (data) => {
 };
 
 const ScrapeShieldSubcategories = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [scrapeShieldSubcategoriesData, setScrapeShieldSubcategoriesData] =
     useState();
+
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // ErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const {
+    isOpen: CopyingProgressBarIsOpen,
+    onOpen: CopyingProgressBarOnOpen,
+    onClose: CopyingProgressBarOnClose,
+  } = useDisclosure(); // ProgressBarModal -- Copying;
+  const [currentZone, setCurrentZone] = useState();
+  const [currentProgressSubcategory, setCurrentProgressSubcategory] =
+    useState("");
+  const [subcategoriesCopied, setSubcategoriesCopied] = useState("");
+  const [numberOfSubcategoriesToCopy, setNumberOfSubcategoriesToCopy] =
+    useState(0);
+  const [numberOfSubcategoriesCopied, setNumberOfSubcategoriesCopied] =
+    useState(0);
 
   useEffect(() => {
     async function getData() {
@@ -127,11 +159,147 @@ const ScrapeShieldSubcategories = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const patchDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await Promise.all([
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/email_obfuscation"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/server_side_exclude"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/hotlink_protection"
+        ),
+      ]);
+      const processedResp = resp.map((settingArray) =>
+        settingArray.map((zone) => zone.resp)
+      );
+      setScrapeShieldSubcategoriesData(processedResp);
+    }
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data;
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    setSubcategoriesCopied("");
+    const subcategories = {
+      email_obfuscation: undefined,
+      server_side_exclude: undefined,
+      hotlink_protection: undefined,
+    };
+
+    const subcategoriesEndpoints = {
+      email_obfuscation: "/patch/settings/email_obfuscation",
+      server_side_exclude: "/patch/settings/server_side_exclude",
+      hotlink_protection: "/patch/settings/hotlink_protection",
+    };
+
+    setNumberOfSubcategoriesCopied(0);
+    setNumberOfSubcategoriesToCopy(data.length * data[0].slice(1).length);
+    CopyingProgressBarOnOpen();
+
+    for (const record of baseZoneData) {
+      const currentSubcategory = record[0];
+      if (currentSubcategory.success === true && currentSubcategory.result) {
+        setCurrentProgressSubcategory(currentSubcategory.result.id);
+        const createData = {
+          value: currentSubcategory.result.value,
+        };
+        for (const key of otherZoneKeys) {
+          const dataToCreate = _.cloneDeep(createData);
+          const authObj = {
+            zoneId: credentials[key].zoneId,
+            apiToken: `Bearer ${credentials[key].apiToken}`,
+          };
+          setCurrentZone(key);
+          const dataWithAuth = { ...authObj, data: dataToCreate };
+          const { resp: postRequestResp } = await sendPostRequest(
+            dataWithAuth,
+            subcategoriesEndpoints[currentSubcategory.result.id]
+          );
+          if (postRequestResp.success === true) {
+            subcategories[currentSubcategory.result.id] = true;
+          }
+        }
+      } else {
+      }
+      setNumberOfSubcategoriesCopied((prev) => prev + 1);
+    }
+    setSubcategoriesCopied(subcategories);
+    CopyingProgressBarOnClose();
+    SuccessPromptOnOpen();
+    setScrapeShieldSubcategoriesData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <Heading size="md" id={props.id}>
-        Scrape Shield Subcategories
-      </Heading>
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          showCopyButton={
+            scrapeShieldSubcategoriesData &&
+            scrapeShieldSubcategoriesData.length
+          }
+          copy={() =>
+            patchDataFromBaseToOthers(
+              scrapeShieldSubcategoriesData,
+              zoneKeys,
+              credentials
+            )
+          }
+        />
+      }
+      {ErrorPromptIsOpen && (
+        <ErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorMessage={`An error has occurred, please close this window and try again.`}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={SubcategoriesSuccessMessage(
+            subcategoriesCopied,
+            zoneDetails.zone_1.name,
+            zoneDetails[currentZone].name
+          )}
+        />
+      )}
+      {CopyingProgressBarIsOpen && (
+        <ProgressBarModal
+          isOpen={CopyingProgressBarIsOpen}
+          onOpen={CopyingProgressBarOnOpen}
+          onClose={CopyingProgressBarOnClose}
+          title={`Your setting for ${Humanize(
+            currentProgressSubcategory
+          )} is being copied from ${zoneDetails.zone_1.name} to ${
+            zoneDetails[currentZone].name
+          }`}
+          progress={numberOfSubcategoriesCopied}
+          total={numberOfSubcategoriesToCopy}
+        />
+      )}
       {!scrapeShieldSubcategoriesData && <LoadingBox />}
       {scrapeShieldSubcategoriesData && (
         <Table {...getTableProps}>

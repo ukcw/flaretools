@@ -2460,6 +2460,56 @@ router.post('/delete/workers/routes', async request => {
  *
  *
  *
+ *
+ * Scrape Shield
+ *
+ *
+ *
+ */
+
+/**
+ * Email Address Obfuscation
+ */
+router.post('/patch/settings/email_obfuscation', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/email_obfuscation',
+    query.data,
+  )
+})
+
+/**
+ * Server-Side Exclude
+ */
+router.post('/patch/settings/server_side_exclude', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/server_side_exclude',
+    query.data,
+  )
+})
+
+/**
+ * Hotlink Protection
+ */
+router.post('/patch/settings/hotlink_protection', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/hotlink_protection',
+    query.data,
+  )
+})
+
+/**
+ *
+ *
+ *
  * Spectrum
  *
  *
