@@ -2534,18 +2534,21 @@ router.post('/delete/pagerules', async request => {
   )
 })
 
-// // URL Rewrite
-// router.post(
-//   '/rulesets/phases/http_request_transform/entrypoint',
-//   async request => {
-//     const { query } = await request.json()
-//     return FetchRequest(
-//       query.zoneId,
-//       query.apiToken,
-//       '/rulesets/phases/http_request_transform/entrypoint',
-//     )
-//   },
-// )
+/**
+ * URL Rewrite
+ */
+router.post(
+  '/put/rulesets/phases/http_request_transform/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return PutRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_request_transform/entrypoint',
+      query.data,
+    )
+  },
+)
 
 /**
  * HTTP Request Late Modification

@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Tbody,
@@ -8,7 +7,6 @@ import {
   Th,
   Thead,
   Tr,
-  HStack,
   VStack,
   Text,
   Divider,
