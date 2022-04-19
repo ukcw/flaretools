@@ -35,9 +35,10 @@ const RecordsErrorPromptModal = ({
               ={" "}
               {errorList.map((errObj) => (
                 <ListItem>
-                  {errObj.code}: {errObj.message}
-                  <br />
                   <Text fontWeight={"bold"}>{errObj.data}</Text>
+                  Code: {errObj.code}
+                  <br />
+                  Message: {errObj.message}
                 </ListItem>
               ))}
             </UnorderedList>

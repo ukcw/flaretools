@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Tbody,
@@ -28,9 +27,9 @@ import {
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
-import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
+import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) => {
@@ -89,7 +88,7 @@ const SpectrumApplications = (props) => {
   const [numberOfRecordsDeleted, setNumberOfRecordsDeleted] = useState(0);
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
-  const [errorPromptMessage, setErrorPromptMessage] = useState("");
+  const [errorPromptList, setErrorPromptList] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -197,6 +196,7 @@ const SpectrumApplications = (props) => {
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
+
   const handleDelete = async (data, zoneKeys, credentials) => {
     if (NonEmptyErrorIsOpen) {
       NonEmptyErrorOnClose();
@@ -224,6 +224,12 @@ const SpectrumApplications = (props) => {
       const { resp } = await getZoneSetting(authObj, "/spectrum/apps");
 
       if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setErrorPromptList((prev) => [...prev, errorObj]);
         ErrorPromptOnOpen();
         return;
       } else {
@@ -235,8 +241,14 @@ const SpectrumApplications = (props) => {
             "/delete/spectrum/apps"
           );
           if (resp.success === false) {
-            // NonEmptyErrorOnClose();
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setErrorPromptList((prev) => [...prev, errorObj]);
             ErrorPromptOnOpen();
+            return;
           }
           setNumberOfRecordsDeleted((prev) => prev + 1);
         }
@@ -261,6 +273,9 @@ const SpectrumApplications = (props) => {
       const processedResp = resp.map((zone) => zone.resp);
       setSpectrumApplicationsData(processedResp);
     }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
 
     SuccessPromptOnClose();
     // not possible for data not to be loaded (logic is at displaying this button)
@@ -290,34 +305,45 @@ const SpectrumApplications = (props) => {
     setNumberOfRecordsToCopy(data[0].result.length * data.slice(1).length);
 
     for (const record of baseZoneData.result) {
-      console.log(record);
+      const exp = new RegExp("(.*)?." + zoneDetails.zone_1.name);
+
+      // match out base zone name
+      const recordDnsName = record.dns.name.match(exp)[1];
+      record.dns.name = recordDnsName;
+
       const createData = {
-        origin_direct:
-          record?.origin_direct !== undefined
-            ? record.origin_direct
-            : [record.origin_dns.name],
+        // origin_direct:
+        //   record?.origin_direct !== undefined
+        //     ? record.origin_direct
+        //     : [record.origin_dns.name],
+        origin_direct: record.origin_direct,
         dns: record.dns,
         protocol: record.protocol,
       };
-      // if (record?.proxy_protocol !== undefined) {
-      //   createData["proxy_protocol"] = record.proxy_protocol;
-      // }
-      // if (record?.edge_ips !== undefined) {
-      //   createData.edge_ips = record.edge_ips;
-      // }
-      // if (record?.argo_smart_routing !== undefined) {
-      //   createData["argo_smart_routing"] = record.argo_smart_routing;
-      // }
-      // if (record?.ip_firewall !== undefined) {
-      //   createData["ip_firewall"] = record.ip_firewall;
-      // }
-      // if (record?.tls !== undefined) {
-      //   createData["tls"] = record.tls;
-      // }
-      // if (record?.traffic_type !== undefined) {
-      //   createData["traffic_type"] = record.traffic_type;
-      // }
-      console.log(createData);
+      if (record?.proxy_protocol !== undefined) {
+        createData["proxy_protocol"] = record.proxy_protocol;
+      }
+      if (record?.edge_ips !== undefined) {
+        createData.edge_ips = record.edge_ips;
+      }
+      if (record?.argo_smart_routing !== undefined) {
+        createData["argo_smart_routing"] = record.argo_smart_routing;
+      }
+      if (record?.ip_firewall !== undefined) {
+        createData["ip_firewall"] = record.ip_firewall;
+      }
+      if (record?.tls !== undefined) {
+        createData["tls"] = record.tls;
+      }
+      if (record?.traffic_type !== undefined) {
+        createData["traffic_type"] = record.traffic_type;
+      }
+      if (record?.origin_dns !== undefined) {
+        createData["origin_dns"] = record.origin_dns;
+      }
+      if (record?.origin_port !== undefined) {
+        createData["origin_port"] = record.origin_port;
+      }
       for (const key of otherZoneKeys) {
         const dataToCreate = _.cloneDeep(createData);
         const authObj = {
@@ -335,19 +361,23 @@ const SpectrumApplications = (props) => {
           "/copy/spectrum/apps"
         );
         if (postRequestResp.success === false) {
-          console.log(postRequestResp);
-          const errorStr = `Code: ${postRequestResp.errors[0].code} 
-          Message: ${postRequestResp.errors[0].message}`;
-          setErrorPromptMessage(errorStr);
-          CopyingProgressBarOnClose();
-          ErrorPromptOnOpen();
-          return;
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: dataToCreate.dns.name,
+          };
+          errorCount += 1;
+          setErrorPromptList((prev) => [...prev, errorObj]);
         }
         setNumberOfRecordsCopied((prev) => prev + 1);
       }
     }
     CopyingProgressBarOnClose();
-    SuccessPromptOnOpen();
+    if (errorCount > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
     setSpectrumApplicationsData();
     getData();
   };
@@ -391,14 +421,12 @@ const SpectrumApplications = (props) => {
         />
       )}
       {ErrorPromptIsOpen && (
-        <ErrorPromptModal
+        <RecordsErrorPromptModal
           isOpen={ErrorPromptIsOpen}
           onOpen={ErrorPromptOnOpen}
           onClose={ErrorPromptOnClose}
           title={`Error`}
-          errorMessage={`An error has occurred, please close this window and try again. ${
-            errorPromptMessage ? errorPromptMessage : ""
-          }`}
+          errorList={errorPromptList}
         />
       )}
       {SuccessPromptIsOpen && (

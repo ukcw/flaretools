@@ -280,6 +280,9 @@ const CustomHostnames = (props) => {
       setCustomHostnamesData(processedResp);
     }
 
+    let errorCount = 0;
+    setErrorPromptList([]);
+
     SuccessPromptOnClose();
     // not possible for data not to be loaded (logic is at displaying this button)
     const baseZoneData = data[0];
@@ -345,6 +348,7 @@ const CustomHostnames = (props) => {
             message: postRequestResp.errors[0].message,
             data: dataToCreate.hostname,
           };
+          errorCount += 1;
           setErrorPromptList((prev) => [...prev, errorObj]);
         }
         setNumberOfRecordsCopied((prev) => prev + 1);
@@ -354,7 +358,7 @@ const CustomHostnames = (props) => {
 
     // if there is some error at the end of copying, show the records that
     // were not copied
-    if (errorPromptList.length > 0) {
+    if (errorCount > 0) {
       ErrorPromptOnOpen();
     } else {
       SuccessPromptOnOpen();

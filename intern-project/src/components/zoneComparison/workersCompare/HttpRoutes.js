@@ -30,6 +30,7 @@ import LoadingBox from "../../LoadingBox";
 import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
+import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) => {
@@ -69,6 +70,7 @@ const HttpRoutes = (props) => {
   const [numberOfRecordsDeleted, setNumberOfRecordsDeleted] = useState(0);
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
+  const [errorPromptList, setErrorPromptList] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -163,6 +165,12 @@ const HttpRoutes = (props) => {
       const { resp } = await getZoneSetting(authObj, "/workers/routes");
 
       if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setErrorPromptList((prev) => [...prev, errorObj]);
         ErrorPromptOnOpen();
         return;
       } else {
@@ -174,8 +182,14 @@ const HttpRoutes = (props) => {
             "/delete/workers/routes"
           );
           if (resp.success === false) {
-            // NonEmptyErrorOnClose();
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setErrorPromptList((prev) => [...prev, errorObj]);
             ErrorPromptOnOpen();
+            return;
           }
           setNumberOfRecordsDeleted((prev) => prev + 1);
         }
@@ -200,6 +214,9 @@ const HttpRoutes = (props) => {
       const processedResp = resp.map((zone) => zone.resp);
       setHttpRoutesData(processedResp);
     }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
 
     SuccessPromptOnClose();
     // not possible for data not to be loaded (logic is at displaying this button)
@@ -256,18 +273,27 @@ const HttpRoutes = (props) => {
           "/copy/workers/routes"
         );
         if (postRequestResp.success === false) {
-          CopyingProgressBarOnClose();
-          ErrorPromptOnOpen();
-          return;
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: dataToCreate.pattern,
+          };
+          errorCount += 1;
+          setErrorPromptList((prev) => [...prev, errorObj]);
         }
         setNumberOfRecordsCopied((prev) => prev + 1);
       }
     }
     CopyingProgressBarOnClose();
-    SuccessPromptOnOpen();
+    if (errorCount > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
     setHttpRoutesData();
     getData();
   };
+
   return (
     <Stack w="100%" spacing={4}>
       {
@@ -303,12 +329,12 @@ const HttpRoutes = (props) => {
         />
       )}
       {ErrorPromptIsOpen && (
-        <ErrorPromptModal
+        <RecordsErrorPromptModal
           isOpen={ErrorPromptIsOpen}
           onOpen={ErrorPromptOnOpen}
           onClose={ErrorPromptOnClose}
           title={`Error`}
-          errorMessage={`An error has occurred, please close this window and try again.`}
+          errorList={errorPromptList}
         />
       )}
       {SuccessPromptIsOpen && (

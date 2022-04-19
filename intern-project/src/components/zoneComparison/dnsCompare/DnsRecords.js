@@ -172,6 +172,12 @@ const DnsRecords = (props) => {
       const { resp } = await getZoneSetting(authObj, "/dns_records");
 
       if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setErrorPromptList((prev) => [...prev, errorObj]);
         ErrorPromptOnOpen();
         return;
       } else {
@@ -183,7 +189,12 @@ const DnsRecords = (props) => {
             "/delete/dns_records"
           );
           if (resp.success === false) {
-            // NonEmptyErrorOnClose();
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setErrorPromptList((prev) => [...prev, errorObj]);
             ErrorPromptOnOpen();
           }
           setNumberOfRecordsDeleted((prev) => prev + 1);
@@ -209,6 +220,9 @@ const DnsRecords = (props) => {
       const processedResp = resp.map((zone) => zone.resp);
       setDnsRecords(processedResp);
     }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
 
     SuccessPromptOnClose();
     // not possible for data not to be loaded (logic is at displaying this button)
@@ -286,6 +300,7 @@ const DnsRecords = (props) => {
             message: postRequestResp.errors[0].message,
             data: dataToCreate.name,
           };
+          errorCount += 1;
           setErrorPromptList((prev) => [...prev, errorObj]);
         }
         setNumberOfRecordsCopied((prev) => prev + 1);
@@ -295,7 +310,7 @@ const DnsRecords = (props) => {
 
     // if there is some error at the end of copying, show the records that
     // were not copied
-    if (errorPromptList.length > 0) {
+    if (errorCount > 0) {
       ErrorPromptOnOpen();
     } else {
       SuccessPromptOnOpen();
