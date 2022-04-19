@@ -489,6 +489,25 @@ export const patchZoneSetting = async (query, endpoint) => {
 };
 
 /**
+ * A POST request containing the data required to patch a resource at the specified endpoint
+ * @param {*} query
+ * @param {*} endpoint
+ * @returns
+ */
+export const putZoneSetting = async (query, endpoint) => {
+  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  return resp.json();
+};
+
+/**
  *
  * @param {*} query
  * @param {*} endpoint

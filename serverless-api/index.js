@@ -1919,6 +1919,53 @@ async function PatchRequest(zoneId, apiToken, endpoint, data) {
   }
 }
 
+async function putZoneSetting(zoneId, apiToken, endpoint, data) {
+  var myHeaders = new Headers()
+  myHeaders.append('Authorization', `${apiToken}`)
+  myHeaders.append('Content-Type', 'application/json')
+
+  var requestOptions = {
+    method: 'PUT',
+    headers: myHeaders,
+    redirect: 'follow',
+    body: JSON.stringify(data),
+  }
+
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/zones/${zoneId}${endpoint}`,
+    requestOptions,
+  )
+
+  const respJSON = await resp.json()
+
+  return respJSON
+}
+
+async function PutRequest(zoneId, apiToken, endpoint, data) {
+  try {
+    const resp = await putZoneSetting(zoneId, apiToken, endpoint, data)
+
+    return new Response(
+      JSON.stringify({
+        resp,
+      }),
+      {
+        headers: {
+          'Content-type': 'application/json',
+          ...corsHeaders,
+        },
+      },
+    )
+  } catch (e) {
+    return new Response(JSON.stringify(e.message), {
+      headers: {
+        'Content-type': 'application/json',
+        ...corsHeaders,
+      },
+    })
+  }
+}
+
 /**
  * DNS Records
  */
@@ -2486,6 +2533,55 @@ router.post('/delete/pagerules', async request => {
     query.identifier,
   )
 })
+
+// // URL Rewrite
+// router.post(
+//   '/rulesets/phases/http_request_transform/entrypoint',
+//   async request => {
+//     const { query } = await request.json()
+//     return FetchRequest(
+//       query.zoneId,
+//       query.apiToken,
+//       '/rulesets/phases/http_request_transform/entrypoint',
+//     )
+//   },
+// )
+
+/**
+ * HTTP Request Late Modification
+ */
+router.post(
+  '/put/rulesets/phases/http_request_late_transform/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return PutRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_request_late_transform/entrypoint',
+      query.data,
+    )
+  },
+)
+
+// HTTP Response Headers Modification
+router.post(
+  '/rulesets/phases/http_response_headers_transform/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return FetchRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_response_headers_transform/entrypoint',
+    )
+  },
+)
+
+// // Normalization Settings (ENDPOINT HAS BEEN UPDATED BY CLOUDFLARE last checked 10/03/2022)
+// router.post('/url_normalization', async request => {
+//   const { query } = await request.json()
+
+//   return FetchRequest(query.zoneId, query.apiToken, '/url_normalization')
+// })
 
 /**
  *

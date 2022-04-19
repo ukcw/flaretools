@@ -101,7 +101,7 @@ const HttpResponseHeaderMod = (props) => {
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
-        "/rulesets/phases/http_request_late_transform/entrypoint"
+        "/rulesets/phases/http_response_headers_transform/entrypoint"
       );
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.resp };
@@ -128,7 +128,13 @@ const HttpResponseHeaderMod = (props) => {
           const exprs = row.expression.split(/\band\b|\bor\b/);
           const output = exprs.map((expr) => GetExpressionOutput(expr));
           return (
-            <VStack w="100%" p={0} align={"flex-start"}>
+            <VStack
+              w="100%"
+              p={0}
+              align={"flex-start"}
+              overflowWrap={"break-word"}
+              wordBreak={"break-word"}
+            >
               <Text>{row.description}</Text>
               <Text color="grey">{output.join(", ")}</Text>
             </VStack>
@@ -155,7 +161,14 @@ const HttpResponseHeaderMod = (props) => {
               const item = row.action_parameters.headers[header];
               return item?.expression !== undefined &&
                 item?.operation !== undefined ? (
-                <VStack w="100%" p={0} align={"flex-start"} key={header}>
+                <VStack
+                  w="100%"
+                  p={0}
+                  align={"flex-start"}
+                  key={header}
+                  overflowWrap={"break-word"}
+                  wordBreak={"break-word"}
+                >
                   <Text fontWeight={"bold"}>Operation: </Text>
                   <Text>{item.operation}</Text>
                   <Text fontWeight={"bold"}>Header name:</Text>
@@ -168,7 +181,14 @@ const HttpResponseHeaderMod = (props) => {
                   ) : null}
                 </VStack>
               ) : item?.value !== undefined && item?.operation !== undefined ? (
-                <VStack w="100%" p={0} align={"flex-start"} key={header}>
+                <VStack
+                  w="100%"
+                  p={0}
+                  align={"flex-start"}
+                  key={header}
+                  overflowWrap={"break-word"}
+                  wordBreak={"break-word"}
+                >
                   <Text fontWeight={"bold"}>Operation: </Text>
                   <Text>{item.operation}</Text>
                   <Text fontWeight={"bold"}>Header name:</Text>

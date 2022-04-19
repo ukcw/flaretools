@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Tbody,
@@ -8,24 +7,32 @@ import {
   Th,
   Thead,
   Tr,
-  HStack,
   VStack,
   Text,
   Divider,
+  useDisclosure,
 } from "@chakra-ui/react";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
+  getZoneSetting,
   HeaderFactory,
   HeaderFactoryWithTags,
+  Humanize,
+  putZoneSetting,
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
+import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
+import ProgressBarModal from "../commonComponents/ProgressBarModal";
+import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const GetExpressionOutput = (expr) => {
   if (/ip.geoip.country /.test(expr)) {
@@ -93,8 +100,32 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const HttpRequestHeaderMod = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [httpRequestHeaderModData, setHttpRequestHeaderModData] = useState();
+  const {
+    isOpen: NonEmptyErrorIsOpen,
+    onOpen: NonEmptyErrorOnOpen,
+    onClose: NonEmptyErrorOnClose,
+  } = useDisclosure(); // NonEmptyErrorModal;
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // RecordsBasedErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const {
+    isOpen: CopyingProgressBarIsOpen,
+    onOpen: CopyingProgressBarOnOpen,
+    onClose: CopyingProgressBarOnClose,
+  } = useDisclosure(); // ProgressBarModal -- Copying;
+  const [currentZone, setCurrentZone] = useState();
+  const [numberOfZonesToCopy, setNumberOfZonesToCopy] = useState(0);
+  const [numberOfZonesCopied, setNumberOfZonesCopied] = useState(0);
+  const [errorPromptList, setErrorPromptList] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -129,7 +160,13 @@ const HttpRequestHeaderMod = (props) => {
           const exprs = row.expression.split(/\band\b|\bor\b/);
           const output = exprs.map((expr) => GetExpressionOutput(expr));
           return (
-            <VStack w="100%" p={0} align={"flex-start"}>
+            <VStack
+              w="100%"
+              p={0}
+              align={"flex-start"}
+              overflowWrap={"break-word"}
+              wordBreak={"break-word"}
+            >
               <Text>{row.description}</Text>
               <Text color="grey">{output.join(", ")}</Text>
             </VStack>
@@ -156,7 +193,14 @@ const HttpRequestHeaderMod = (props) => {
               const item = row.action_parameters.headers[header];
               return item?.expression !== undefined &&
                 item?.operation !== undefined ? (
-                <VStack w="100%" p={0} align={"flex-start"} key={header}>
+                <VStack
+                  w="100%"
+                  p={0}
+                  align={"flex-start"}
+                  key={header}
+                  overflowWrap={"break-word"}
+                  wordBreak={"break-word"}
+                >
                   <Text fontWeight={"bold"}>Operation: </Text>
                   <Text>{item.operation}</Text>
                   <Text fontWeight={"bold"}>Header name:</Text>
@@ -169,7 +213,14 @@ const HttpRequestHeaderMod = (props) => {
                   ) : null}
                 </VStack>
               ) : item?.value !== undefined && item?.operation !== undefined ? (
-                <VStack w="100%" p={0} align={"flex-start"} key={header}>
+                <VStack
+                  w="100%"
+                  p={0}
+                  align={"flex-start"}
+                  key={header}
+                  overflowWrap={"break-word"}
+                  wordBreak={"break-word"}
+                >
                   <Text fontWeight={"bold"}>Operation: </Text>
                   <Text>{item.operation}</Text>
                   <Text fontWeight={"bold"}>Header name:</Text>
@@ -230,13 +281,260 @@ const HttpRequestHeaderMod = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const handleDelete = async (data, zoneKeys, credentials) => {
+    if (NonEmptyErrorIsOpen) {
+      NonEmptyErrorOnClose();
+    }
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await putZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/http_request_late_transform/entrypoint"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj["result"] =
+          zone.resp.result?.rules !== undefined
+            ? makeData(zone.resp.result.rules)
+            : [];
+        return newObj;
+      });
+      setHttpRequestHeaderModData(processedResp);
+    }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+
+    const baseZoneData = data[0].result.map((record) => {
+      const newObj = {
+        action: record.action,
+        action_parameters: record.action_parameters,
+        expression: record.expression,
+        enabled: record.enabled,
+        version: record.version,
+        description: record.description,
+      };
+      return newObj;
+    });
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    setNumberOfZonesCopied(0);
+    setNumberOfZonesToCopy(otherZoneKeys.length);
+
+    CopyingProgressBarOnOpen();
+    for (const key of otherZoneKeys) {
+      setCurrentZone(key);
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/put/rulesets/phases/http_request_late_transform/entrypoint"
+      );
+      if (postRequestResp.success === false) {
+        const errorObj = {
+          code: postRequestResp.errors[0].code,
+          message: postRequestResp.errors[0].message,
+          data: "",
+        };
+        errorCount += 1;
+        setErrorPromptList((prev) => [...prev, errorObj]);
+      }
+      setNumberOfZonesCopied((prev) => prev + 1);
+    }
+    CopyingProgressBarOnClose();
+
+    // if there is some error at the end of copying, show the records that
+    // were not copied
+    if (errorCount > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
+    setHttpRequestHeaderModData();
+    getData();
+  };
+
+  const putDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await putZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/http_request_late_transform/entrypoint"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj["result"] =
+          zone.resp.result?.rules !== undefined
+            ? makeData(zone.resp.result.rules)
+            : [];
+        return newObj;
+      });
+      setHttpRequestHeaderModData(processedResp);
+    }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+
+    const baseZoneData = data[0].result.map((record) => {
+      const newObj = {
+        action: record.action,
+        action_parameters: record.action_parameters,
+        expression: record.expression,
+        enabled: record.enabled,
+        version: record.version,
+        description: record.description,
+      };
+      return newObj;
+    });
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const { resp: checkIfEmpty } = await getZoneSetting(
+        authObj,
+        "/rulesets/phases/http_request_late_transform/entrypoint"
+      );
+
+      if (checkIfEmpty.success === true && checkIfEmpty.result.length !== 0) {
+        setCurrentZone(key);
+        NonEmptyErrorOnOpen();
+        return;
+      }
+    }
+
+    setNumberOfZonesCopied(0);
+    setNumberOfZonesToCopy(otherZoneKeys.length);
+
+    CopyingProgressBarOnOpen();
+    for (const key of otherZoneKeys) {
+      setCurrentZone(key);
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/put/rulesets/phases/http_request_late_transform/entrypoint"
+      );
+      if (postRequestResp.success === false) {
+        const errorObj = {
+          code: postRequestResp.errors[0].code,
+          message: postRequestResp.errors[0].message,
+          data: "",
+        };
+        errorCount += 1;
+        setErrorPromptList((prev) => [...prev, errorObj]);
+      }
+      setNumberOfZonesCopied((prev) => prev + 1);
+    }
+    CopyingProgressBarOnClose();
+
+    // if there is some error at the end of copying, show the records that
+    // were not copied
+    if (errorCount > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
+    setHttpRequestHeaderModData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md" id={props.id}>
-          HTTP Request Header Modification
-        </Heading>
-      </HStack>
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          showCopyButton={
+            httpRequestHeaderModData &&
+            httpRequestHeaderModData[0].success &&
+            httpRequestHeaderModData[0].result.length
+          }
+          copy={() =>
+            putDataFromBaseToOthers(
+              httpRequestHeaderModData,
+              zoneKeys,
+              credentials
+            )
+          }
+        />
+      }
+      {NonEmptyErrorIsOpen && (
+        <NonEmptyErrorModal
+          isOpen={NonEmptyErrorIsOpen}
+          onOpen={NonEmptyErrorOnOpen}
+          onClose={NonEmptyErrorOnClose}
+          handleDelete={() =>
+            handleDelete(httpRequestHeaderModData, zoneKeys, credentials)
+          }
+          title={`There are some existing records in ${zoneDetails[currentZone].name}`}
+          errorMessage={`To proceed with copying ${Humanize(props.id)} from ${
+            zoneDetails.zone_1.name
+          } 
+          to ${zoneDetails[currentZone].name}, the existing records 
+          in ${
+            zoneDetails[currentZone].name
+          } need to be deleted. This action is irreversible.`}
+        />
+      )}
+      {ErrorPromptIsOpen && (
+        <RecordsErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorList={errorPromptList}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={`Your ${Humanize(
+            props.id
+          )} settings have been successfully copied
+          from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
+        />
+      )}
+      {CopyingProgressBarIsOpen && (
+        <ProgressBarModal
+          isOpen={CopyingProgressBarIsOpen}
+          onOpen={CopyingProgressBarOnOpen}
+          onClose={CopyingProgressBarOnClose}
+          title={`Your rules for ${Humanize(props.id)} is being copied from ${
+            zoneDetails.zone_1.name
+          } to ${zoneDetails[currentZone].name}`}
+          progress={numberOfZonesCopied}
+          total={numberOfZonesToCopy}
+        />
+      )}
       {!httpRequestHeaderModData && <LoadingBox />}
       {httpRequestHeaderModData && (
         <Table {...getTableProps}>
