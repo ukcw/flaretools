@@ -2190,11 +2190,28 @@ router.post('/patch/settings/tls_client_auth', async request => {
 //   return FetchRequest(query.zoneId, query.apiToken, '/rate_limits')
 // })
 
-// // Firewall User Agent Blocking Rules
-// router.post('/firewall/ua_rules', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(query.zoneId, query.apiToken, '/firewall/ua_rules')
-// })
+/**
+ * Firewall User Agent Blocking Rules
+ */
+router.post('/copy/firewall/ua_rules', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/ua_rules',
+    query.data,
+  )
+})
+
+router.post('/delete/firewall/ua_rules', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/ua_rules',
+    query.identifier,
+  )
+})
 
 /**
  * Firewall Lockdowns
