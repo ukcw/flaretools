@@ -222,6 +222,7 @@ const ZoneLockdown = (props) => {
             };
             setErrorPromptList((prev) => [...prev, errorObj]);
             ErrorPromptOnOpen();
+            return;
           }
           setNumberOfRecordsDeleted((prev) => prev + 1);
         }
@@ -315,7 +316,7 @@ const ZoneLockdown = (props) => {
           const errorObj = {
             code: postRequestResp.errors[0].code,
             message: postRequestResp.errors[0].message,
-            data: dataToCreate.name,
+            data: record.id,
           };
           errorCount += 1;
           setErrorPromptList((prev) => [...prev, errorObj]);

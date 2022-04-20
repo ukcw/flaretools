@@ -258,6 +258,7 @@ const PageRules = (props) => {
             };
             setErrorPromptList((prev) => [...prev, errorObj]);
             ErrorPromptOnOpen();
+            return;
           }
           setNumberOfRecordsDeleted((prev) => prev + 1);
         }

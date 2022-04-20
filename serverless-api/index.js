@@ -2174,15 +2174,28 @@ router.post('/patch/settings/tls_client_auth', async request => {
 //   return FetchRequest(query.zoneId, query.apiToken, '/rulesets')
 // })
 
-// // Firewall Access Rules
-// router.post('/firewall/access_rules/rules', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(
-//     query.zoneId,
-//     query.apiToken,
-//     '/firewall/access_rules/rules',
-//   )
-// })
+/**
+ * Firewall Access Rules (IP Access Rules)
+ */
+router.post('/copy/firewall/access_rules/rules', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/access_rules/rules',
+    query.data,
+  )
+})
+
+router.post('/delete/firewall/access_rules/rules', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/access_rules/rules',
+    query.identifier,
+  )
+})
 
 // // Rate Limits
 // router.post('/rate_limits', async request => {
