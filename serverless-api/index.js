@@ -2134,7 +2134,7 @@ router.post('/patch/settings/tls_client_auth', async request => {
  *
  *
  *
- * FIREWALL GOES HERE
+ * FIREWALL
  *
  *
  *
@@ -2197,11 +2197,23 @@ router.post('/delete/firewall/access_rules/rules', async request => {
   )
 })
 
-// // Rate Limits
-// router.post('/rate_limits', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(query.zoneId, query.apiToken, '/rate_limits')
-// })
+/**
+ * Rate Limits
+ */
+router.post('/copy/rate_limits', async request => {
+  const { query } = await request.json()
+  return PostRequest(query.zoneId, query.apiToken, '/rate_limits', query.data)
+})
+
+router.post('/delete/rate_limits', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/rate_limits',
+    query.identifier,
+  )
+})
 
 /**
  * Firewall User Agent Blocking Rules
