@@ -1,5 +1,4 @@
 import {
-  Heading,
   Stack,
   Table,
   Tag,

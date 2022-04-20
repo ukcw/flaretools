@@ -2196,11 +2196,28 @@ router.post('/patch/settings/tls_client_auth', async request => {
 //   return FetchRequest(query.zoneId, query.apiToken, '/firewall/ua_rules')
 // })
 
-// // Firewall Lockdowns
-// router.post('/firewall/lockdowns', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(query.zoneId, query.apiToken, '/firewall/lockdowns')
-// })
+/**
+ * Firewall Lockdowns
+ */
+router.post('/copy/firewall/lockdowns', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/lockdowns',
+    query.data,
+  )
+})
+
+router.post('/delete/firewall/lockdowns', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/lockdowns',
+    query.identifier,
+  )
+})
 
 /**
  * Security Level
