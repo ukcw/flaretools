@@ -2127,11 +2127,210 @@ router.post('/patch/settings/tls_client_auth', async request => {
 })
 
 /**
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  * FIREWALL GOES HERE
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
+// // Firewall Rules
+// router.post('/firewall/rules', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/firewall/rules')
+// })
+
+// // WAF Setting
+// router.post('/settings/waf', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/settings/waf')
+// })
+
+// // managed_rulesets_results, to be added
+// router.post(
+//   '/rulesets/phases/http_request_firewall_managed/entrypoint',
+//   async request => {
+//     const { query } = await request.json()
+//     return FetchRequest(
+//       query.zoneId,
+//       query.apiToken,
+//       '/rulesets/phases/http_request_firewall_managed/entrypoint',
+//     )
+//   },
+// )
+
+// // Rulesets
+// router.post('/rulesets', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/rulesets')
+// })
+
+// // Firewall Access Rules
+// router.post('/firewall/access_rules/rules', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(
+//     query.zoneId,
+//     query.apiToken,
+//     '/firewall/access_rules/rules',
+//   )
+// })
+
+// // Rate Limits
+// router.post('/rate_limits', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/rate_limits')
+// })
+
+// // Firewall User Agent Blocking Rules
+// router.post('/firewall/ua_rules', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/firewall/ua_rules')
+// })
+
+// // Firewall Lockdowns
+// router.post('/firewall/lockdowns', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/firewall/lockdowns')
+// })
+
 /**
+ * Security Level
+ */
+router.post('/patch/settings/security_level', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/security_level',
+    query.data,
+  )
+})
+
+/**
+ * Challenge TTL
+ */
+router.post('/patch/settings/challenge_ttl', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/challenge_ttl',
+    query.data,
+  )
+})
+
+/**
+ * Browser Check
+ */
+router.post('/patch/settings/browser_check', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/browser_check',
+    query.data,
+  )
+})
+
+/**
+ * Privacy Pass
+ */
+router.post('/patch/settings/privacy_pass', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    '/settings/privacy_pass',
+    query.data,
+  )
+})
+
+// // Custom Rules
+// router.post(
+//   '/rulesets/phases/http_request_firewall_custom/entrypoint',
+//   async request => {
+//     const { query } = await request.json()
+//     return FetchRequest(
+//       query.zoneId,
+//       query.apiToken,
+//       '/rulesets/phases/http_request_firewall_custom/entrypoint',
+//     )
+//   },
+// )
+
+// // Custom Rules Rate Limits
+// router.post('/rulesets/phases/http_ratelimit/entrypoint', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(
+//     query.zoneId,
+//     query.apiToken,
+//     '/rulesets/phases/http_ratelimit/entrypoint',
+//   )
+// })
+
+// // Page Shield
+// router.post('/script_monitor/scripts', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(query.zoneId, query.apiToken, '/script_monitor/scripts')
+// })
+
+// // DDoS L7
+// router.post('/rulesets/phases/ddos_l7/entrypoint', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(
+//     query.zoneId,
+//     query.apiToken,
+//     '/rulesets/phases/ddos_l7/entrypoint',
+//   )
+// })
+
+// // DDoS L7 ruleset
+// // DDoS L7 Ruleset ID = 4d21379b4f9f4bb088e0729962c8b3cf
+// // if this ID changes on Cloudflare API's side, then this value needs to be updated
+// router.post('/rulesets/ddos_l7', async request => {
+//   const { query } = await request.json()
+//   return FetchRequest(
+//     query.zoneId,
+//     query.apiToken,
+//     '/rulesets/4d21379b4f9f4bb088e0729962c8b3cf',
+//   )
+// })
+
+/**
+ * DDoS L7
+ */
+router.post('/put/rulesets/phases/ddos_l7/entrypoint', async request => {
+  const { query } = await request.json()
+  return PutRequest(
+    query.zoneId,
+    query.apiToken,
+    '/rulesets/phases/ddos_l7/entrypoint',
+    query.data,
+  )
+})
+
+/**
+ *
+ *
+ *
+ *
+ *
  * Speed
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
 /**
@@ -2760,6 +2959,41 @@ router.post('/patch/settings/true_client_ip_header', async request => {
     query.apiToken,
     '/settings/true_client_ip_header',
     query.data,
+  )
+})
+/**
+ *
+ *
+ *
+ *
+ * Traffic
+ *
+ *
+ *
+ *
+ */
+
+/**
+ * Load Balancers
+ */
+
+router.post('/copy/load_balancers', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/load_balancers',
+    query.data,
+  )
+})
+
+router.post('/delete/load_balancers', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/load_balancers',
+    query.identifier,
   )
 })
 
