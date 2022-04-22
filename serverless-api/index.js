@@ -2143,11 +2143,35 @@ router.post('/patch/settings/tls_client_auth', async request => {
  *
  */
 
-// // Firewall Rules
-// router.post('/firewall/rules', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(query.zoneId, query.apiToken, '/firewall/rules')
-// })
+/**
+ * Firewall Rules
+ */
+router.post('/copy/firewall/rules', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/rules',
+    query.data,
+  )
+})
+
+router.post('/delete/firewall/rules', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    '/firewall/rules',
+    query.identifier,
+  )
+})
+
+// before creating a Firewall Rule, we need to first
+// create the filter at the zone to be copied to
+router.post('/filters', async request => {
+  const { query } = await request.json()
+  return PostRequest(query.zoneId, query.apiToken, '/filters', query.data)
+})
 
 // // WAF Setting
 // router.post('/settings/waf', async request => {
@@ -2335,6 +2359,19 @@ router.post('/patch/settings/privacy_pass', async request => {
 //     '/rulesets/phases/http_ratelimit/entrypoint',
 //   )
 // })
+
+/**
+ * Custom Rules Rate Limits
+ */
+router.post('/put/rulesets/phases/http_ratelimit/entrypoint', async request => {
+  const { query } = await request.json()
+  return PutRequest(
+    query.zoneId,
+    query.apiToken,
+    '/rulesets/phases/http_ratelimit/entrypoint',
+    query.data,
+  )
+})
 
 // // Page Shield
 // router.post('/script_monitor/scripts', async request => {
