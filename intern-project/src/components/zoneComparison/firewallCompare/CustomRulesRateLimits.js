@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Tbody,
@@ -8,7 +7,6 @@ import {
   Th,
   Thead,
   Tr,
-  HStack,
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
@@ -218,11 +216,11 @@ const CustomRulesRateLimits = (props) => {
     const baseZoneData = data[0].result.map((record) => {
       const newObj = {
         action: record.action,
-        action_parameters: record.action_parameters,
-        expression: record.expression,
-        enabled: record.enabled,
-        version: record.version,
         description: record.description,
+        enabled: record.enabled,
+        expression: record.expression,
+        ratelimit: record.ratelimit,
+        version: record.version,
       };
       return newObj;
     });
@@ -303,7 +301,7 @@ const CustomRulesRateLimits = (props) => {
         description: record.description,
         enabled: record.enabled,
         expression: record.expression,
-        rate_limit: record.action_parameters,
+        ratelimit: record.ratelimit,
         version: record.version,
       };
       return newObj;
@@ -345,6 +343,7 @@ const CustomRulesRateLimits = (props) => {
         "/put/rulesets/phases/http_ratelimit/entrypoint"
       );
       if (postRequestResp.success === false) {
+        console.log(postRequestResp);
         const errorObj = {
           code: postRequestResp.errors[0].code,
           message: postRequestResp.errors[0].message,

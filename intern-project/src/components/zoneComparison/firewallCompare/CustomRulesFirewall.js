@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Tbody,
@@ -8,22 +7,29 @@ import {
   Th,
   Thead,
   Tr,
-  HStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
+  getZoneSetting,
   HeaderFactory,
   HeaderFactoryWithTags,
   Humanize,
+  putZoneSetting,
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 import _ from "lodash";
+import ProgressBarModal from "../commonComponents/ProgressBarModal";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
+import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 
 const conditionsToMatch = (base, toCompare) => {
   const checkActionParameters = (base, toCompare) => {
@@ -51,8 +57,32 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const CustomRulesFirewall = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [customRulesFirewallData, setCustomRulesFirewallData] = useState();
+  const {
+    isOpen: NonEmptyErrorIsOpen,
+    onOpen: NonEmptyErrorOnOpen,
+    onClose: NonEmptyErrorOnClose,
+  } = useDisclosure(); // NonEmptyErrorModal;
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // RecordsBasedErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const {
+    isOpen: CopyingProgressBarIsOpen,
+    onOpen: CopyingProgressBarOnOpen,
+    onClose: CopyingProgressBarOnClose,
+  } = useDisclosure(); // ProgressBarModal -- Copying;
+  const [currentZone, setCurrentZone] = useState();
+  const [numberOfZonesToCopy, setNumberOfZonesToCopy] = useState(0);
+  const [numberOfZonesCopied, setNumberOfZonesCopied] = useState(0);
+  const [errorPromptList, setErrorPromptList] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -131,13 +161,262 @@ const CustomRulesFirewall = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const handleDelete = async (data, zoneKeys, credentials) => {
+    if (NonEmptyErrorIsOpen) {
+      NonEmptyErrorOnClose();
+    }
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await putZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/http_request_firewall_custom/entrypoint"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result?.rules !== undefined
+          ? (newObj.result = newObj.result.rules)
+          : (newObj.result = []);
+        return newObj;
+      });
+      setCustomRulesFirewallData(processedResp);
+    }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+
+    const baseZoneData = data[0].result.map((record) => {
+      const newObj = {
+        action: record.action,
+        description: record.description,
+        enabled: record.enabled,
+        expression: record.expression,
+        version: record.version,
+        action_parameters: record.action_parameters,
+      };
+      return newObj;
+    });
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    setNumberOfZonesCopied(0);
+    setNumberOfZonesToCopy(otherZoneKeys.length);
+
+    for (const key of otherZoneKeys) {
+      setCurrentZone(key);
+      if (!CopyingProgressBarIsOpen) {
+        CopyingProgressBarOnOpen();
+      }
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/put/rulesets/phases/http_request_firewall_custom/entrypoint"
+      );
+      if (postRequestResp.success === false) {
+        const errorObj = {
+          code: postRequestResp.errors[0].code,
+          message: postRequestResp.errors[0].message,
+          data: "",
+        };
+        errorCount += 1;
+        setErrorPromptList((prev) => [...prev, errorObj]);
+      }
+      setNumberOfZonesCopied((prev) => prev + 1);
+    }
+    CopyingProgressBarOnClose();
+
+    // if there is some error at the end of copying, show the records that
+    // were not copied
+    if (errorCount > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
+    setCustomRulesFirewallData();
+    getData();
+  };
+
+  const putDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await putZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/http_request_firewall_custom/entrypoint"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result?.rules !== undefined
+          ? (newObj.result = newObj.result.rules)
+          : (newObj.result = []);
+        return newObj;
+      });
+      setCustomRulesFirewallData(processedResp);
+    }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+
+    const baseZoneData = data[0].result.map((record) => {
+      const newObj = {
+        action: record.action,
+        description: record.description,
+        enabled: record.enabled,
+        expression: record.expression,
+        version: record.version,
+        action_parameters: record.action_parameters,
+      };
+      return newObj;
+    });
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const { resp: checkIfEmpty } = await getZoneSetting(
+        authObj,
+        "/rulesets/phases/http_request_firewall_custom/entrypoint"
+      );
+
+      if (checkIfEmpty.success === true && checkIfEmpty.result.length !== 0) {
+        setCurrentZone(key);
+        NonEmptyErrorOnOpen();
+        return;
+      }
+    }
+
+    setNumberOfZonesCopied(0);
+    setNumberOfZonesToCopy(otherZoneKeys.length);
+
+    for (const key of otherZoneKeys) {
+      setCurrentZone(key);
+      if (!CopyingProgressBarIsOpen) {
+        CopyingProgressBarOnOpen();
+      }
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/put/rulesets/phases/http_request_firewall_custom/entrypoint"
+      );
+      if (postRequestResp.success === false) {
+        const errorObj = {
+          code: postRequestResp.errors[0].code,
+          message: postRequestResp.errors[0].message,
+          data: "",
+        };
+        errorCount += 1;
+        setErrorPromptList((prev) => [...prev, errorObj]);
+      }
+      setNumberOfZonesCopied((prev) => prev + 1);
+    }
+    CopyingProgressBarOnClose();
+
+    // if there is some error at the end of copying, show the records that
+    // were not copied
+    if (errorCount > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
+    setCustomRulesFirewallData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md" id={props.id}>
-          Custom Rules Firewall
-        </Heading>
-      </HStack>
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          showCopyButton={
+            customRulesFirewallData &&
+            customRulesFirewallData[0].success &&
+            customRulesFirewallData[0].result.length
+          }
+          copy={() =>
+            putDataFromBaseToOthers(
+              customRulesFirewallData,
+              zoneKeys,
+              credentials
+            )
+          }
+        />
+      }
+      {NonEmptyErrorIsOpen && (
+        <NonEmptyErrorModal
+          isOpen={NonEmptyErrorIsOpen}
+          onOpen={NonEmptyErrorOnOpen}
+          onClose={NonEmptyErrorOnClose}
+          handleDelete={() =>
+            handleDelete(customRulesFirewallData, zoneKeys, credentials)
+          }
+          title={`There are some existing records in ${zoneDetails[currentZone].name}`}
+          errorMessage={`To proceed with copying ${Humanize(props.id)} from ${
+            zoneDetails.zone_1.name
+          } 
+          to ${zoneDetails[currentZone].name}, the existing records 
+          in ${
+            zoneDetails[currentZone].name
+          } need to be deleted. This action is irreversible.`}
+        />
+      )}
+      {ErrorPromptIsOpen && (
+        <RecordsErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorList={errorPromptList}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={`Your ${Humanize(
+            props.id
+          )} settings have been successfully copied
+          from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
+        />
+      )}
+      {CopyingProgressBarIsOpen && (
+        <ProgressBarModal
+          isOpen={CopyingProgressBarIsOpen}
+          onOpen={CopyingProgressBarOnOpen}
+          onClose={CopyingProgressBarOnClose}
+          title={`Your rules for ${Humanize(props.id)} is being copied from ${
+            zoneDetails.zone_1.name
+          } to ${zoneDetails[currentZone].name}`}
+          progress={numberOfZonesCopied}
+          total={numberOfZonesToCopy}
+        />
+      )}
       {!customRulesFirewallData && <LoadingBox />}
       {customRulesFirewallData && (
         <Table {...getTableProps}>

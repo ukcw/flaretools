@@ -2337,31 +2337,24 @@ router.post('/patch/settings/privacy_pass', async request => {
   )
 })
 
-// // Custom Rules
-// router.post(
-//   '/rulesets/phases/http_request_firewall_custom/entrypoint',
-//   async request => {
-//     const { query } = await request.json()
-//     return FetchRequest(
-//       query.zoneId,
-//       query.apiToken,
-//       '/rulesets/phases/http_request_firewall_custom/entrypoint',
-//     )
-//   },
-// )
-
-// // Custom Rules Rate Limits
-// router.post('/rulesets/phases/http_ratelimit/entrypoint', async request => {
-//   const { query } = await request.json()
-//   return FetchRequest(
-//     query.zoneId,
-//     query.apiToken,
-//     '/rulesets/phases/http_ratelimit/entrypoint',
-//   )
-// })
+/**
+ * Custom Rules WAF -- not tested yet
+ */
+router.post(
+  '/put/rulesets/phases/http_request_firewall_custom/entrypoint',
+  async request => {
+    const { query } = await request.json()
+    return PutRequest(
+      query.zoneId,
+      query.apiToken,
+      '/rulesets/phases/http_request_firewall_custom/entrypoint',
+      query.data,
+    )
+  },
+)
 
 /**
- * Custom Rules Rate Limits
+ * Custom Rules Rate Limits -- not tested yet
  */
 router.post('/put/rulesets/phases/http_ratelimit/entrypoint', async request => {
   const { query } = await request.json()
