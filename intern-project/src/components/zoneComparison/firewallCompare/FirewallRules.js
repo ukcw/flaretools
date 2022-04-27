@@ -136,7 +136,13 @@ const FirewallRules = (props) => {
         Header: "Description",
         accessor: (row) => {
           return (
-            <VStack w="100%" p={0} align={"flex-start"}>
+            <VStack
+              w="100%"
+              p={0}
+              align={"flex-start"}
+              overflowWrap={"break-word"}
+              wordBreak={"break-word"}
+            >
               <Text>{row.description}</Text>
               {/*<Text color="grey">
                 {ConcatenateExpressions(row.filter.expression)}

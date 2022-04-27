@@ -128,6 +128,7 @@ const ManagedRules = (props) => {
           Managed Rules
         </Heading>
       </HStack>
+      {console.log(managedRulesData)}
       {!managedRulesData && <LoadingBox />}
       {managedRulesData && (
         <Table {...getTableProps}>

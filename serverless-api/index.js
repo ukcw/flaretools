@@ -2366,6 +2366,20 @@ router.post('/put/rulesets/phases/http_ratelimit/entrypoint', async request => {
   )
 })
 
+/**
+ * Deprecated: Cloudflare Managed Ruleset
+ */
+//  firewall/waf/packages/1e334934fd7ae32ad705667f8c1057aa/groups/dc85d7a0289180d88640b056069dfa94
+router.post('/patch/firewall/waf/packages', async request => {
+  const { query } = await request.json()
+  return PatchRequest(
+    query.zoneId,
+    query.apiToken,
+    `/firewall/waf/packages${query.endpoint}`,
+    query.data,
+  )
+})
+
 // // Page Shield
 // router.post('/script_monitor/scripts', async request => {
 //   const { query } = await request.json()

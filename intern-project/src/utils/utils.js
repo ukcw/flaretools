@@ -991,3 +991,24 @@ export const SubcategoriesSuccessMessage = (
   }
   `;
 };
+
+export const RulesetsSuccessMessage = (rulesets, baseZone, otherZone) => {
+  const objKeys = Object.keys(rulesets);
+  let allSettingsMatch = true;
+  for (let i = 0; i < objKeys.length; i++) {
+    if (rulesets[objKeys[i]] !== undefined) {
+      allSettingsMatch = false;
+    }
+  }
+
+  if (allSettingsMatch) {
+    return `Your settings have been successfully copied from ${baseZone} to ${otherZone}.`;
+  } else {
+    return `Your settings for ${Object.keys(rulesets)
+      .filter((ruleset) => rulesets[ruleset] !== undefined)
+      .map((ruleset) => Humanize(ruleset))
+      .join(", ")} have been successfully copied
+    from ${baseZone} to ${otherZone}.
+  `;
+  }
+};
