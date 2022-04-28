@@ -26,6 +26,7 @@ import {
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
+import CopyExtraModal from "../commonComponents/CopyExtraModal";
 import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
@@ -58,6 +59,12 @@ const DeprecatedFirewallCfRules = (props) => {
   const [rulesCopied, setRulesCopied] = useState("");
   const [numberOfRulesToCopy, setNumberOfRulesToCopy] = useState(0);
   const [numberOfRulesCopied, setNumberOfRulesCopied] = useState(0);
+  const [copyOverAdvancedRules, setCopyoverAdvancedRules] = useState(false);
+  const {
+    isOpen: CopyExtraPromptIsOpen,
+    onOpen: CopyExtraPromptOnOpen,
+    onClose: CopyExtraPromptOnClose,
+  } = useDisclosure(); // CopyExtraPromptModal;
 
   useEffect(() => {
     async function getData() {
@@ -142,7 +149,7 @@ const DeprecatedFirewallCfRules = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
-  const patchDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+  const patchExtraFromBaseToOthers = async (data, zoneKeys, credentials) => {
     async function sendPostRequest(data, endpoint) {
       const resp = await patchZoneSetting(data, endpoint);
       return resp;
@@ -173,7 +180,78 @@ const DeprecatedFirewallCfRules = (props) => {
       setDeprecatedFirewallCfRulesData(processedResp);
     }
 
+    CopyExtraPromptOnClose();
     SuccessPromptOnClose();
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = _.filter(
+      data[0].deprecatedFirewallRules,
+      (ruleset) => ruleset.name === "CloudFlare"
+    );
+
+    const modifiedRules = _.filter(
+      baseZoneData[0].detailed.result,
+      (rule) => rule.mode !== "default"
+    );
+
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // setRulesCopied({});
+    const rulesCopiedOver = {};
+
+    setNumberOfRulesCopied(0);
+    setNumberOfRulesToCopy(modifiedRules.length * data.slice(1).length);
+    CopyingProgressBarOnOpen();
+
+    // .result is required because we have result + deprecatedFirewallRules
+
+    for (const record of modifiedRules) {
+      if (record?.description !== undefined) {
+        setCurrentProgressRuleset(record.description);
+        const createData = {
+          mode: record.mode,
+        };
+        const ruleEndpoint = `/${record.package_id}/rules/${record.id}`;
+        for (const key of otherZoneKeys) {
+          const dataToCreate = _.cloneDeep(createData);
+          const authObj = {
+            zoneId: credentials[key].zoneId,
+            apiToken: `Bearer ${credentials[key].apiToken}`,
+          };
+          setCurrentZone(key);
+          const dataWithAuth = {
+            ...authObj,
+            data: dataToCreate,
+            endpoint: ruleEndpoint,
+          };
+          const { resp: postRequestResp } = await sendPostRequest(
+            dataWithAuth,
+            "/patch/firewall/waf/packages"
+          );
+          if (postRequestResp.success === true) {
+            // pass condition
+            console.log(postRequestResp);
+          }
+        }
+      } else {
+      }
+      setNumberOfRulesCopied((prev) => prev + 1);
+      rulesCopiedOver[record.id] = record.description;
+    }
+    setRulesCopied(rulesCopiedOver);
+    CopyingProgressBarOnClose();
+    SuccessPromptOnOpen();
+    setDeprecatedFirewallCfRulesData();
+    getData();
+  };
+
+  const patchDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    CopyExtraPromptOnClose();
 
     // not possible for data not to be loaded (logic is at displaying this button)
     const baseZoneData = data[0];
@@ -233,9 +311,38 @@ const DeprecatedFirewallCfRules = (props) => {
     }
     setRulesCopied(rulesets);
     CopyingProgressBarOnClose();
-    SuccessPromptOnOpen();
+    CopyExtraPromptOnOpen();
+  };
+
+  const handleClose = async () => {
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/firewall/deprecated"
+      );
+
+      const processedResp = resp.map((zone) => {
+        let newObj = { ...zone };
+        if (zone.deprecatedFirewallRules) {
+          zone.deprecatedFirewallRules.forEach((ruleset) => {
+            if (ruleset.name === "CloudFlare") {
+              newObj.result = ruleset.dash.result;
+              newObj.success = ruleset.dash.success;
+            }
+          });
+        } else {
+          newObj.result = [];
+          newObj.success = true;
+        }
+        return newObj;
+      });
+      setDeprecatedFirewallCfRulesData(processedResp);
+    }
+
     setDeprecatedFirewallCfRulesData();
     getData();
+    CopyExtraPromptOnClose();
   };
 
   return (
@@ -247,7 +354,10 @@ const DeprecatedFirewallCfRules = (props) => {
           showCopyButton={
             deprecatedFirewallCfRulesData &&
             deprecatedFirewallCfRulesData[0].success &&
-            deprecatedFirewallCfRulesData[0].result.length
+            deprecatedFirewallCfRulesData[0].result.length &&
+            // short hack for making a prior check for ONE other zone
+            // before allowing to copy over deprecrated settings
+            deprecatedFirewallCfRulesData[1].result.length
           }
           copy={() =>
             patchDataFromBaseToOthers(
@@ -292,6 +402,30 @@ const DeprecatedFirewallCfRules = (props) => {
           }`}
           progress={numberOfRulesCopied}
           total={numberOfRulesToCopy}
+        />
+      )}
+      {CopyExtraPromptIsOpen && (
+        <CopyExtraModal
+          isOpen={CopyExtraPromptIsOpen}
+          onOpen={CopyExtraPromptOnOpen}
+          onClose={CopyExtraPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied.`}
+          handleExtra={() =>
+            patchExtraFromBaseToOthers(
+              deprecatedFirewallCfRulesData,
+              zoneKeys,
+              credentials
+            )
+          }
+          handleClose={() => handleClose()}
+          successMessage={RulesetsSuccessMessage(
+            rulesCopied,
+            zoneDetails.zone_1.name,
+            zoneDetails[currentZone].name
+          )}
+          copyMessage={`Do you want to copy
+        over advanced rules for the Cloudflare Managed Ruleset?`}
+          copyButtonText={`Copy`}
         />
       )}
       {console.log(deprecatedFirewallCfRulesData)}
