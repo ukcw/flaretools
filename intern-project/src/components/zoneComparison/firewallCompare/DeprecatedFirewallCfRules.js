@@ -59,7 +59,6 @@ const DeprecatedFirewallCfRules = (props) => {
   const [rulesCopied, setRulesCopied] = useState("");
   const [numberOfRulesToCopy, setNumberOfRulesToCopy] = useState(0);
   const [numberOfRulesCopied, setNumberOfRulesCopied] = useState(0);
-  const [copyOverAdvancedRules, setCopyoverAdvancedRules] = useState(false);
   const {
     isOpen: CopyExtraPromptIsOpen,
     onOpen: CopyExtraPromptOnOpen,
@@ -230,7 +229,6 @@ const DeprecatedFirewallCfRules = (props) => {
           );
           if (postRequestResp.success === true) {
             // pass condition
-            console.log(postRequestResp);
           }
         }
       } else {
@@ -428,7 +426,6 @@ const DeprecatedFirewallCfRules = (props) => {
           copyButtonText={`Copy`}
         />
       )}
-      {console.log(deprecatedFirewallCfRulesData)}
       {!deprecatedFirewallCfRulesData && <LoadingBox />}
       {deprecatedFirewallCfRulesData && (
         <Table {...getTableProps}>
