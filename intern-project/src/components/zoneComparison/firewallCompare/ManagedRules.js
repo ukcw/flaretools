@@ -352,14 +352,13 @@ const ManagedRules = (props) => {
       }
       for (const key of otherZoneKeys) {
         const dataToCreate = _.cloneDeep(createData);
-        console.log("bef", dataToCreate.expression);
+
         if (replaceBaseUrl) {
           dataToCreate.expression = dataToCreate.expression.replaceAll(
             zoneDetails["zone_1"].name,
             zoneDetails[key].name
           );
         }
-        console.log("aft", dataToCreate.expression);
 
         const authObj = {
           zoneId: credentials[key].zoneId,
