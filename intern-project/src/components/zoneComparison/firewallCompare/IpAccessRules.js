@@ -211,13 +211,11 @@ const IpAccessRules = (props) => {
       } else {
         for (const record of resp.result) {
           const createData = _.cloneDeep(authObj);
-          console.log("record", record);
           createData["identifier"] = record.id; // need to send identifier to API endpoint
           const { resp } = await deleteZoneSetting(
             createData,
             "/delete/firewall/access_rules/rules"
           );
-          console.log("resp", resp);
 
           if (resp.success === false) {
             const errorObj = {

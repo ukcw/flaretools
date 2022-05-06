@@ -2144,6 +2144,60 @@ router.post('/patch/settings/tls_client_auth', async request => {
  */
 
 /**
+ * Check Deprecated WAF
+ */
+
+router.post('/firewall/waf/packages', async request => {
+  const { query } = await request.json()
+  return FetchRequest(query.zoneId, query.apiToken, '/firewall/waf/packages')
+})
+
+/**
+ * Managed Rules
+ */
+
+router.post('/delete/rulesets/rules', async request => {
+  const { query } = await request.json()
+  return DeleteRequest(
+    query.zoneId,
+    query.apiToken,
+    `/rulesets/${query.rulesetId}/rules`,
+    query.identifier,
+  )
+})
+
+router.post('/copy/rulesets/rules', async request => {
+  const { query } = await request.json()
+  return PostRequest(
+    query.zoneId,
+    query.apiToken,
+    `/rulesets/${query.rulesetId}/rules`,
+    query.data,
+  )
+})
+
+// router.post('/patch/rulesets/rules', async request => {
+//   const { query } = await request.json()
+//   return PatchRequest(
+//     query.zoneId,
+//     query.apiToken,
+//     `/rulesets/${query.rulesetId}/rules`,
+//     query.data,
+//   )
+// })
+
+/*
+{
+  "success":false,
+  "errors":[
+    {"code":1040,"message":"WAF is deprecated for this zone, Managed Rulesets should be used instead"}
+  ],
+  "messages":[],
+  "result":null
+}
+*/
+
+/**
  * Firewall Rules
  */
 router.post('/copy/firewall/rules', async request => {
@@ -2338,7 +2392,7 @@ router.post('/patch/settings/privacy_pass', async request => {
 })
 
 /**
- * Custom Rules WAF -- not tested yet
+ * Custom Rules WAF
  */
 router.post(
   '/put/rulesets/phases/http_request_firewall_custom/entrypoint',
@@ -2354,7 +2408,7 @@ router.post(
 )
 
 /**
- * Custom Rules Rate Limits -- not tested yet
+ * Custom Rules Rate Limits
  */
 router.post('/put/rulesets/phases/http_ratelimit/entrypoint', async request => {
   const { query } = await request.json()

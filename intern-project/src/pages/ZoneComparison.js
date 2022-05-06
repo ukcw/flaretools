@@ -147,7 +147,7 @@ function ZoneComparison() {
                 <Input
                   type="text"
                   placeholder="Zone ID"
-                  defaultValue={process.env.REACT_APP_COPIER_TEST_ZONE_ID}
+                  defaultValue={process.env.REACT_APP_NEW_COPIER_TEST_ZONE_ID}
                   // defaultValue={process.env.REACT_APP_BURRITO_BOT_ZONE_ID}
                   onChange={(e) => handleChange(e, "zone_2", "zoneId")}
                   onBlur={(e) => handleChange(e, "zone_2", "zoneId")} // for testing

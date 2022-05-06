@@ -1012,3 +1012,9 @@ export const RulesetsSuccessMessage = (rulesets, baseZone, otherZone) => {
   `;
   }
 };
+
+export const defaultManageRulesetIds = [
+  "4814384a9e5d4991b9815dcfc25d2f1f",
+  "c2e184081120413c86c3ab7e14069605",
+  "efb7b8c949ac4650a09736fc376e9aee",
+];

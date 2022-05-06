@@ -1,28 +1,40 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
+  FormControl,
+  FormLabel,
   Stack,
+  Switch,
   Table,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
-  HStack,
+  useDisclosure,
 } from "@chakra-ui/react";
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import { useCompareContext } from "../../../lib/contextLib";
 import {
+  CategoryTitle,
   CompareBaseToOthers,
   CompareData,
+  createZoneSetting,
+  deleteZoneSetting,
   getMultipleZoneSettings,
+  getZoneSetting,
   HeaderFactory,
   HeaderFactoryWithTags,
   Humanize,
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
+import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
+import ProgressBarModal from "../commonComponents/ProgressBarModal";
+import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
+import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const rulesetMapping = {
   efb7b8c949ac4650a09736fc376e9aee: "Cloudflare Managed Ruleset",
@@ -39,11 +51,58 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const ManagedRules = (props) => {
-  const { zoneKeys, credentials } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
   const [managedRulesData, setManagedRulesData] = useState();
+  const {
+    isOpen: NonEmptyErrorIsOpen,
+    onOpen: NonEmptyErrorOnOpen,
+    onClose: NonEmptyErrorOnClose,
+  } = useDisclosure(); // NonEmptyErrorModal;
+  const {
+    isOpen: ErrorPromptIsOpen,
+    onOpen: ErrorPromptOnOpen,
+    onClose: ErrorPromptOnClose,
+  } = useDisclosure(); // RecordsBasedErrorPromptModal;
+  const {
+    isOpen: SuccessPromptIsOpen,
+    onOpen: SuccessPromptOnOpen,
+    onClose: SuccessPromptOnClose,
+  } = useDisclosure(); // SuccessPromptModal;
+  const {
+    isOpen: DeletionProgressBarIsOpen,
+    onOpen: DeletionProgressBarOnOpen,
+    onClose: DeletionProgressBarOnClose,
+  } = useDisclosure(); // ProgressBarModal -- Deletion;
+  const {
+    isOpen: CopyingProgressBarIsOpen,
+    onOpen: CopyingProgressBarOnOpen,
+    onClose: CopyingProgressBarOnClose,
+  } = useDisclosure(); // ProgressBarModal -- Copying;
+  const [currentZone, setCurrentZone] = useState();
+  const [numberOfRecordsToDelete, setNumberOfRecordsToDelete] = useState(0);
+  const [numberOfRecordsDeleted, setNumberOfRecordsDeleted] = useState(0);
+  const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
+  const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
+  const [errorPromptList, setErrorPromptList] = useState([]);
+  const [isDeprecatedWaf, setIsDeprecatedWaf] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(false);
 
   useEffect(() => {
     async function getData() {
+      // check deprecated WAF or not
+      const deprecatedResp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/firewall/waf/packages"
+      );
+      let areZonesDeprecated = false;
+      deprecatedResp.forEach((zone) => {
+        if (zone.resp.success) {
+          areZonesDeprecated = true;
+        }
+      });
+      setIsDeprecatedWaf(areZonesDeprecated);
+
       const resp = await getMultipleZoneSettings(
         zoneKeys,
         credentials,
@@ -51,11 +110,15 @@ const ManagedRules = (props) => {
       );
       const processedResp = resp.map((zone) => {
         const newObj = { ...zone.resp };
-        if (zone.resp.success) {
+        if (zone.resp.success && zone.resp.result?.rules !== undefined) {
           newObj.result = zone.resp.result.rules.map((ruleset) => {
             const replaceRuleWithName = { ...ruleset };
-            replaceRuleWithName["name"] =
-              rulesetMapping[ruleset.action_parameters.id];
+            if (ruleset.action_parameters?.id !== undefined) {
+              replaceRuleWithName["name"] =
+                rulesetMapping[ruleset.action_parameters.id];
+            } else {
+              replaceRuleWithName["name"] = ruleset.description;
+            }
             return replaceRuleWithName;
           });
         } else {
@@ -121,14 +184,320 @@ const ManagedRules = (props) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
+  const handleDelete = async (data, zoneKeys, credentials) => {
+    if (NonEmptyErrorIsOpen) {
+      NonEmptyErrorOnClose();
+    }
+
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    setNumberOfRecordsDeleted(0);
+    setNumberOfRecordsToDelete(0);
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].success === true && data[i].result.length) {
+        setNumberOfRecordsToDelete((prev) => prev + data[i].result.length);
+      }
+    }
+
+    DeletionProgressBarOnOpen();
+
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+
+      const { resp } = await getZoneSetting(
+        authObj,
+        "/rulesets/phases/http_request_firewall_managed/entrypoint"
+      );
+
+      if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setErrorPromptList((prev) => [...prev, errorObj]);
+        ErrorPromptOnOpen();
+        return;
+      } else {
+        const rulesetId = resp.result.id;
+        for (const record of resp.result.rules) {
+          // if (record.action_parameters?.id !== undefined) {
+          //   const isDefaultRuleset = defaultManageRulesetIds.includes(
+          //     record.action_parameters.id
+          //   );
+          //   if (isDefaultRuleset) {
+          //     continue;
+          //   }
+          // }
+          const createData = _.cloneDeep(authObj);
+          createData["identifier"] = record.id; // need to send identifier to API endpoint
+          createData["rulesetId"] = rulesetId;
+          const { resp } = await deleteZoneSetting(
+            createData,
+            "/delete/rulesets/rules"
+          );
+          if (resp.success === false) {
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setErrorPromptList((prev) => [...prev, errorObj]);
+            ErrorPromptOnOpen();
+            return;
+          }
+          setNumberOfRecordsDeleted((prev) => prev + 1);
+        }
+      }
+    }
+    DeletionProgressBarOnClose();
+    copyDataFromBaseToOthers(data, zoneKeys, credentials);
+  };
+
+  const copyDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
+    async function sendPostRequest(data, endpoint) {
+      const resp = await createZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      // check deprecated WAF or not
+      const deprecatedResp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/firewall/waf/packages"
+      );
+      let areZonesDeprecated = false;
+      deprecatedResp.forEach((zone) => {
+        if (zone.resp.success) {
+          areZonesDeprecated = true;
+        }
+      });
+      setIsDeprecatedWaf(areZonesDeprecated);
+
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/http_request_firewall_managed/entrypoint"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        if (zone.resp.success && zone.resp.result?.rules !== undefined) {
+          newObj.result = zone.resp.result.rules.map((ruleset) => {
+            const replaceRuleWithName = { ...ruleset };
+            if (ruleset.action_parameters?.id !== undefined) {
+              replaceRuleWithName["name"] =
+                rulesetMapping[ruleset.action_parameters.id];
+            } else {
+              replaceRuleWithName["name"] = ruleset.description;
+            }
+            return replaceRuleWithName;
+          });
+        } else {
+          newObj.result = [];
+        }
+        return newObj;
+      });
+      setManagedRulesData(processedResp);
+    }
+
+    let errorCount = 0;
+    setErrorPromptList([]);
+
+    SuccessPromptOnClose();
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // check if other zone has any data prior to create records
+    // we want to start the other zone from a clean slate
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const { resp: checkIfEmpty } = await getZoneSetting(
+        authObj,
+        "/rulesets/phases/http_request_firewall_managed/entrypoint"
+      );
+
+      if (
+        checkIfEmpty.success === true &&
+        checkIfEmpty.result?.rules !== undefined &&
+        checkIfEmpty.result.rules.length !== 0
+      ) {
+        setCurrentZone(key);
+        NonEmptyErrorOnOpen();
+        return;
+      }
+    }
+
+    setNumberOfRecordsCopied(0);
+    setNumberOfRecordsToCopy(data[0].result.length * data.slice(1).length);
+
+    for (const record of baseZoneData.result) {
+      const createData = {
+        action: record.action,
+        action_parameters: record.action_parameters,
+        enabled: record.enabled,
+        expression: record.expression,
+        version: record.version,
+      };
+      if (record?.description !== undefined) {
+        createData["description"] = record.description;
+      }
+      for (const key of otherZoneKeys) {
+        const dataToCreate = _.cloneDeep(createData);
+        console.log("bef", dataToCreate.expression);
+        if (replaceBaseUrl) {
+          dataToCreate.expression = dataToCreate.expression.replaceAll(
+            zoneDetails["zone_1"].name,
+            zoneDetails[key].name
+          );
+        }
+        console.log("aft", dataToCreate.expression);
+
+        const authObj = {
+          zoneId: credentials[key].zoneId,
+          apiToken: `Bearer ${credentials[key].apiToken}`,
+        };
+        const { resp: currentRuleset } = await getZoneSetting(
+          authObj,
+          "/rulesets/phases/http_request_firewall_managed/entrypoint"
+        );
+        let rulesetId = "";
+        if (currentRuleset.result?.id !== undefined) {
+          rulesetId = currentRuleset.result.id;
+        }
+        setCurrentZone(key);
+        if (CopyingProgressBarIsOpen) {
+        } else {
+          CopyingProgressBarOnOpen();
+        }
+
+        const dataWithAuth = {
+          ...authObj,
+          data: dataToCreate,
+          rulesetId: rulesetId,
+        };
+        const { resp: postRequestResp } = await sendPostRequest(
+          dataWithAuth,
+          "/copy/rulesets/rules"
+        );
+        if (postRequestResp.success === false) {
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: record.id,
+          };
+          errorCount += 1;
+          setErrorPromptList((prev) => [...prev, errorObj]);
+        }
+        setNumberOfRecordsCopied((prev) => prev + 1);
+      }
+    }
+    CopyingProgressBarOnClose();
+
+    // if there is some error at the end of copying, show the records that
+    // were not copied
+    if (errorCount > 0) {
+      ErrorPromptOnOpen();
+    } else {
+      SuccessPromptOnOpen();
+    }
+    setManagedRulesData();
+    getData();
+  };
+
   return (
     <Stack w="100%" spacing={4}>
-      <HStack w="100%" spacing={4}>
-        <Heading size="md" id={props.id}>
-          Managed Rules
-        </Heading>
-      </HStack>
-      {console.log(managedRulesData)}
+      {
+        <CategoryTitle
+          id={props.id}
+          copyable={true}
+          showCopyButton={
+            managedRulesData &&
+            managedRulesData[0].success &&
+            managedRulesData[0].result.length &&
+            !isDeprecatedWaf
+          }
+          copy={() =>
+            copyDataFromBaseToOthers(managedRulesData, zoneKeys, credentials)
+          }
+        />
+      }
+      <ReplaceBaseUrlSwitch
+        switchText="Copy using Base Zone URL"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
+      {NonEmptyErrorIsOpen && (
+        <NonEmptyErrorModal
+          isOpen={NonEmptyErrorIsOpen}
+          onOpen={NonEmptyErrorOnOpen}
+          onClose={NonEmptyErrorOnClose}
+          handleDelete={() =>
+            handleDelete(managedRulesData, zoneKeys, credentials)
+          }
+          title={`There are some existing records in ${zoneDetails[currentZone].name}`}
+          errorMessage={`To proceed with copying ${Humanize(props.id)} from ${
+            zoneDetails.zone_1.name
+          } 
+          to ${zoneDetails[currentZone].name}, the existing records 
+          in ${
+            zoneDetails[currentZone].name
+          } need to be deleted. This action is irreversible.`}
+        />
+      )}
+      {ErrorPromptIsOpen && (
+        <RecordsErrorPromptModal
+          isOpen={ErrorPromptIsOpen}
+          onOpen={ErrorPromptOnOpen}
+          onClose={ErrorPromptOnClose}
+          title={`Error`}
+          errorList={errorPromptList}
+        />
+      )}
+      {SuccessPromptIsOpen && (
+        <SuccessPromptModal
+          isOpen={SuccessPromptIsOpen}
+          onOpen={SuccessPromptOnOpen}
+          onClose={SuccessPromptOnClose}
+          title={`${Humanize(props.id)} successfully copied`}
+          successMessage={`Your ${Humanize(
+            props.id
+          )} settings have been successfully copied
+          from ${zoneDetails.zone_1.name} to ${zoneDetails[currentZone].name}.`}
+        />
+      )}
+      {DeletionProgressBarIsOpen && (
+        <ProgressBarModal
+          isOpen={DeletionProgressBarIsOpen}
+          onOpen={DeletionProgressBarOnOpen}
+          onClose={DeletionProgressBarOnClose}
+          title={`${Humanize(props.id)} records from ${
+            zoneDetails[currentZone].name
+          } are being deleted`}
+          progress={numberOfRecordsDeleted}
+          total={numberOfRecordsToDelete}
+        />
+      )}
+      {CopyingProgressBarIsOpen && (
+        <ProgressBarModal
+          isOpen={CopyingProgressBarIsOpen}
+          onOpen={CopyingProgressBarOnOpen}
+          onClose={CopyingProgressBarOnClose}
+          title={`${Humanize(props.id)} records are being copied from ${
+            zoneDetails.zone_1.name
+          } to ${zoneDetails[currentZone].name}`}
+          progress={numberOfRecordsCopied}
+          total={numberOfRecordsToCopy}
+        />
+      )}
       {!managedRulesData && <LoadingBox />}
       {managedRulesData && (
         <Table {...getTableProps}>
