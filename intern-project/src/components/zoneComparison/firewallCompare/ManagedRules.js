@@ -1,9 +1,6 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  FormControl,
-  FormLabel,
   Stack,
-  Switch,
   Table,
   Tbody,
   Td,
@@ -430,7 +427,7 @@ const ManagedRules = (props) => {
         />
       }
       <ReplaceBaseUrlSwitch
-        switchText="Copy using Base Zone URL"
+        switchText="Replace Base Zone Hostname"
         switchState={replaceBaseUrl}
         changeSwitchState={setReplaceBaseUrl}
       />

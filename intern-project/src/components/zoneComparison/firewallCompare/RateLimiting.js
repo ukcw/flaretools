@@ -402,11 +402,10 @@ const RateLimiting = (props) => {
         />
       }
       <ReplaceBaseUrlSwitch
-        switchText="Copy using Base Zone URL"
+        switchText="Replace Base Zone Hostname"
         switchState={replaceBaseUrl}
         changeSwitchState={setReplaceBaseUrl}
       />
-      {console.log(rateLimitingData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}

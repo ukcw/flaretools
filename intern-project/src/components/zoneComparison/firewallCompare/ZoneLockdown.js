@@ -32,6 +32,7 @@ import LoadingBox from "../../LoadingBox";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) => {
@@ -102,6 +103,7 @@ const ZoneLockdown = (props) => {
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
   const [errorPromptList, setErrorPromptList] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -294,9 +296,12 @@ const ZoneLockdown = (props) => {
 
         // change urls that have base zone name to the current zone (to be copied)
         // name
-        dataToCreate.urls.map((url) =>
-          url.replace(zoneDetails.zone_1.name, zoneDetails[key].name)
-        );
+        if (replaceBaseUrl) {
+          dataToCreate.urls = dataToCreate.urls.map((url) =>
+            url.replaceAll(zoneDetails.zone_1.name, zoneDetails[key].name)
+          );
+        }
+
         const authObj = {
           zoneId: credentials[key].zoneId,
           apiToken: `Bearer ${credentials[key].apiToken}`,
@@ -353,6 +358,11 @@ const ZoneLockdown = (props) => {
           }
         />
       }
+      <ReplaceBaseUrlSwitch
+        switchText="Replace Base Zone Hostname"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}
