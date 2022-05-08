@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Tbody,
@@ -8,7 +7,6 @@ import {
   Th,
   Thead,
   Tr,
-  HStack,
   VStack,
   Text,
   useDisclosure,
@@ -291,7 +289,6 @@ const LoadBalancers = (props) => {
   };
 
   const copyDataFromBaseToOthers = async (data, zoneKeys, credentials) => {
-    return;
     async function sendPostRequest(data, endpoint) {
       const resp = await createZoneSetting(data, endpoint);
       return resp;
@@ -336,7 +333,7 @@ const LoadBalancers = (props) => {
       };
       const { resp: checkIfEmpty } = await getZoneSetting(
         authObj,
-        "/dns_records"
+        "/load_balancers"
       );
 
       if (checkIfEmpty.success === true && checkIfEmpty.result.length !== 0) {
@@ -350,10 +347,11 @@ const LoadBalancers = (props) => {
     setNumberOfRecordsToCopy(data[0].result.length * data.slice(1).length);
 
     for (const record of baseZoneData.result) {
-      const exp = new RegExp("(.*)?." + zoneDetails.zone_1.name);
+      // const exp = new RegExp("(.*)?." + zoneDetails.zone_1.name);
       const createData = {
         type: record.type,
-        name: record.name.match(exp) ? record.name.match(exp)[1] : null,
+        // name: record.name.match(exp) ? record.name.match(exp)[1] : null,
+        name: record.name,
         content: record.content,
         ttl: record.ttl,
       };
@@ -365,6 +363,13 @@ const LoadBalancers = (props) => {
       }
       for (const key of otherZoneKeys) {
         const dataToCreate = _.cloneDeep(createData);
+
+        // Should not have more than one occurrence of hostname
+        dataToCreate.name = dataToCreate.name.replace(
+          zoneDetails["zone_1"].name,
+          zoneDetails[key].name
+        );
+
         const authObj = {
           zoneId: credentials[key].zoneId,
           apiToken: `Bearer ${credentials[key].apiToken}`,
@@ -374,24 +379,26 @@ const LoadBalancers = (props) => {
         } else {
           CopyingProgressBarOnOpen();
         }
-        if (dataToCreate.name === null) {
-          const { zone_details: otherZoneDetails } = await getZoneSetting(
-            authObj,
-            "/zone_details"
-          );
-          if (otherZoneDetails.success) {
-            dataToCreate.name = otherZoneDetails.result.name;
-          } else {
-            return alert(
-              `Error: Authentication details for ${zoneDetails[key].name} was incorrect`
-            );
-          }
-        }
+        // if (dataToCreate.name === null) {
+        //   const { zone_details: otherZoneDetails } = await getZoneSetting(
+        //     authObj,
+        //     "/zone_details"
+        //   );
+        //   if (otherZoneDetails.success) {
+        //     dataToCreate.name = otherZoneDetails.result.name;
+        //   } else {
+        //     return alert(
+        //       `Error: Authentication details for ${zoneDetails[key].name} was incorrect`
+        //     );
+        //   }
+        // }
         const dataWithAuth = { ...authObj, data: dataToCreate };
         const { resp: postRequestResp } = await sendPostRequest(
           dataWithAuth,
-          "/copy/dns_records"
+          "/copy/load_balancers"
         );
+        console.log(dataToCreate);
+        console.log(postRequestResp);
         if (postRequestResp.success === false) {
           const errorObj = {
             code: postRequestResp.errors[0].code,

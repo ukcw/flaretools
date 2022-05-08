@@ -435,7 +435,6 @@ const FirewallRules = (props) => {
         switchState={replaceBaseUrl}
         changeSwitchState={setReplaceBaseUrl}
       />
-      {console.log(firewallRulesData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}

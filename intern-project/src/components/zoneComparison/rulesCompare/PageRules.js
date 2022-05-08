@@ -409,7 +409,6 @@ const PageRules = (props) => {
         switchState={replaceBaseUrl}
         changeSwitchState={setReplaceBaseUrl}
       />
-      {console.log(pageRulesData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}

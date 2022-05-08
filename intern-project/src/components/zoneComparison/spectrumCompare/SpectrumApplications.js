@@ -308,18 +308,21 @@ const SpectrumApplications = (props) => {
       const exp = new RegExp("(.*)?." + zoneDetails.zone_1.name);
 
       // match out base zone name
-      const recordDnsName = record.dns.name.match(exp)[1];
-      record.dns.name = recordDnsName;
+      // const recordDnsName = record.dns.name.match(exp)[1];
+      // record.dns.name = recordDnsName;
 
       const createData = {
         // origin_direct:
         //   record?.origin_direct !== undefined
         //     ? record.origin_direct
         //     : [record.origin_dns.name],
-        origin_direct: record.origin_direct,
         dns: record.dns,
         protocol: record.protocol,
       };
+
+      if (record?.origin_direct !== undefined) {
+        createData["origin_direct"] = record.origin_direct;
+      }
       if (record?.proxy_protocol !== undefined) {
         createData["proxy_protocol"] = record.proxy_protocol;
       }
@@ -355,6 +358,10 @@ const SpectrumApplications = (props) => {
         } else {
           CopyingProgressBarOnOpen();
         }
+        dataToCreate.dns.name = dataToCreate.dns.name.replace(
+          zoneDetails["zone_1"].name,
+          zoneDetails[key].name
+        );
         const dataWithAuth = { ...authObj, data: dataToCreate };
         const { resp: postRequestResp } = await sendPostRequest(
           dataWithAuth,
