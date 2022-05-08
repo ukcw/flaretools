@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Heading,
   Stack,
   Table,
   Tbody,
@@ -8,7 +7,6 @@ import {
   Th,
   Thead,
   Tr,
-  HStack,
   VStack,
   Text,
   useDisclosure,
@@ -35,6 +33,7 @@ import LoadingBox from "../../LoadingBox";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const ModeOutput = (actionObj) => {
@@ -123,6 +122,7 @@ const RateLimiting = (props) => {
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
   const [errorPromptList, setErrorPromptList] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -332,6 +332,20 @@ const RateLimiting = (props) => {
       }
       for (const key of otherZoneKeys) {
         const dataToCreate = _.cloneDeep(createData);
+
+        if (replaceBaseUrl) {
+          if (
+            dataToCreate.match?.request !== undefined &&
+            dataToCreate.match.request?.url !== undefined
+          ) {
+            dataToCreate.match.request.url =
+              dataToCreate.match.request.url.replaceAll(
+                zoneDetails["zone_1"].name,
+                zoneDetails[key].name
+              );
+          }
+        }
+
         const authObj = {
           zoneId: credentials[key].zoneId,
           apiToken: `Bearer ${credentials[key].apiToken}`,
@@ -387,6 +401,11 @@ const RateLimiting = (props) => {
           }
         />
       }
+      <ReplaceBaseUrlSwitch
+        switchText="Copy using Base Zone URL"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
       {console.log(rateLimitingData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
