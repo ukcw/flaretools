@@ -28,6 +28,7 @@ import LoadingBox from "../../LoadingBox";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) => {
@@ -103,6 +104,7 @@ const CustomRulesRateLimits = (props) => {
   const [numberOfZonesToCopy, setNumberOfZonesToCopy] = useState(0);
   const [numberOfZonesCopied, setNumberOfZonesCopied] = useState(0);
   const [errorPromptList, setErrorPromptList] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -234,11 +236,21 @@ const CustomRulesRateLimits = (props) => {
       if (!CopyingProgressBarIsOpen) {
         CopyingProgressBarOnOpen();
       }
+      const replacedUrlData = replaceBaseUrl
+        ? baseZoneData.map((record) => {
+            record.expression = record.expression.replaceAll(
+              zoneDetails["zone_1"].name,
+              zoneDetails[key].name
+            );
+            return record;
+          })
+        : baseZoneData;
       const authObj = {
         zoneId: credentials[key].zoneId,
         apiToken: `Bearer ${credentials[key].apiToken}`,
       };
-      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      console.log(replacedUrlData);
+      const dataWithAuth = { ...authObj, data: { rules: replacedUrlData } };
       const { resp: postRequestResp } = await sendPostRequest(
         dataWithAuth,
         "/put/rulesets/phases/http_ratelimit/entrypoint"
@@ -333,11 +345,20 @@ const CustomRulesRateLimits = (props) => {
       if (!CopyingProgressBarIsOpen) {
         CopyingProgressBarOnOpen();
       }
+      const replacedUrlData = replaceBaseUrl
+        ? baseZoneData.map((record) => {
+            record.expression = record.expression.replaceAll(
+              zoneDetails["zone_1"].name,
+              zoneDetails[key].name
+            );
+            return record;
+          })
+        : baseZoneData;
       const authObj = {
         zoneId: credentials[key].zoneId,
         apiToken: `Bearer ${credentials[key].apiToken}`,
       };
-      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const dataWithAuth = { ...authObj, data: { rules: replacedUrlData } };
       const { resp: postRequestResp } = await sendPostRequest(
         dataWithAuth,
         "/put/rulesets/phases/http_ratelimit/entrypoint"
@@ -387,6 +408,12 @@ const CustomRulesRateLimits = (props) => {
           }
         />
       }
+      <ReplaceBaseUrlSwitch
+        switchText="Copy using Base Zone URL"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
+      {console.log(customRulesRateLimitsData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}
