@@ -32,6 +32,7 @@ import LoadingBox from "../../LoadingBox";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 function isObject(obj) {
@@ -129,6 +130,7 @@ const PageRules = (props) => {
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
   const [errorPromptList, setErrorPromptList] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(true);
 
   useEffect(() => {
     async function getData() {
@@ -336,12 +338,14 @@ const PageRules = (props) => {
             dataToCreate.targets[i]?.constraint !== undefined &&
             dataToCreate.targets[i].constraint?.value !== undefined
           ) {
-            dataToCreate.targets[i].constraint.value = dataToCreate.targets[
-              i
-            ].constraint.value.replace(
-              zoneDetails.zone_1.name,
-              zoneDetails[key].name
-            );
+            if (replaceBaseUrl) {
+              dataToCreate.targets[i].constraint.value = dataToCreate.targets[
+                i
+              ].constraint.value.replaceAll(
+                zoneDetails.zone_1.name,
+                zoneDetails[key].name
+              );
+            }
           }
         }
 
@@ -400,6 +404,12 @@ const PageRules = (props) => {
           }
         />
       }
+      <ReplaceBaseUrlSwitch
+        switchText="Replace Base Zone Hostname"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
+      {console.log(pageRulesData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}
