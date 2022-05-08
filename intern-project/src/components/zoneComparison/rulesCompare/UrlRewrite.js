@@ -31,6 +31,7 @@ import LoadingBox from "../../LoadingBox";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const GetExpressionOutput = (expr) => {
@@ -121,6 +122,7 @@ const UrlRewrite = (props) => {
   const [numberOfZonesToCopy, setNumberOfZonesToCopy] = useState(0);
   const [numberOfZonesCopied, setNumberOfZonesCopied] = useState(0);
   const [errorPromptList, setErrorPromptList] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -297,11 +299,22 @@ const UrlRewrite = (props) => {
       if (!CopyingProgressBarIsOpen) {
         CopyingProgressBarOnOpen();
       }
+
+      const replacedUrlData = replaceBaseUrl
+        ? baseZoneData.map((record) => {
+            record.expression = record.expression.replaceAll(
+              zoneDetails["zone_1"].name,
+              zoneDetails[key].name
+            );
+            return record;
+          })
+        : baseZoneData;
+
       const authObj = {
         zoneId: credentials[key].zoneId,
         apiToken: `Bearer ${credentials[key].apiToken}`,
       };
-      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const dataWithAuth = { ...authObj, data: { rules: replacedUrlData } };
       const { resp: postRequestResp } = await sendPostRequest(
         dataWithAuth,
         "/put/rulesets/phases/http_request_transform/entrypoint"
@@ -397,11 +410,22 @@ const UrlRewrite = (props) => {
       if (!CopyingProgressBarIsOpen) {
         CopyingProgressBarOnOpen();
       }
+
+      const replacedUrlData = replaceBaseUrl
+        ? baseZoneData.map((record) => {
+            record.expression = record.expression.replaceAll(
+              zoneDetails["zone_1"].name,
+              zoneDetails[key].name
+            );
+            return record;
+          })
+        : baseZoneData;
+
       const authObj = {
         zoneId: credentials[key].zoneId,
         apiToken: `Bearer ${credentials[key].apiToken}`,
       };
-      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const dataWithAuth = { ...authObj, data: { rules: replacedUrlData } };
       const { resp: postRequestResp } = await sendPostRequest(
         dataWithAuth,
         "/put/rulesets/phases/http_request_transform/entrypoint"
@@ -446,6 +470,11 @@ const UrlRewrite = (props) => {
           }
         />
       }
+      <ReplaceBaseUrlSwitch
+        switchText="Replace Base Zone Hostname"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}
