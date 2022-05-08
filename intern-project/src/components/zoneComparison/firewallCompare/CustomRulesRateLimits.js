@@ -413,7 +413,6 @@ const CustomRulesRateLimits = (props) => {
         switchState={replaceBaseUrl}
         changeSwitchState={setReplaceBaseUrl}
       />
-      {console.log(customRulesRateLimitsData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}

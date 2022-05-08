@@ -387,6 +387,7 @@ const RateLimiting = (props) => {
           }
         />
       }
+      {console.log(rateLimitingData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}

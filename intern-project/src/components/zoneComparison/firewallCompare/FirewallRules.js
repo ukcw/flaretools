@@ -33,6 +33,7 @@ import LoadingBox from "../../LoadingBox";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const ConcatenateExpressions = (expr) => {
@@ -103,6 +104,7 @@ const FirewallRules = (props) => {
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
   const [errorPromptList, setErrorPromptList] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -338,6 +340,7 @@ const FirewallRules = (props) => {
       }
       for (const key of otherZoneKeys) {
         const dataToCreate = _.cloneDeep(createData);
+
         const authObj = {
           zoneId: credentials[key].zoneId,
           apiToken: `Bearer ${credentials[key].apiToken}`,
@@ -347,7 +350,12 @@ const FirewallRules = (props) => {
         } else {
           CopyingProgressBarOnOpen();
         }
-
+        if (replaceBaseUrl) {
+          filterData.expression = filterData.expression.replaceAll(
+            zoneDetails["zone_1"].name,
+            zoneDetails[key].name
+          );
+        }
         const filterDataWithAuth = { ...authObj, data: [filterData] };
         const { resp: filterResp } = await sendPostRequest(
           filterDataWithAuth,
@@ -422,6 +430,12 @@ const FirewallRules = (props) => {
           }
         />
       }
+      <ReplaceBaseUrlSwitch
+        switchText="Copy using Base Zone URL"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
+      {console.log(firewallRulesData)}
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}
