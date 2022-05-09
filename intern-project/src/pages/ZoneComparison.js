@@ -10,7 +10,7 @@ import {
   InputLeftAddon,
   Stack,
 } from "@chakra-ui/react";
-import { getMultipleZoneSettings } from "../utils/utils";
+import { getMultipleZoneSettings, ZoneCopierFunctions } from "../utils/utils";
 import { CompareContext } from "../lib/contextLib";
 import DnsCompare from "../components/zoneComparison/dnsCompare/DnsCompare";
 import SslTlsCompare from "../components/zoneComparison/sslTlsCompare/SslTlsCompare";
@@ -32,6 +32,8 @@ function ZoneComparison() {
   const [keys, setKeys] = useState();
   const searchDetails = useRef({});
   const [successfulSearch, setSuccessfulSearch] = useState(false);
+  const [bulkCopyFunctions, setBulkCopyFunctions] =
+    useState(ZoneCopierFunctions);
 
   const search = async () => {
     const zoneKeys = Object.keys(searchDetails.current).sort(
@@ -95,7 +97,7 @@ function ZoneComparison() {
     <Grid
       gridTemplateColumns={
         successfulSearch
-          ? "minmax(0,0.5fr) minmax(0,2.5fr) minmax(0,0.5fr)"
+          ? "minmax(0,0.4fr) minmax(0,2.5fr) minmax(0,0.5fr)"
           : "minmax(0,5fr)"
       }
       justifyContent="center"
@@ -178,6 +180,7 @@ function ZoneComparison() {
               zoneKeys: keys,
               credentials: credentials,
               zoneDetails: zoneDetails,
+              zoneCopierFunctions: bulkCopyFunctions,
             }}
           >
             <DnsCompare />
@@ -200,6 +203,7 @@ function ZoneComparison() {
             zone1name={zoneDetails.zone_1.name}
             zone2name={zoneDetails.zone_2.name}
             style={{ float: "right" }}
+            zoneBulkCopy={bulkCopyFunctions}
           />
         </>
       )}

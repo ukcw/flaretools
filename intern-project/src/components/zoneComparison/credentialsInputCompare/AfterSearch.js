@@ -1,15 +1,39 @@
 import {
+  Button,
   Heading,
-  Input,
-  InputGroup,
-  InputLeftAddon,
   Stack,
   Text,
+  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
+import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 
 const AfterSearch = (props) => {
+  const {
+    isOpen: NotLoadedBarIsOpen,
+    onOpen: NotLoadedBarOnOpen,
+    onClose: NotLoadedBarOnClose,
+  } = useDisclosure(); // Not Fully Loaded App Modal
+
+  function bulkCopySettings(fnObj) {
+    const keys = Object.keys(fnObj);
+
+    let doneLoading = true;
+
+    keys.forEach((k) => {
+      if (fnObj[k] === undefined) {
+        doneLoading = false;
+      }
+    });
+
+    if (doneLoading) {
+      keys.forEach((k) => fnObj[k]());
+    } else {
+      NotLoadedBarOnOpen();
+    }
+    console.log("done");
+  }
   return (
     <VStack
       spacing={4}
@@ -38,6 +62,23 @@ const AfterSearch = (props) => {
           <Heading size="sm">Zone 2</Heading>
           <Text>{props.zone2name}</Text>
         </Stack>
+        <Button
+          size={"sm"}
+          onClick={() => bulkCopySettings(props.zoneBulkCopy)}
+        >
+          Bulk Copy
+        </Button>
+        {NotLoadedBarIsOpen && (
+          <ErrorPromptModal
+            isOpen={NotLoadedBarIsOpen}
+            onOpen={NotLoadedBarOnOpen}
+            onClose={NotLoadedBarOnClose}
+            title={"Bulk Copying will be ready in a bit!"}
+            errorMessage={
+              "Please wait for the application to fully load the contents of your zones."
+            }
+          />
+        )}
       </Stack>
     </VStack>
   );

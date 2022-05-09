@@ -41,7 +41,8 @@ const conditionsToMatch = (base, toCompare) =>
   base.ttl === toCompare.ttl;
 
 const DnsRecords = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [dnsRecords, setDnsRecords] = useState();
   const {
     isOpen: NonEmptyErrorIsOpen,
@@ -319,6 +320,20 @@ const DnsRecords = (props) => {
     setDnsRecords();
     getData();
   };
+
+  if (dnsRecords && dnsRecords[0].success && dnsRecords[0].result.length) {
+    console.log(zoneCopierFunctions);
+    zoneCopierFunctions[props.id] = () =>
+      copyDataFromBaseToOthers(dnsRecords, zoneKeys, credentials);
+    console.log(zoneCopierFunctions);
+    // zoneCopierFunctions((prev) => {
+    //   return {
+    //     ...prev,
+    //     [props.id]: () =>
+    //       copyDataFromBaseToOthers(dnsRecords, zoneKeys, credentials),
+    //   };
+    // });
+  }
 
   return (
     <Stack w="100%" spacing={4}>
