@@ -27,12 +27,14 @@ import {
   HeaderFactory,
   HeaderFactoryWithTags,
   Humanize,
+  replaceInstances,
   UnsuccessfulHeadersWithTags,
 } from "../../../utils/utils";
 import LoadingBox from "../../LoadingBox";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import ProgressBarModal from "../commonComponents/ProgressBarModal";
 import RecordsErrorPromptModal from "../commonComponents/RecordsErrorPromptModal";
+import ReplaceBaseUrlSwitch from "../commonComponents/ReplaceBaseUrlSwitch";
 import SuccessPromptModal from "../commonComponents/SuccessPromptModal";
 
 const conditionsToMatch = (base, toCompare) => {
@@ -88,6 +90,7 @@ const CustomHostnames = (props) => {
   const [numberOfRecordsToCopy, setNumberOfRecordsToCopy] = useState(0);
   const [numberOfRecordsCopied, setNumberOfRecordsCopied] = useState(0);
   const [errorPromptList, setErrorPromptList] = useState([]);
+  const [replaceBaseUrl, setReplaceBaseUrl] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -327,7 +330,16 @@ const CustomHostnames = (props) => {
         ssl: record.ssl,
       };
       for (const key of otherZoneKeys) {
-        const dataToCreate = _.cloneDeep(createData);
+        let dataToCreate = _.cloneDeep(createData);
+
+        if (replaceBaseUrl) {
+          dataToCreate = replaceInstances(
+            dataToCreate,
+            zoneDetails["zone_1"].name,
+            zoneDetails[key].name
+          );
+        }
+
         const authObj = {
           zoneId: credentials[key].zoneId,
           apiToken: `Bearer ${credentials[key].apiToken}`,
@@ -383,6 +395,11 @@ const CustomHostnames = (props) => {
           }
         />
       }
+      <ReplaceBaseUrlSwitch
+        switchText="Replace Base Zone Hostname"
+        switchState={replaceBaseUrl}
+        changeSwitchState={setReplaceBaseUrl}
+      />
       {NonEmptyErrorIsOpen && (
         <NonEmptyErrorModal
           isOpen={NonEmptyErrorIsOpen}

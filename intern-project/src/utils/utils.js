@@ -1018,3 +1018,20 @@ export const defaultManageRulesetIds = [
   "c2e184081120413c86c3ab7e14069605",
   "efb7b8c949ac4650a09736fc376e9aee",
 ];
+
+export function replaceInstances(data, toReplace, replaceWith) {
+  if (data && data.constructor === Object) {
+    // console.log("obj", data);
+    const keys = Object.keys(data);
+    for (let i = 0; i < keys.length; i++) {
+      data[keys[i]] = replaceInstances(data[keys[i]], toReplace, replaceWith);
+    }
+  } else if (Array.isArray(data)) {
+    // console.log("array", data);
+    data = data.map((entry) => replaceInstances(entry, toReplace, replaceWith));
+  } else if (typeof data === "string" || data instanceof String) {
+    // console.log("str", data);
+    data = data.replaceAll(toReplace, replaceWith);
+  }
+  return data;
+}
