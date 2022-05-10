@@ -42,11 +42,7 @@ const AfterSearch = (props) => {
     if (doneLoading) {
       BulkCopyProgressOnOpen();
       for (let i = 0; i < keys.length; i++) {
-        if (
-          fnObj[keys[i]] !== undefined &&
-          fnObj[keys[i]] !== false &&
-          keys[i] === "dns_management"
-        ) {
+        if (fnObj[keys[i]] !== undefined && fnObj[keys[i]] !== false) {
           fnObj[keys[i]](setCopyResults, setCopyProgress);
         }
       }

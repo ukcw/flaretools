@@ -178,6 +178,115 @@ const SslSetting = (props) => {
     getData();
   };
 
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/ssl"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj["result"] = [newObj.result];
+        return newObj;
+      });
+      setSslSettingData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["status"] = "copy";
+      newState[props.id]["totalToCopy"] = 1;
+      newState[props.id]["progressTotal"] = 0;
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    for (const record of baseZoneData.result) {
+      const createData = {
+        value: record.value,
+      };
+      for (const key of otherZoneKeys) {
+        const dataToCreate = _.cloneDeep(createData);
+        const authObj = {
+          zoneId: credentials[key].zoneId,
+          apiToken: `Bearer ${credentials[key].apiToken}`,
+        };
+        const dataWithAuth = { ...authObj, data: dataToCreate };
+        const { resp: postRequestResp } = await sendPostRequest(
+          dataWithAuth,
+          "/patch/settings/ssl"
+        );
+        if (postRequestResp.success === false) {
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: dataToCreate.value,
+          };
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["errors"].push(errorObj);
+            return newState;
+          });
+        } else {
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["copied"].push(dataToCreate);
+            return newState;
+          });
+        }
+        setProgress((prevState) => {
+          const newState = {
+            ...prevState,
+          };
+          newState[props.id]["progressTotal"] += 1;
+          return newState;
+        });
+      }
+    }
+    setSslSettingData();
+    getData();
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = true;
+      return newState;
+    });
+    return;
+  };
+
   if (!sslSettingData) {
   } // don't do anything while the app has not loaded
   else if (
@@ -185,8 +294,14 @@ const SslSetting = (props) => {
     sslSettingData[0].success &&
     sslSettingData[0].result.length
   ) {
-    zoneCopierFunctions[props.id] = () =>
-      patchDataFromBaseToOthers(sslSettingData, zoneKeys, credentials);
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        sslSettingData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
   } else {
     zoneCopierFunctions[props.id] = false;
   }
