@@ -1076,3 +1076,326 @@ export const ZoneCopierFunctions = {
   scrape_shield_subcategories: undefined,
   spectrum_applications: undefined,
 };
+
+export const BulkCopyResults = {
+  dns_management: {
+    errors: [],
+    copied: [],
+  },
+  cloudflare_nameservers: undefined,
+  custom_nameservers: undefined,
+  dnssec: undefined,
+  cname_flattening: undefined,
+  ssl_setting: {
+    errors: [],
+    copied: [],
+  },
+  edge_certificates: undefined,
+  http_strict_transport_security: undefined,
+  custom_hostnames: {
+    errors: [],
+    copied: [],
+  },
+  ssl_subcategories: {
+    errors: [],
+    copied: [],
+  },
+  managed_rules: {
+    errors: [],
+    copied: [],
+  },
+  cloudflare_managed_ruleset: {
+    errors: [],
+    copied: [],
+  },
+  owasp_modsecurity_core_ruleset: {
+    errors: [],
+    copied: [],
+  },
+  custom_rules_firewall: {
+    errors: [],
+    copied: [],
+  },
+  custom_rules_rate_limits: {
+    errors: [],
+    copied: [],
+  },
+  firewall_rules: {
+    errors: [],
+    copied: [],
+  },
+  http_ddos_attack_protection: {
+    errors: [],
+    copied: [],
+  },
+  ip_access_rules: {
+    errors: [],
+    copied: [],
+  },
+  rate_limiting: {
+    errors: [],
+    copied: [],
+  },
+  user_agent_blocking: {
+    errors: [],
+    copied: [],
+  },
+  zone_lockdown: {
+    errors: [],
+    copied: [],
+  },
+  firewall_subcategories: {
+    errors: [],
+    copied: [],
+  },
+  automatic_platform_optimization: {
+    errors: [],
+    copied: [],
+  },
+  mobile_redirect: {
+    errors: [],
+    copied: [],
+  },
+  minify: {
+    errors: [],
+    copied: [],
+  },
+  railguns: undefined,
+  speed_subcategories: {
+    errors: [],
+    copied: [],
+  },
+  caching_subcategories: {
+    errors: [],
+    copied: [],
+  },
+  http_routes: {
+    errors: [],
+    copied: [],
+  },
+  page_rules: {
+    errors: [],
+    copied: [],
+  },
+  url_rewrite: {
+    errors: [],
+    copied: [],
+  },
+  http_request_header_modification: {
+    errors: [],
+    copied: [],
+  },
+  http_response_header_modification: {
+    errors: [],
+    copied: [],
+  },
+  normalization_settings: {
+    errors: [],
+    copied: [],
+  },
+  network_subcategories: {
+    errors: [],
+    copied: [],
+  },
+  load_balancers: {
+    errors: [],
+    copied: [],
+  },
+  scrape_shield_subcategories: {
+    errors: [],
+    copied: [],
+  },
+  spectrum_applications: {
+    errors: [],
+    copied: [],
+  },
+};
+
+export const BulkCopyProgress = {
+  dns_management: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  ssl_setting: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  custom_hostnames: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  ssl_subcategories: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  managed_rules: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  cloudflare_managed_ruleset: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  owasp_modsecurity_core_ruleset: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  custom_rules_firewall: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  custom_rules_rate_limits: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  firewall_rules: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  http_ddos_attack_protection: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  ip_access_rules: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  rate_limiting: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  user_agent_blocking: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  zone_lockdown: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  firewall_subcategories: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  automatic_platform_optimization: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  mobile_redirect: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  minify: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  speed_subcategories: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  caching_subcategories: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  http_routes: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  page_rules: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  url_rewrite: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  http_request_header_modification: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  http_response_header_modification: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  normalization_settings: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  network_subcategories: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  load_balancers: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  scrape_shield_subcategories: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+  spectrum_applications: {
+    status: undefined,
+    totalToCopy: undefined,
+    progressTotal: undefined,
+    completed: undefined,
+  },
+};

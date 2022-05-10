@@ -54,7 +54,8 @@ const returnConditions = (data) => {
 };
 
 const SslSubcategories = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [sslSubcategoriesData, setSslSubcategoriesData] = useState();
   const {
     isOpen: ErrorPromptIsOpen,
@@ -313,6 +314,15 @@ const SslSubcategories = (props) => {
     setSslSubcategoriesData();
     getData();
   };
+
+  if (!sslSubcategoriesData) {
+  } // don't do anything while the app has not loaded
+  else if (sslSubcategoriesData && sslSubcategoriesData.length) {
+    zoneCopierFunctions[props.id] = () =>
+      patchDataFromBaseToOthers(sslSubcategoriesData, zoneKeys, credentials);
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>

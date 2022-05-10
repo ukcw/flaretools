@@ -48,7 +48,8 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const ManagedRules = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [managedRulesData, setManagedRulesData] = useState();
   const {
     isOpen: NonEmptyErrorIsOpen,
@@ -408,6 +409,20 @@ const ManagedRules = (props) => {
     setManagedRulesData();
     getData();
   };
+
+  if (!managedRulesData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    managedRulesData &&
+    managedRulesData[0].success &&
+    managedRulesData[0].result.length &&
+    !isDeprecatedWaf
+  ) {
+    zoneCopierFunctions[props.id] = () =>
+      copyDataFromBaseToOthers(managedRulesData, zoneKeys, credentials);
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>

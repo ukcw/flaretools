@@ -51,7 +51,8 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const SslSetting = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [sslSettingData, setSslSettingData] = useState();
   const {
     isOpen: ErrorPromptIsOpen,
@@ -176,6 +177,19 @@ const SslSetting = (props) => {
     setSslSettingData();
     getData();
   };
+
+  if (!sslSettingData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    sslSettingData &&
+    sslSettingData[0].success &&
+    sslSettingData[0].result.length
+  ) {
+    zoneCopierFunctions[props.id] = () =>
+      patchDataFromBaseToOthers(sslSettingData, zoneKeys, credentials);
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>

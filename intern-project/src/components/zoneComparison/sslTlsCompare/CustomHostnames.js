@@ -57,7 +57,8 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const CustomHostnames = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [customHostnamesData, setCustomHostnamesData] = useState();
   const {
     isOpen: NonEmptyErrorIsOpen,
@@ -378,6 +379,19 @@ const CustomHostnames = (props) => {
     setCustomHostnamesData();
     getData();
   };
+
+  if (!customHostnamesData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    customHostnamesData &&
+    customHostnamesData[0].success &&
+    customHostnamesData[0].result.length
+  ) {
+    zoneCopierFunctions[props.id] = () =>
+      copyDataFromBaseToOthers(customHostnamesData, zoneKeys, credentials);
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>

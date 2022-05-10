@@ -321,18 +321,264 @@ const DnsRecords = (props) => {
     getData();
   };
 
-  if (dnsRecords && dnsRecords[0].success && dnsRecords[0].result.length) {
-    console.log(zoneCopierFunctions);
-    zoneCopierFunctions[props.id] = () =>
-      copyDataFromBaseToOthers(dnsRecords, zoneKeys, credentials);
-    console.log(zoneCopierFunctions);
-    // zoneCopierFunctions((prev) => {
-    //   return {
-    //     ...prev,
-    //     [props.id]: () =>
-    //       copyDataFromBaseToOthers(dnsRecords, zoneKeys, credentials),
-    //   };
-    // });
+  const bulkDeleteHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    const otherZoneKeys = zoneKeys.slice(1);
+    let bulkErrorCount = 0;
+
+    // reset state for the setting
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["status"] = "delete";
+      newState[props.id]["completed"] = false;
+      newState[props.id]["totalToCopy"] = 0;
+      newState[props.id]["progressTotal"] = 0;
+      return newState;
+    });
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].success === true && data[i].result.length) {
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+          };
+          newState[props.id]["totalToCopy"] += data[i].result.length;
+          return newState;
+        });
+      }
+    }
+
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+
+      const { resp } = await getZoneSetting(authObj, "/dns_records");
+
+      if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+          };
+          newState[props.id]["errors"].push(errorObj);
+          return newState;
+        });
+        bulkErrorCount += 1;
+      } else {
+        for (const record of resp.result) {
+          const createData = _.cloneDeep(authObj);
+          createData["identifier"] = record.id; // need to send identifier to API endpoint
+          const { resp } = await deleteZoneSetting(
+            createData,
+            "/delete/dns_records"
+          );
+          if (resp.success === false) {
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+              };
+              newState[props.id]["errors"].push(errorObj);
+              return newState;
+            });
+            bulkErrorCount += 1;
+          }
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["progressTotal"] += 0;
+            return newState;
+          });
+        }
+      }
+    }
+    if (bulkErrorCount > 0) {
+      return;
+    } else {
+      bulkCopyHandler(data, zoneKeys, credentials, setResults, setProgress);
+    }
+  };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await createZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/dns_records"
+      );
+      const processedResp = resp.map((zone) => zone.resp);
+      setDnsRecords(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // check if other zone has any data prior to create records
+    // we want to start the other zone from a clean slate
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const { resp: checkIfEmpty } = await getZoneSetting(
+        authObj,
+        "/dns_records"
+      );
+
+      if (checkIfEmpty.success === true && checkIfEmpty.result.length !== 0) {
+        return bulkDeleteHandler(
+          data,
+          zoneKeys,
+          credentials,
+          setResults,
+          setProgress
+        );
+      }
+    }
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["status"] = "copy";
+      newState[props.id]["totalToCopy"] =
+        data[0].result.length * data.slice(1).length;
+      newState[props.id]["progressTotal"] = 0;
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    for (const record of baseZoneData.result) {
+      const exp = new RegExp("(.*)?." + zoneDetails.zone_1.name);
+      const createData = {
+        type: record.type,
+        name: record.name.match(exp) ? record.name.match(exp)[1] : null,
+        content: record.content,
+        ttl: record.ttl,
+      };
+      if (record?.priority !== undefined) {
+        createData["priority"] = record.priority;
+      }
+      if (record?.proxied !== undefined) {
+        createData["proxied"] = record.proxied;
+      }
+      for (const key of otherZoneKeys) {
+        const dataToCreate = _.cloneDeep(createData);
+        const authObj = {
+          zoneId: credentials[key].zoneId,
+          apiToken: `Bearer ${credentials[key].apiToken}`,
+        };
+        // setCurrentZone(key);
+        // if (CopyingProgressBarIsOpen) {
+        // } else {
+        //   CopyingProgressBarOnOpen();
+        // }
+        if (dataToCreate.name === null) {
+          dataToCreate.name = zoneDetails[key].name;
+        }
+        const dataWithAuth = { ...authObj, data: dataToCreate };
+        const { resp: postRequestResp } = await sendPostRequest(
+          dataWithAuth,
+          "/copy/dns_records"
+        );
+        if (postRequestResp.success === false) {
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: dataToCreate.name,
+          };
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["errors"].push(errorObj);
+            return newState;
+          });
+        } else {
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["copied"].push(dataToCreate);
+            return newState;
+          });
+        }
+        setProgress((prevState) => {
+          const newState = {
+            ...prevState,
+          };
+          newState[props.id]["progressTotal"] += 1;
+          return newState;
+        });
+      }
+    }
+
+    // return errors and successfully copied records
+    setDnsRecords();
+    getData();
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = true;
+      return newState;
+    });
+    return;
+  };
+
+  if (!dnsRecords) {
+  } // don't do anything while the app has not loaded
+  else if (dnsRecords && dnsRecords[0].success && dnsRecords[0].result.length) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        dnsRecords,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
   }
 
   return (

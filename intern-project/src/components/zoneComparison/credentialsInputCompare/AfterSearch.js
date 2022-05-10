@@ -6,8 +6,10 @@ import {
   useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
+import BulkCopyProgressModal from "../commonComponents/BulkCopyProgressModal";
+import { BulkCopyResults, BulkCopyProgress } from "../../../utils/utils";
 
 const AfterSearch = (props) => {
   const {
@@ -15,25 +17,47 @@ const AfterSearch = (props) => {
     onOpen: NotLoadedBarOnOpen,
     onClose: NotLoadedBarOnClose,
   } = useDisclosure(); // Not Fully Loaded App Modal
+  const {
+    isOpen: BulkCopyProgressIsOpen,
+    onOpen: BulkCopyProgressOnOpen,
+    onClose: BulkCopyProgressOnClose,
+  } = useDisclosure(); // Not Fully Loaded App Modal
 
-  function bulkCopySettings(fnObj) {
+  const [copyResults, setCopyResults] = useState(BulkCopyResults);
+  const [copyProgress, setCopyProgress] = useState(BulkCopyProgress);
+
+  const bulkCopySettings = async (fnObj) => {
     const keys = Object.keys(fnObj);
-
     let doneLoading = true;
 
-    keys.forEach((k) => {
-      if (fnObj[k] === undefined) {
-        doneLoading = false;
-      }
+    const progKeys = Object.keys(copyProgress);
+    progKeys.forEach((k) => {
+      const settingKeys = Object.keys(copyProgress[k]);
+
+      settingKeys.forEach((sKey) => {
+        copyProgress[k][sKey] = undefined;
+      });
     });
 
     if (doneLoading) {
-      keys.forEach((k) => fnObj[k]());
+      BulkCopyProgressOnOpen();
+      for (let i = 0; i < keys.length; i++) {
+        if (
+          fnObj[keys[i]] !== undefined &&
+          fnObj[keys[i]] !== false &&
+          keys[i] === "dns_management"
+        ) {
+          fnObj[keys[i]](setCopyResults, setCopyProgress);
+        }
+      }
+      // BulkCopyProgressOnClose();
+      // keys.forEach((k) => fnObj[k]());
     } else {
       NotLoadedBarOnOpen();
     }
-    console.log("done");
-  }
+    console.log("done", fnObj);
+  };
+
   return (
     <VStack
       spacing={4}
@@ -77,6 +101,16 @@ const AfterSearch = (props) => {
             errorMessage={
               "Please wait for the application to fully load the contents of your zones."
             }
+          />
+        )}
+        {BulkCopyProgressIsOpen && (
+          <BulkCopyProgressModal
+            isOpen={BulkCopyProgressIsOpen}
+            onOpen={BulkCopyProgressOnOpen}
+            onClose={BulkCopyProgressOnClose}
+            title={"Your configurations are being copied"}
+            progress={copyProgress}
+            data={copyResults}
           />
         )}
       </Stack>
