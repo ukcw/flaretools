@@ -49,7 +49,7 @@ const BulkCopyProgressModal = ({
           {/* <ModalCloseButton /> */}
           <ModalBody pb={6}>
             <Accordion allowMultiple allowToggle w="100%">
-              {Object.keys(progress).map((key) => {
+              {Object.keys(progress).map((key, idx) => {
                 let returnComponent = null;
                 let progressIcon = null;
                 if (progress[key].completed === undefined) {
@@ -67,7 +67,7 @@ const BulkCopyProgressModal = ({
                       ? "Deleting prior configuration records"
                       : "";
                   returnComponent = (
-                    <ListItem key={key}>
+                    <ListItem key={idx}>
                       <Text>{statusDisplay}</Text>
                       <Progress
                         hasStripe
@@ -89,8 +89,8 @@ const BulkCopyProgressModal = ({
                           Some records were copied but these had issues
                         </Heading>
                         <List>
-                          {data[key].errors.map((err) => (
-                            <ListItem key={err}>
+                          {data[key].errors.map((err, idx) => (
+                            <ListItem key={idx}>
                               <ListIcon as={WarningTwoIcon} color={"red"} />
                               <Stack>
                                 <Text fontWeight={"bold"}>
