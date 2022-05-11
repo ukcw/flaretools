@@ -410,6 +410,320 @@ const ManagedRules = (props) => {
     getData();
   };
 
+  const bulkDeleteHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    const otherZoneKeys = zoneKeys.slice(1);
+    let bulkErrorCount = 0;
+
+    // reset state for the setting
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["status"] = "delete";
+      newState[props.id]["completed"] = false;
+      newState[props.id]["totalToCopy"] = 0;
+      newState[props.id]["progressTotal"] = 0;
+      return newState;
+    });
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].success === true && data[i].result.length) {
+        setProgress((prevState) => {
+          const newState = {
+            ...prevState,
+          };
+          newState[props.id]["totalToCopy"] += data[i].result.length;
+          return newState;
+        });
+      }
+    }
+
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+
+      const { resp } = await getZoneSetting(
+        authObj,
+        "/rulesets/phases/http_request_firewall_managed/entrypoint"
+      );
+
+      if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+          };
+          newState[props.id]["errors"].push(errorObj);
+          return newState;
+        });
+        bulkErrorCount += 1;
+      } else {
+        const rulesetId = resp.result.id;
+        for (const record of resp.result.rules) {
+          // if (record.action_parameters?.id !== undefined) {
+          //   const isDefaultRuleset = defaultManageRulesetIds.includes(
+          //     record.action_parameters.id
+          //   );
+          //   if (isDefaultRuleset) {
+          //     continue;
+          //   }
+          // }
+          const createData = _.cloneDeep(authObj);
+          createData["identifier"] = record.id; // need to send identifier to API endpoint
+          createData["rulesetId"] = rulesetId;
+          const { resp } = await deleteZoneSetting(
+            createData,
+            "/delete/rulesets/rules"
+          );
+          if (resp.success === false) {
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+              };
+              newState[props.id]["errors"].push(errorObj);
+              return newState;
+            });
+            bulkErrorCount += 1;
+          }
+          setProgress((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["progressTotal"] += 1;
+            return newState;
+          });
+        }
+      }
+    }
+    if (bulkErrorCount > 0) {
+      return;
+    } else {
+      bulkCopyHandler(data, zoneKeys, credentials, setResults, setProgress);
+    }
+  };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["errors"] = [];
+      newState[props.id]["copied"] = [];
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await createZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      // check deprecated WAF or not
+      const deprecatedResp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/firewall/waf/packages"
+      );
+      let areZonesDeprecated = false;
+      deprecatedResp.forEach((zone) => {
+        if (zone.resp.success) {
+          areZonesDeprecated = true;
+        }
+      });
+      setIsDeprecatedWaf(areZonesDeprecated);
+
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/http_request_firewall_managed/entrypoint"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        if (zone.resp.success && zone.resp.result?.rules !== undefined) {
+          newObj.result = zone.resp.result.rules.map((ruleset) => {
+            const replaceRuleWithName = { ...ruleset };
+            if (ruleset.action_parameters?.id !== undefined) {
+              replaceRuleWithName["name"] =
+                rulesetMapping[ruleset.action_parameters.id];
+            } else {
+              replaceRuleWithName["name"] = ruleset.description;
+            }
+            return replaceRuleWithName;
+          });
+        } else {
+          newObj.result = [];
+        }
+        return newObj;
+      });
+      setManagedRulesData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // check if other zone has any data prior to create records
+    // we want to start the other zone from a clean slate
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const { resp: checkIfEmpty } = await getZoneSetting(
+        authObj,
+        "/rulesets/phases/http_request_firewall_managed/entrypoint"
+      );
+
+      if (
+        checkIfEmpty.success === true &&
+        checkIfEmpty.result?.rules !== undefined &&
+        checkIfEmpty.result.rules.length !== 0
+      ) {
+        // setCurrentZone(key)
+        return bulkDeleteHandler(
+          data,
+          zoneKeys,
+          credentials,
+          setResults,
+          setProgress
+        );
+      }
+    }
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["status"] = "copy";
+      newState[props.id]["totalToCopy"] =
+        data[0].result.length * data.slice(1).length;
+      newState[props.id]["progressTotal"] = 0;
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    for (const record of baseZoneData.result) {
+      const createData = {
+        action: record.action,
+        action_parameters: record.action_parameters,
+        enabled: record.enabled,
+        expression: record.expression,
+        version: record.version,
+      };
+      if (record?.description !== undefined) {
+        createData["description"] = record.description;
+      }
+      for (const key of otherZoneKeys) {
+        const dataToCreate = _.cloneDeep(createData);
+
+        if (replaceBaseUrl) {
+          dataToCreate.expression = dataToCreate.expression.replaceAll(
+            zoneDetails["zone_1"].name,
+            zoneDetails[key].name
+          );
+        }
+
+        const authObj = {
+          zoneId: credentials[key].zoneId,
+          apiToken: `Bearer ${credentials[key].apiToken}`,
+        };
+        const { resp: currentRuleset } = await getZoneSetting(
+          authObj,
+          "/rulesets/phases/http_request_firewall_managed/entrypoint"
+        );
+        let rulesetId = "";
+        if (currentRuleset.result?.id !== undefined) {
+          rulesetId = currentRuleset.result.id;
+        }
+        // setCurrentZone(key);
+
+        const dataWithAuth = {
+          ...authObj,
+          data: dataToCreate,
+          rulesetId: rulesetId,
+        };
+        const { resp: postRequestResp } = await sendPostRequest(
+          dataWithAuth,
+          "/copy/rulesets/rules"
+        );
+        if (postRequestResp.success === false) {
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: record.id,
+          };
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["errors"].push(errorObj);
+            return newState;
+          });
+        } else {
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+            };
+            newState[props.id]["copied"].push(dataToCreate);
+            return newState;
+          });
+        }
+        setProgress((prevState) => {
+          const newState = {
+            ...prevState,
+          };
+          newState[props.id]["progressTotal"] += 1;
+          return newState;
+        });
+      }
+    }
+
+    setManagedRulesData();
+    getData();
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = true;
+      return newState;
+    });
+    return;
+  };
+
   if (!managedRulesData) {
   } // don't do anything while the app has not loaded
   else if (
@@ -418,8 +732,14 @@ const ManagedRules = (props) => {
     managedRulesData[0].result.length &&
     !isDeprecatedWaf
   ) {
-    zoneCopierFunctions[props.id] = () =>
-      copyDataFromBaseToOthers(managedRulesData, zoneKeys, credentials);
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        managedRulesData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
   } else {
     zoneCopierFunctions[props.id] = false;
   }

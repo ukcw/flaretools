@@ -2176,6 +2176,7 @@ router.post('/copy/rulesets/rules', async request => {
   )
 })
 
+// not in use
 // router.post('/patch/rulesets/rules', async request => {
 //   const { query } = await request.json()
 //   return PatchRequest(

@@ -15,7 +15,6 @@ import {
   Button,
   Divider,
   Heading,
-  HStack,
   List,
   ListIcon,
   ListItem,
@@ -26,13 +25,9 @@ import {
   ModalHeader,
   ModalOverlay,
   Progress,
-  Spacer,
   Spinner,
   Stack,
-  Table,
-  TableContainer,
   Text,
-  Thead,
 } from "@chakra-ui/react";
 import { Humanize } from "../../../utils/utils";
 
@@ -45,8 +40,6 @@ const BulkCopyProgressModal = ({
   data,
   total,
 }) => {
-  const progressKeys = Object.keys(progress);
-
   return (
     <>
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
@@ -55,39 +48,6 @@ const BulkCopyProgressModal = ({
           <ModalHeader>{title}</ModalHeader>
           {/* <ModalCloseButton /> */}
           <ModalBody pb={6}>
-            {/* <Text>{}</Text> */}
-            {/* <List>
-              {progressKeys.map((setting) => {
-                if (progress[setting].completed === undefined) {
-                  // skip, component has not started copying
-                  return
-                } else if (progress[setting].completed === false) {
-                  // copying has started but has not yet completed
-                  const currentCount = progress[setting].progressTotal;
-                  const totalCount = progress[setting].totalToCopy;
-                  return (
-                    <ListItem key={progress[setting]}>
-                      <Text>{Humanize(setting)}</Text>
-                      <Text>{Humanize(progress[setting].status)}</Text>
-                      <Progress
-                        hasStripe
-                        isAnimated
-                        value={(currentCount / totalCount) * 100}
-                      />
-                      <Divider />
-                    </ListItem>
-                  );
-                } else {
-                  // copying has completed
-                  return (
-                    <ListItem key={progress[setting]}>
-                      <ListIcon as={CheckCircleIcon} color="green" />
-                      {Humanize(setting)}
-                    </ListItem>
-                  );
-                }
-              })}
-            </List> */}
             <Accordion allowMultiple allowToggle w="100%">
               {Object.keys(progress).map((key) => {
                 let returnComponent = null;
@@ -107,8 +67,7 @@ const BulkCopyProgressModal = ({
                       ? "Deleting prior configuration records"
                       : "";
                   returnComponent = (
-                    <ListItem key={progress[key]}>
-                      <Text>{Humanize(key)}</Text>
+                    <ListItem key={key}>
                       <Text>{statusDisplay}</Text>
                       <Progress
                         hasStripe
@@ -123,7 +82,7 @@ const BulkCopyProgressModal = ({
                   progressIcon = <CheckCircleIcon color="green" />;
 
                   if (data[key].errors.length > 0 && data[key].copied.length) {
-                    progressIcon = <WarningIcon />;
+                    progressIcon = <WarningIcon color={"orange"} />;
                     returnComponent = (
                       <>
                         <Heading size={"sm"}>
@@ -134,9 +93,13 @@ const BulkCopyProgressModal = ({
                             <ListItem key={err}>
                               <ListIcon as={WarningTwoIcon} color={"red"} />
                               <Stack>
+                                <Text fontWeight={"bold"}>
+                                  {Humanize(err.data)}
+                                </Text>
+                                <Text fontWeight={"bold"}>Code: </Text>
                                 <Text>{err.code}</Text>
+                                <Text fontWeight={"bold"}>Message: </Text>
                                 <Text>{err.message}</Text>
-                                <Text>{err.data}</Text>
                               </Stack>
                             </ListItem>
                           ))}

@@ -391,19 +391,7 @@ const CustomHostnames = (props) => {
     let bulkErrorCount = 0;
 
     // reset state for the setting
-    setResults((prevState) => {
-      const newState = {
-        ...prevState,
-      };
-      newState[props.id]["status"] = "delete";
-      newState[props.id]["completed"] = false;
-      newState[props.id]["totalToCopy"] = 0;
-      newState[props.id]["progressTotal"] = 0;
-      return newState;
-    });
-
-    // reset state for the setting
-    setResults((prevState) => {
+    setProgress((prevState) => {
       const newState = {
         ...prevState,
       };
@@ -416,7 +404,7 @@ const CustomHostnames = (props) => {
 
     for (let i = 1; i < data.length; i++) {
       if (data[i].success === true && data[i].result.length) {
-        setResults((prevState) => {
+        setProgress((prevState) => {
           const newState = {
             ...prevState,
           };
@@ -471,7 +459,7 @@ const CustomHostnames = (props) => {
             });
             bulkErrorCount += 1;
           }
-          setResults((prevState) => {
+          setProgress((prevState) => {
             const newState = {
               ...prevState,
             };
@@ -501,6 +489,16 @@ const CustomHostnames = (props) => {
         ...prevState,
       };
       newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["errors"] = [];
+      newState[props.id]["copied"] = [];
       return newState;
     });
 

@@ -194,6 +194,16 @@ const SslSetting = (props) => {
       return newState;
     });
 
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["errors"] = [];
+      newState[props.id]["copied"] = [];
+      return newState;
+    });
+
     async function sendPostRequest(data, endpoint) {
       const resp = await patchZoneSetting(data, endpoint);
       return resp;
