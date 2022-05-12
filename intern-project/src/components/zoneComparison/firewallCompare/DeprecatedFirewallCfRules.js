@@ -18,6 +18,7 @@ import {
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
+  getZoneNumber,
   HeaderFactory,
   HeaderFactoryWithTags,
   Humanize,
@@ -441,36 +442,52 @@ const DeprecatedFirewallCfRules = (props) => {
         };
         const ruleEndpoint = `/${record.package_id}/groups/${record.id}`;
         for (const key of otherZoneKeys) {
-          const dataToCreate = _.cloneDeep(createData);
-          const authObj = {
-            zoneId: credentials[key].zoneId,
-            apiToken: `Bearer ${credentials[key].apiToken}`,
+          // do a check if setting to be PATCH is already the same value
+          const zoneNumber = getZoneNumber(key) - 1;
+          const getRuleValue = (rulesetData, zoneNumber, ruleId) => {
+            const zoneRules = rulesetData[zoneNumber];
+            for (let i = 0; i < zoneRules.result.length; i++) {
+              if (zoneRules.result[i].id === ruleId) {
+                return zoneRules.result[i].mode;
+              }
+            }
+            return false;
           };
-          // setCurrentZone(key);
-          const dataWithAuth = {
-            ...authObj,
-            data: dataToCreate,
-            endpoint: ruleEndpoint,
-          };
-          const { resp: postRequestResp } = await sendPostRequest(
-            dataWithAuth,
-            "/patch/firewall/waf/packages"
-          );
-          if (postRequestResp.success === true) {
+          if (record.mode === getRuleValue(data, zoneNumber, record.id)) {
+            // nothing to do if settings are already the same
             rulesets[recordName.replace(" ", "_").toLowerCase()] = true;
           } else {
-            const errorObj = {
-              code: postRequestResp.errors[0].code,
-              message: postRequestResp.errors[0].message,
-              data: dataToCreate.mode,
+            const dataToCreate = _.cloneDeep(createData);
+            const authObj = {
+              zoneId: credentials[key].zoneId,
+              apiToken: `Bearer ${credentials[key].apiToken}`,
             };
-            setResults((prevState) => {
-              const newState = {
-                ...prevState,
+            // setCurrentZone(key);
+            const dataWithAuth = {
+              ...authObj,
+              data: dataToCreate,
+              endpoint: ruleEndpoint,
+            };
+            const { resp: postRequestResp } = await sendPostRequest(
+              dataWithAuth,
+              "/patch/firewall/waf/packages"
+            );
+            if (postRequestResp.success === true) {
+              rulesets[recordName.replace(" ", "_").toLowerCase()] = true;
+            } else {
+              const errorObj = {
+                code: postRequestResp.errors[0].code,
+                message: postRequestResp.errors[0].message,
+                data: dataToCreate.mode,
               };
-              newState[props.id]["errors"].push(errorObj);
-              return newState;
-            });
+              setResults((prevState) => {
+                const newState = {
+                  ...prevState,
+                };
+                newState[props.id]["errors"].push(errorObj);
+                return newState;
+              });
+            }
           }
         }
       } else {

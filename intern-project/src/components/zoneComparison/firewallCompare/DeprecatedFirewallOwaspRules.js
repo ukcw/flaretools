@@ -20,6 +20,7 @@ import {
   CompareBaseToOthers,
   CompareData,
   getMultipleZoneSettings,
+  getZoneNumber,
   HeaderFactory,
   HeaderFactoryWithTags,
   Humanize,
@@ -38,7 +39,8 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const DeprecatedFirewallOwaspRules = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [
     deprecatedFirewallOwaspRulesData,
     setDeprecatedFirewallOwaspRulesData,
@@ -339,8 +341,204 @@ const DeprecatedFirewallOwaspRules = (props) => {
     CopyExtraPromptOnClose();
   };
 
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/firewall/deprecated"
+      );
+      const processedResp = resp.map((zone) => {
+        let newObj = { ...zone };
+        if (zone.deprecatedFirewallRules) {
+          zone.deprecatedFirewallRules.forEach((ruleset) => {
+            if (ruleset.name === "OWASP ModSecurity Core Rule Set") {
+              newObj.result = ruleset.dash.result;
+              newObj.success = ruleset.dash.success;
+            }
+          });
+        } else {
+          newObj.result = [];
+          newObj.success = true;
+        }
+        return newObj;
+      });
+      setDeprecatedFirewallOwaspRulesData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    setRulesCopied("");
+    const rulesets = {};
+
+    baseZoneData.result.forEach(
+      (ruleset) => (rulesets[ruleset.name] = undefined)
+    );
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["status"] = "copy";
+      newState[props.id]["totalToCopy"] =
+        data[0].result.length * data.slice(1).length;
+      newState[props.id]["progressTotal"] = 0;
+      newState[props.id]["completed"] = false;
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["errors"] = [];
+      newState[props.id]["copied"] = [];
+      return newState;
+    });
+
+    // .result is required because we have result + deprecatedFirewallRules
+
+    for (const record of baseZoneData.result) {
+      if (record?.name !== undefined) {
+        // setCurrentProgressRuleset(record.name);
+        const recordName = record.name;
+        const createData = {
+          mode: record.mode,
+        };
+        const ruleEndpoint = `/${record.package_id}/groups/${record.id}`;
+        for (const key of otherZoneKeys) {
+          // do a check if setting to be PATCH is already the same value
+          const zoneNumber = getZoneNumber(key) - 1;
+          const getRuleValue = (rulesetData, zoneNumber, ruleId) => {
+            const zoneRules = rulesetData[zoneNumber];
+            for (let i = 0; i < zoneRules.result.length; i++) {
+              if (zoneRules.result[i].id === ruleId) {
+                return zoneRules.result[i].mode;
+              }
+            }
+            return false;
+          };
+          if (record.mode === getRuleValue(data, zoneNumber, record.id)) {
+            // nothing to do if settings are already the same
+            rulesets[recordName] = true;
+          } else {
+            const dataToCreate = _.cloneDeep(createData);
+            const authObj = {
+              zoneId: credentials[key].zoneId,
+              apiToken: `Bearer ${credentials[key].apiToken}`,
+            };
+            // setCurrentZone(key);
+            const dataWithAuth = {
+              ...authObj,
+              data: dataToCreate,
+              endpoint: ruleEndpoint,
+            };
+            const { resp: postRequestResp } = await sendPostRequest(
+              dataWithAuth,
+              "/patch/firewall/waf/packages"
+            );
+            if (postRequestResp.success === true) {
+              rulesets[recordName] = true;
+            } else {
+              const errorObj = {
+                code: postRequestResp.errors[0].code,
+                message: postRequestResp.errors[0].message,
+                data: dataToCreate.mode,
+              };
+              setResults((prevState) => {
+                const newState = {
+                  ...prevState,
+                };
+                newState[props.id]["errors"].push(errorObj);
+                return newState;
+              });
+            }
+          }
+        }
+      } else {
+      }
+      setProgress((prevState) => {
+        const newState = {
+          ...prevState,
+        };
+        newState[props.id]["progressTotal"] += 1;
+        return newState;
+      });
+    }
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      const subcategoriesKeys = Object.keys(rulesets);
+      subcategoriesKeys.forEach((k) =>
+        newState[props.id]["copied"].push({
+          name: k,
+          success: rulesets[k],
+        })
+      );
+      return newState;
+    });
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+      };
+      newState[props.id]["completed"] = true;
+      return newState;
+    });
+    setDeprecatedFirewallOwaspRulesData();
+    getData();
+    return;
+  };
+
+  if (!deprecatedFirewallOwaspRulesData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    deprecatedFirewallOwaspRulesData &&
+    deprecatedFirewallOwaspRulesData[0].success &&
+    deprecatedFirewallOwaspRulesData[0].result.length &&
+    // short hack for making a prior check for ONE other zone
+    // before allowing to copy over deprecrated settings
+    deprecatedFirewallOwaspRulesData[1].result.length
+  ) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        deprecatedFirewallOwaspRulesData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
+
   return (
     <Stack w="100%" spacing={4}>
+      {console.log(deprecatedFirewallOwaspRulesData)}
       {
         <CategoryTitle
           id={props.id}

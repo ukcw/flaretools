@@ -1399,3 +1399,7 @@ export const BulkCopyProgress = {
     completed: undefined,
   },
 };
+
+export const getZoneNumber = (zoneStr) => {
+  return Number(zoneStr.split("_").pop());
+};
