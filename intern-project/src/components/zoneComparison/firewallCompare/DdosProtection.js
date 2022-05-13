@@ -72,7 +72,8 @@ const isOverridden = (index, overrideArray, ruleId) => {
 };
 
 const DdosProtection = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [ddosProtectionData, setDdosProtectionData] = useState();
   const [overrideData, setOverrideData] = useState();
   const {
@@ -428,6 +429,193 @@ const DdosProtection = (props) => {
     setDdosProtectionData();
     getData();
   };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await putZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const overrideResp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/ddos_l7/entrypoint"
+      );
+      const processedOverrideResp = overrideResp.map((zone) => zone.resp);
+
+      const ddosResp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/ddos_l7"
+      );
+      setOverrideData(processedOverrideResp);
+
+      const processedDdosResp = ddosResp.map((zone, idx) => {
+        const newObj = { ...zone.resp };
+        newObj.result = newObj.result.rules.map((record) => {
+          record["sensitivity_level"] = "high"; // this is default value from Cloudflare DASH
+
+          // update values of record if there is an overridden record
+          const overrideValue = isOverridden(
+            idx,
+            processedOverrideResp,
+            record.id
+          );
+
+          if (overrideValue !== false) {
+            const keys = Object.keys(overrideValue);
+            keys.forEach((key) => {
+              if (key !== "id") {
+                record[key] = overrideValue[key];
+              }
+            });
+          }
+          return record;
+        });
+        return newObj;
+      });
+      setDdosProtectionData(processedDdosResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData =
+      data[0].result.rules[0].action_parameters.overrides.rules;
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: otherZoneKeys.length,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    for (const key of otherZoneKeys) {
+      // setCurrentZone(key);
+
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const dataWithAuth = { ...authObj, data: { rules: baseZoneData } };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/put/rulesets/phases/ddos_l7/entrypoint"
+      );
+      if (postRequestResp.success === false) {
+        const errorObj = {
+          code: postRequestResp.errors[0].code,
+          message: postRequestResp.errors[0].message,
+          data: "",
+        };
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              errors: prevState[props.id]["errors"].concat(errorObj),
+            },
+          };
+          return newState;
+        });
+      } else {
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              copied: prevState[props.id]["copied"].concat(baseZoneData),
+            },
+          };
+          return newState;
+        });
+      }
+      setProgress((prevState) => {
+        const newState = {
+          ...prevState,
+          [props.id]: {
+            ...prevState[props.id],
+            progressTotal: prevState[props.id]["progressTotal"] + 1,
+          },
+        };
+        return newState;
+      });
+    }
+
+    setDdosProtectionData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!overrideData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    overrideData &&
+    overrideData[0].success &&
+    overrideData[0].result.rules[0].action_parameters.overrides?.rules !==
+      undefined
+  ) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        overrideData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
