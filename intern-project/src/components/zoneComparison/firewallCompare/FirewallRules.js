@@ -71,7 +71,8 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const FirewallRules = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [firewallRulesData, setFirewallRulesData] = useState();
   const {
     isOpen: NonEmptyErrorIsOpen,
@@ -413,6 +414,372 @@ const FirewallRules = (props) => {
     setFirewallRulesData();
     getData();
   };
+
+  const bulkDeleteHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    const otherZoneKeys = zoneKeys.slice(1);
+    let bulkErrorCount = 0;
+
+    // reset state for the setting
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "delete",
+          totalToCopy: 0,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].success === true && data[i].result.length) {
+        setProgress((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              totalToCopy:
+                prevState[props.id]["totalToCopy"] + data[i].result.length,
+            },
+          };
+          return newState;
+        });
+      }
+    }
+
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+
+      const { resp } = await getZoneSetting(authObj, "/firewall/rules");
+
+      if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              errors: prevState[props.id]["errors"].concat(errorObj),
+            },
+          };
+          return newState;
+        });
+        bulkErrorCount += 1;
+      } else {
+        for (const record of resp.result) {
+          const createData = _.cloneDeep(authObj);
+          createData["identifier"] = record.id; // need to send identifier to API endpoint
+          const { resp } = await deleteZoneSetting(
+            createData,
+            "/delete/firewall/rules"
+          );
+          if (resp.success === false) {
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  errors: prevState[props.id]["errors"].concat(errorObj),
+                },
+              };
+              return newState;
+            });
+            bulkErrorCount += 1;
+          }
+          setProgress((prevState) => {
+            const newState = {
+              ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                progressTotal: prevState[props.id]["progressTotal"] + 1,
+              },
+            };
+            return newState;
+          });
+        }
+      }
+    }
+
+    if (bulkErrorCount > 0) {
+      return;
+    } else {
+      bulkCopyHandler(data, zoneKeys, credentials, setResults, setProgress);
+    }
+  };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await createZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/firewall/rules"
+      );
+      const processedResp = resp.map((zone) => zone.resp);
+      setFirewallRulesData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // check if other zone has any data prior to create records
+    // we want to start the other zone from a clean slate
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const { resp: checkIfEmpty } = await getZoneSetting(
+        authObj,
+        "/firewall/rules"
+      );
+
+      if (checkIfEmpty.success === true && checkIfEmpty.result.length !== 0) {
+        return bulkDeleteHandler(
+          data,
+          zoneKeys,
+          credentials,
+          setResults,
+          setProgress
+        );
+      }
+    }
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: data[0].result.length * data.slice(1).length,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    for (const record of baseZoneData.result) {
+      // need to create filter at copy zone first
+      const filterData = {
+        expression: record.filter.expression,
+      };
+      if (record.filter?.description !== undefined) {
+        filterData["description"] = record.filter.description;
+      }
+
+      // data for creating the rule at copy zone
+      const createData = {
+        action: record.action,
+        filter: {},
+      };
+      if (record?.id !== undefined) {
+        createData["id"] = record.id;
+      }
+      if (record?.products !== undefined) {
+        createData["products"] = record.products;
+      }
+      if (record?.priority !== undefined) {
+        createData["priority"] = record.priority;
+      }
+      if (record?.paused !== undefined) {
+        createData["paused"] = record.paused;
+      }
+      if (record?.description !== undefined) {
+        createData["description"] = record.description;
+      }
+      if (record?.ref !== undefined) {
+        createData["ref"] = record.ref;
+      }
+      for (const key of otherZoneKeys) {
+        const dataToCreate = _.cloneDeep(createData);
+
+        const authObj = {
+          zoneId: credentials[key].zoneId,
+          apiToken: `Bearer ${credentials[key].apiToken}`,
+        };
+        // setCurrentZone(key);
+
+        if (replaceBaseUrl) {
+          filterData.expression = filterData.expression.replaceAll(
+            zoneDetails["zone_1"].name,
+            zoneDetails[key].name
+          );
+        }
+        const filterDataWithAuth = { ...authObj, data: [filterData] };
+        const { resp: filterResp } = await sendPostRequest(
+          filterDataWithAuth,
+          "/filters"
+        );
+
+        if (filterResp.success === true) {
+          dataToCreate.filter = filterResp.result[0];
+        } else {
+          if (
+            filterResp.errors[0].code === 10102 &&
+            filterResp.errors[0].message ===
+              "config duplicates an already existing config"
+          ) {
+            dataToCreate.filter["id"] = filterResp.errors[0].meta.id;
+          } else {
+            const errorObj = {
+              code: filterResp.errors[0].code,
+              message: filterResp.errors[0].message,
+              data: record.id,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  errors: prevState[props.id]["errors"].concat(errorObj),
+                },
+              };
+              return newState;
+            });
+          }
+        }
+
+        if (_.isEmpty(dataToCreate.filter) === false) {
+          const dataWithAuth = { ...authObj, data: [dataToCreate] };
+          const { resp: postRequestResp } = await sendPostRequest(
+            dataWithAuth,
+            "/copy/firewall/rules"
+          );
+          if (postRequestResp.success === false) {
+            const errorObj = {
+              code: postRequestResp.errors[0].code,
+              message: postRequestResp.errors[0].message,
+              data: record.id,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  errors: prevState[props.id]["errors"].concat(errorObj),
+                },
+              };
+              return newState;
+            });
+          } else {
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  copied: prevState[props.id]["copied"].concat(dataToCreate),
+                },
+              };
+              return newState;
+            });
+          }
+          setProgress((prevState) => {
+            const newState = {
+              ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                progressTotal: prevState[props.id]["progressTotal"] + 1,
+              },
+            };
+            return newState;
+          });
+        }
+      }
+    }
+
+    setFirewallRulesData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!firewallRulesData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    firewallRulesData &&
+    firewallRulesData[0].success &&
+    firewallRulesData[0].result.length
+  ) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        firewallRulesData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
