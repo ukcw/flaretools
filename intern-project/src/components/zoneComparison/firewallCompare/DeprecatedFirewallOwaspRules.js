@@ -350,8 +350,11 @@ const DeprecatedFirewallOwaspRules = (props) => {
       // trigger spinner on UI
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
       };
-      newState[props.id]["completed"] = false;
       return newState;
     });
 
@@ -399,12 +402,14 @@ const DeprecatedFirewallOwaspRules = (props) => {
     setProgress((prevState) => {
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: data[0].result.length * data.slice(1).length,
+          progressTotal: 0,
+          completed: false,
+        },
       };
-      newState[props.id]["status"] = "copy";
-      newState[props.id]["totalToCopy"] =
-        data[0].result.length * data.slice(1).length;
-      newState[props.id]["progressTotal"] = 0;
-      newState[props.id]["completed"] = false;
       return newState;
     });
 
@@ -412,9 +417,12 @@ const DeprecatedFirewallOwaspRules = (props) => {
     setResults((prevState) => {
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
       };
-      newState[props.id]["errors"] = [];
-      newState[props.id]["copied"] = [];
       return newState;
     });
 
@@ -470,8 +478,11 @@ const DeprecatedFirewallOwaspRules = (props) => {
               setResults((prevState) => {
                 const newState = {
                   ...prevState,
+                  [props.id]: {
+                    ...prevState[props.id],
+                    errors: prevState[props.id]["errors"].concat(errorObj),
+                  },
                 };
-                newState[props.id]["errors"].push(errorObj);
                 return newState;
               });
             }
@@ -482,29 +493,40 @@ const DeprecatedFirewallOwaspRules = (props) => {
       setProgress((prevState) => {
         const newState = {
           ...prevState,
+          [props.id]: {
+            ...prevState[props.id],
+            progressTotal: prevState[props.id]["progressTotal"] + 1,
+          },
         };
-        newState[props.id]["progressTotal"] += 1;
         return newState;
       });
     }
     setResults((prevState) => {
-      const newState = {
-        ...prevState,
-      };
       const subcategoriesKeys = Object.keys(rulesets);
+      const copiedData = [];
       subcategoriesKeys.forEach((k) =>
-        newState[props.id]["copied"].push({
+        copiedData.push({
           name: k,
           success: rulesets[k],
         })
       );
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          copied: copiedData,
+        },
+      };
       return newState;
     });
     setProgress((prevState) => {
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
       };
-      newState[props.id]["completed"] = true;
       return newState;
     });
     setDeprecatedFirewallOwaspRulesData();

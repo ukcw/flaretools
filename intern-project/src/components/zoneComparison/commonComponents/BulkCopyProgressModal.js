@@ -81,7 +81,10 @@ const BulkCopyProgressModal = ({
                   // copying has completed
                   progressIcon = <CheckCircleIcon color="green" />;
 
-                  if (data[key].errors.length > 0 && data[key].copied.length) {
+                  if (
+                    data[key].errors.length > 0 &&
+                    data[key].copied.length > 0
+                  ) {
                     progressIcon = <WarningIcon color={"orange"} />;
                     returnComponent = (
                       <>
@@ -108,6 +111,7 @@ const BulkCopyProgressModal = ({
                       </>
                     );
                   } else if (data[key].errors.length > 0) {
+                    progressIcon = <WarningTwoIcon color="red" />;
                     returnComponent = (
                       <>
                         <Heading size={"sm"}>Errors</Heading>

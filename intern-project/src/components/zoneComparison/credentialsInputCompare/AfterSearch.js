@@ -51,7 +51,7 @@ const AfterSearch = (props) => {
     } else {
       NotLoadedBarOnOpen();
     }
-    console.log("done", fnObj);
+    console.log("done", copyResults);
   };
 
   return (
@@ -66,6 +66,9 @@ const AfterSearch = (props) => {
       bg="rgba(255,255,255,1)"
       display={"flex"}
     >
+      {console.log(copyProgress)}
+
+      {console.log(copyResults)}
       <Stack
         spacing={2}
         w="100%"

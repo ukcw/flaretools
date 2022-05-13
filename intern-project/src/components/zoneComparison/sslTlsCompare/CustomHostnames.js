@@ -394,11 +394,14 @@ const CustomHostnames = (props) => {
     setProgress((prevState) => {
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "delete",
+          totalToCopy: 0,
+          progressTotal: 0,
+          completed: false,
+        },
       };
-      newState[props.id]["status"] = "delete";
-      newState[props.id]["completed"] = false;
-      newState[props.id]["totalToCopy"] = 0;
-      newState[props.id]["progressTotal"] = 0;
       return newState;
     });
 
@@ -407,8 +410,12 @@ const CustomHostnames = (props) => {
         setProgress((prevState) => {
           const newState = {
             ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              totalToCopy:
+                prevState[props.id]["totalToCopy"] + data[i].result.length,
+            },
           };
-          newState[props.id]["totalToCopy"] += data[i].result.length;
           return newState;
         });
       }
@@ -431,8 +438,11 @@ const CustomHostnames = (props) => {
         setResults((prevState) => {
           const newState = {
             ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              errors: prevState[props.id]["errors"].concat(errorObj),
+            },
           };
-          newState[props.id]["errors"].push(errorObj);
           return newState;
         });
         bulkErrorCount += 1;
@@ -453,8 +463,11 @@ const CustomHostnames = (props) => {
             setResults((prevState) => {
               const newState = {
                 ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  errors: prevState[props.id]["errors"].concat(errorObj),
+                },
               };
-              newState[props.id]["errors"].push(errorObj);
               return newState;
             });
             bulkErrorCount += 1;
@@ -462,8 +475,11 @@ const CustomHostnames = (props) => {
           setProgress((prevState) => {
             const newState = {
               ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                progressTotal: prevState[props.id]["progressTotal"] + 1,
+              },
             };
-            newState[props.id]["progressTotal"] += 1;
             return newState;
           });
         }
@@ -487,8 +503,11 @@ const CustomHostnames = (props) => {
       // trigger spinner on UI
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
       };
-      newState[props.id]["completed"] = false;
       return newState;
     });
 
@@ -496,9 +515,12 @@ const CustomHostnames = (props) => {
     setResults((prevState) => {
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
       };
-      newState[props.id]["errors"] = [];
-      newState[props.id]["copied"] = [];
       return newState;
     });
 
@@ -548,12 +570,14 @@ const CustomHostnames = (props) => {
     setProgress((prevState) => {
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: data[0].result.length * data.slice(1).length,
+          progressTotal: 0,
+          completed: false,
+        },
       };
-      newState[props.id]["status"] = "copy";
-      newState[props.id]["totalToCopy"] =
-        data[0].result.length * data.slice(1).length;
-      newState[props.id]["progressTotal"] = 0;
-      newState[props.id]["completed"] = false;
       return newState;
     });
 
@@ -592,24 +616,33 @@ const CustomHostnames = (props) => {
           setResults((prevState) => {
             const newState = {
               ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                errors: prevState[props.id]["errors"].concat(errorObj),
+              },
             };
-            newState[props.id]["errors"].push(errorObj);
             return newState;
           });
         } else {
           setResults((prevState) => {
             const newState = {
               ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                copied: prevState[props.id]["copied"].concat(dataToCreate),
+              },
             };
-            newState[props.id]["copied"].push(dataToCreate);
             return newState;
           });
         }
         setProgress((prevState) => {
           const newState = {
             ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              progressTotal: prevState[props.id]["progressTotal"] + 1,
+            },
           };
-          newState[props.id]["progressTotal"] += 1;
           return newState;
         });
       }
@@ -622,8 +655,11 @@ const CustomHostnames = (props) => {
     setProgress((prevState) => {
       const newState = {
         ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
       };
-      newState[props.id]["completed"] = true;
       return newState;
     });
     return;
