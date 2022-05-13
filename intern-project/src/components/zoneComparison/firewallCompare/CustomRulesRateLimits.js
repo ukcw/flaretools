@@ -78,7 +78,8 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const CustomRulesRateLimits = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [customRulesRateLimitsData, setCustomRulesRateLimitsData] = useState();
   const {
     isOpen: NonEmptyErrorIsOpen,
@@ -387,6 +388,184 @@ const CustomRulesRateLimits = (props) => {
     setCustomRulesRateLimitsData();
     getData();
   };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await putZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/rulesets/phases/http_ratelimit/entrypoint"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result?.rules !== undefined
+          ? (newObj.result = newObj.result.rules)
+          : (newObj.result = []);
+        return newObj;
+      });
+      setCustomRulesRateLimitsData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+
+    const baseZoneData = data[0].result.map((record) => {
+      const newObj = {
+        action: record.action,
+        description: record.description,
+        enabled: record.enabled,
+        expression: record.expression,
+        ratelimit: record.ratelimit,
+        version: record.version,
+      };
+      return newObj;
+    });
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: otherZoneKeys.length,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    for (const key of otherZoneKeys) {
+      const replacedUrlData = replaceBaseUrl
+        ? baseZoneData.map((record) => {
+            record.expression = record.expression.replaceAll(
+              zoneDetails["zone_1"].name,
+              zoneDetails[key].name
+            );
+            return record;
+          })
+        : baseZoneData;
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const dataWithAuth = { ...authObj, data: { rules: replacedUrlData } };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/put/rulesets/phases/http_ratelimit/entrypoint"
+      );
+      if (postRequestResp.success === false) {
+        console.log(postRequestResp);
+        const errorObj = {
+          code: postRequestResp.errors[0].code,
+          message: postRequestResp.errors[0].message,
+          data: "",
+        };
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              errors: prevState[props.id]["errors"].concat(errorObj),
+            },
+          };
+          return newState;
+        });
+      } else {
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              copied: prevState[props.id]["copied"].concat(replacedUrlData),
+            },
+          };
+          return newState;
+        });
+      }
+      setProgress((prevState) => {
+        const newState = {
+          ...prevState,
+          [props.id]: {
+            ...prevState[props.id],
+            progressTotal: prevState[props.id]["progressTotal"] + 1,
+          },
+        };
+        return newState;
+      });
+    }
+
+    setCustomRulesRateLimitsData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!customRulesRateLimitsData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    customRulesRateLimitsData &&
+    customRulesRateLimitsData[0].success &&
+    customRulesRateLimitsData[0].result.length
+  ) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        customRulesRateLimitsData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
