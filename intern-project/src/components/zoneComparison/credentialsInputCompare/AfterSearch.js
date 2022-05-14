@@ -51,7 +51,7 @@ const AfterSearch = (props) => {
     } else {
       NotLoadedBarOnOpen();
     }
-    console.log("done", copyResults);
+    console.log("done", fnObj);
   };
 
   return (

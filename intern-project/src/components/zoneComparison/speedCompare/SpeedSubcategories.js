@@ -52,7 +52,8 @@ const returnConditions = (data) => {
 };
 
 const SpeedSubcategories = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [speedSubcategoriesData, setSpeedSubcategoriesData] = useState();
   const {
     isOpen: ErrorPromptIsOpen,
@@ -268,6 +269,218 @@ const SpeedSubcategories = (props) => {
     setSpeedSubcategoriesData();
     getData();
   };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await Promise.all([
+        getMultipleZoneSettings(zoneKeys, credentials, "/settings/mirage"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/image_resizing"
+        ),
+        getMultipleZoneSettings(zoneKeys, credentials, "/settings/polish"),
+        getMultipleZoneSettings(zoneKeys, credentials, "/settings/brotli"),
+        getMultipleZoneSettings(zoneKeys, credentials, "/settings/early_hints"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/h2_prioritization"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/rocket_loader"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/prefetch_preload"
+        ),
+      ]);
+      const processedResp = resp.map((settingArray) =>
+        settingArray.map((zone) => zone.resp)
+      );
+      setSpeedSubcategoriesData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data;
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    const subcategories = {
+      mirage: undefined,
+      image_resizing: undefined,
+      polish: undefined,
+      brotli: undefined,
+      early_hints: undefined,
+      h2_prioritization: undefined,
+      rocket_loader: undefined,
+      prefetch_preload: undefined,
+    };
+
+    const subcategoriesEndpoints = {
+      mirage: "/patch/settings/mirage",
+      image_resizing: "/patch/settings/image_resizing",
+      polish: "/patch/settings/polish",
+      brotli: "/patch/settings/brotli",
+      early_hints: "/patch/settings/early_hints",
+      h2_prioritization: "/patch/settings/h2_prioritization",
+      rocket_loader: "/patch/settings/rocket_loader",
+      prefetch_preload: "/patch/settings/prefetch_preload",
+    };
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: data.length * data[0].slice(1).length,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    for (const record of baseZoneData) {
+      const currentSubcategory = record[0];
+      if (currentSubcategory.success === true && currentSubcategory.result) {
+        // setCurrentProgressSubcategory(currentSubcategory.result.id);
+        const createData = {
+          value: currentSubcategory.result.value,
+        };
+        for (const key of otherZoneKeys) {
+          const dataToCreate = _.cloneDeep(createData);
+          const authObj = {
+            zoneId: credentials[key].zoneId,
+            apiToken: `Bearer ${credentials[key].apiToken}`,
+          };
+          // setCurrentZone(key);
+          const dataWithAuth = { ...authObj, data: dataToCreate };
+          const { resp: postRequestResp } = await sendPostRequest(
+            dataWithAuth,
+            subcategoriesEndpoints[currentSubcategory.result.id]
+          );
+          if (postRequestResp.success === true) {
+            subcategories[currentSubcategory.result.id] = true;
+          } else {
+            const errorObj = {
+              code: postRequestResp.errors[0].code,
+              message: postRequestResp.errors[0].message,
+              data: currentSubcategory.result.id,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  errors: prevState[props.id]["errors"].concat(errorObj),
+                },
+              };
+              return newState;
+            });
+          }
+        }
+      } else {
+      }
+      setProgress((prevState) => {
+        const newState = {
+          ...prevState,
+          [props.id]: {
+            ...prevState[props.id],
+            progressTotal: prevState[props.id]["progressTotal"] + 1,
+          },
+        };
+        return newState;
+      });
+    }
+    setResults((prevState) => {
+      const subcategoriesKeys = Object.keys(subcategories);
+      const copiedData = [];
+      subcategoriesKeys.forEach((k) =>
+        copiedData.push({
+          name: k,
+          success: subcategories[k],
+        })
+      );
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          copied: copiedData,
+        },
+      };
+      return newState;
+    });
+    setSpeedSubcategoriesData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!speedSubcategoriesData) {
+  } // don't do anything while the app has not loaded
+  else if (speedSubcategoriesData && speedSubcategoriesData.length) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        speedSubcategoriesData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
