@@ -63,7 +63,8 @@ const returnConditions = (data) => {
 };
 
 const AutomaticPlatformOptimization = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [
     automaticPlatformOptimizationData,
     setAutomaticPlatformOptimizationData,
@@ -227,6 +228,180 @@ const AutomaticPlatformOptimization = (props) => {
     setAutomaticPlatformOptimizationData();
     getData();
   };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/automatic_platform_optimization"
+      );
+      const resp2 = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/settings/automatic_platform_optimization"
+      );
+      const valueResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result.id = "enabled";
+        return newObj;
+      });
+      const cacheByDeviceTypeResp = resp2.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj.result.id = "cache_by_device_type";
+        return newObj;
+      });
+      const secondaryProcessedResp = [
+        [...valueResp],
+        [...cacheByDeviceTypeResp],
+      ];
+      setAutomaticPlatformOptimizationData(secondaryProcessedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0][0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: 1,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    const createData = {
+      value: baseZoneData.result.value,
+    };
+
+    for (const key of otherZoneKeys) {
+      const dataToCreate = _.cloneDeep(createData);
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      // setCurrentZone(key);
+      const dataWithAuth = { ...authObj, data: dataToCreate };
+      const { resp: postRequestResp } = await sendPostRequest(
+        dataWithAuth,
+        "/patch/settings/automatic_platform_optimization"
+      );
+      if (postRequestResp.success === false) {
+        const errorObj = {
+          code: postRequestResp.errors[0].code,
+          message: postRequestResp.errors[0].message,
+          data: dataToCreate.value,
+        };
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              errors: prevState[props.id]["errors"].concat(errorObj),
+            },
+          };
+          return newState;
+        });
+      } else {
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              copied: prevState[props.id]["copied"].concat(dataToCreate),
+            },
+          };
+          return newState;
+        });
+      }
+      setProgress((prevState) => {
+        const newState = {
+          ...prevState,
+          [props.id]: {
+            ...prevState[props.id],
+            progressTotal: prevState[props.id]["progressTotal"] + 1,
+          },
+        };
+        return newState;
+      });
+    }
+    setAutomaticPlatformOptimizationData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!automaticPlatformOptimizationData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    automaticPlatformOptimizationData &&
+    automaticPlatformOptimizationData[0][0].success &&
+    automaticPlatformOptimizationData[0][0].result
+  ) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        automaticPlatformOptimizationData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
