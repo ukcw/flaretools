@@ -53,7 +53,8 @@ const returnConditions = (data) => {
 };
 
 const ScrapeShieldSubcategories = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [scrapeShieldSubcategoriesData, setScrapeShieldSubcategoriesData] =
     useState();
 
@@ -244,6 +245,202 @@ const ScrapeShieldSubcategories = (props) => {
     setScrapeShieldSubcategoriesData();
     getData();
   };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await Promise.all([
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/email_obfuscation"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/server_side_exclude"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/hotlink_protection"
+        ),
+      ]);
+      const processedResp = resp.map((settingArray) =>
+        settingArray.map((zone) => zone.resp)
+      );
+      setScrapeShieldSubcategoriesData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data;
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    const subcategories = {
+      email_obfuscation: undefined,
+      server_side_exclude: undefined,
+      hotlink_protection: undefined,
+    };
+
+    const subcategoriesEndpoints = {
+      email_obfuscation: "/patch/settings/email_obfuscation",
+      server_side_exclude: "/patch/settings/server_side_exclude",
+      hotlink_protection: "/patch/settings/hotlink_protection",
+    };
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: data.length * data[0].slice(1).length,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    for (const record of baseZoneData) {
+      const currentSubcategory = record[0];
+      if (currentSubcategory.success === true && currentSubcategory.result) {
+        // setCurrentProgressSubcategory(currentSubcategory.result.id);
+        const createData = {
+          value: currentSubcategory.result.value,
+        };
+        for (const key of otherZoneKeys) {
+          const dataToCreate = _.cloneDeep(createData);
+          const authObj = {
+            zoneId: credentials[key].zoneId,
+            apiToken: `Bearer ${credentials[key].apiToken}`,
+          };
+          setCurrentZone(key);
+          const dataWithAuth = { ...authObj, data: dataToCreate };
+          const { resp: postRequestResp } = await sendPostRequest(
+            dataWithAuth,
+            subcategoriesEndpoints[currentSubcategory.result.id]
+          );
+          if (postRequestResp.success === true) {
+            subcategories[currentSubcategory.result.id] = true;
+          } else {
+            const errorObj = {
+              code: postRequestResp.errors[0].code,
+              message: postRequestResp.errors[0].message,
+              data: currentSubcategory.result.id,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  errors: prevState[props.id]["errors"].concat(errorObj),
+                },
+              };
+              return newState;
+            });
+          }
+        }
+      } else {
+      }
+      setProgress((prevState) => {
+        const newState = {
+          ...prevState,
+          [props.id]: {
+            ...prevState[props.id],
+            progressTotal: prevState[props.id]["progressTotal"] + 1,
+          },
+        };
+        return newState;
+      });
+    }
+    setResults((prevState) => {
+      const subcategoriesKeys = Object.keys(subcategories);
+      const copiedData = [];
+      subcategoriesKeys.forEach((k) =>
+        copiedData.push({
+          name: k,
+          success: subcategories[k],
+        })
+      );
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          copied: copiedData,
+        },
+      };
+      return newState;
+    });
+    setScrapeShieldSubcategoriesData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!scrapeShieldSubcategoriesData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    scrapeShieldSubcategoriesData &&
+    scrapeShieldSubcategoriesData.length
+  ) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        scrapeShieldSubcategoriesData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
