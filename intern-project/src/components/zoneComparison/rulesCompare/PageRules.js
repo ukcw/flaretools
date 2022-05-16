@@ -97,7 +97,8 @@ const conditionsToMatch = (base, toCompare) => {
 };
 
 const PageRules = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [pageRulesData, setPageRulesData] = useState();
   const {
     isOpen: NonEmptyErrorIsOpen,
@@ -387,6 +388,329 @@ const PageRules = (props) => {
     setPageRulesData();
     getData();
   };
+
+  const bulkDeleteHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    const otherZoneKeys = zoneKeys.slice(1);
+    let bulkErrorCount = 0;
+
+    // reset state for the setting
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "delete",
+          totalToCopy: 0,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].success === true && data[i].result.length) {
+        setProgress((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              totalToCopy:
+                prevState[props.id]["totalToCopy"] + data[i].result.length,
+            },
+          };
+          return newState;
+        });
+      }
+    }
+
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+
+      const { resp } = await getZoneSetting(authObj, "/pagerules");
+
+      if (resp.success === false || resp.result.length === 0) {
+        const errorObj = {
+          code: resp.errors[0].code,
+          message: resp.errors[0].message,
+          data: "",
+        };
+        setResults((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              errors: prevState[props.id]["errors"].concat(errorObj),
+            },
+          };
+          return newState;
+        });
+        bulkErrorCount += 1;
+      } else {
+        for (const record of resp.result) {
+          const createData = _.cloneDeep(authObj);
+          createData["identifier"] = record.id; // need to send identifier to API endpoint
+          const { resp } = await deleteZoneSetting(
+            createData,
+            "/delete/pagerules"
+          );
+          if (resp.success === false) {
+            const errorObj = {
+              code: resp.errors[0].code,
+              message: resp.errors[0].message,
+              data: createData.identifier,
+            };
+            setResults((prevState) => {
+              const newState = {
+                ...prevState,
+                [props.id]: {
+                  ...prevState[props.id],
+                  errors: prevState[props.id]["errors"].concat(errorObj),
+                },
+              };
+              return newState;
+            });
+            bulkErrorCount += 1;
+          }
+          setProgress((prevState) => {
+            const newState = {
+              ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                progressTotal: prevState[props.id]["progressTotal"] + 1,
+              },
+            };
+            return newState;
+          });
+        }
+      }
+    }
+
+    if (bulkErrorCount > 0) {
+      return;
+    } else {
+      bulkCopyHandler(data, zoneKeys, credentials, setResults, setProgress);
+    }
+  };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await createZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await getMultipleZoneSettings(
+        zoneKeys,
+        credentials,
+        "/pagerules"
+      );
+      const processedResp = resp.map((zone) => {
+        const newObj = { ...zone.resp };
+        newObj["result"] = makeData(zone.resp.result);
+        return newObj;
+      });
+      setPageRulesData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data[0];
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    // check if other zone has any data prior to create records
+    // we want to start the other zone from a clean slate
+    for (const key of otherZoneKeys) {
+      const authObj = {
+        zoneId: credentials[key].zoneId,
+        apiToken: `Bearer ${credentials[key].apiToken}`,
+      };
+      const { resp: checkIfEmpty } = await getZoneSetting(
+        authObj,
+        "/pagerules"
+      );
+
+      if (checkIfEmpty.success === true && checkIfEmpty.result.length !== 0) {
+        return bulkDeleteHandler(
+          data,
+          zoneKeys,
+          credentials,
+          setResults,
+          setProgress
+        );
+      }
+    }
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: data[0].result.length * data.slice(1).length,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    for (const record of baseZoneData.result) {
+      const createData = {
+        targets: record.targets,
+        actions: record.actions,
+      };
+      if (record?.priority !== undefined) {
+        createData["priority"] = record.priority;
+      }
+      if (record?.status !== undefined) {
+        createData["status"] = record.status;
+      }
+      for (const key of otherZoneKeys) {
+        const dataToCreate = _.cloneDeep(createData);
+
+        for (let i = 0; i < dataToCreate.targets.length; i++) {
+          if (
+            dataToCreate.targets[i]?.constraint !== undefined &&
+            dataToCreate.targets[i].constraint?.value !== undefined
+          ) {
+            if (replaceBaseUrl) {
+              dataToCreate.targets[i].constraint.value = dataToCreate.targets[
+                i
+              ].constraint.value.replaceAll(
+                zoneDetails.zone_1.name,
+                zoneDetails[key].name
+              );
+            }
+          }
+        }
+
+        const authObj = {
+          zoneId: credentials[key].zoneId,
+          apiToken: `Bearer ${credentials[key].apiToken}`,
+        };
+        // setCurrentZone(key);
+
+        const dataWithAuth = { ...authObj, data: dataToCreate };
+        const { resp: postRequestResp } = await sendPostRequest(
+          dataWithAuth,
+          "/copy/pagerules"
+        );
+        if (postRequestResp.success === false) {
+          const errorObj = {
+            code: postRequestResp.errors[0].code,
+            message: postRequestResp.errors[0].message,
+            data: dataToCreate.targets[0].constraint.value,
+          };
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                errors: prevState[props.id]["errors"].concat(errorObj),
+              },
+            };
+            return newState;
+          });
+        } else {
+          setResults((prevState) => {
+            const newState = {
+              ...prevState,
+              [props.id]: {
+                ...prevState[props.id],
+                copied: prevState[props.id]["copied"].concat(dataToCreate),
+              },
+            };
+            return newState;
+          });
+        }
+        setProgress((prevState) => {
+          const newState = {
+            ...prevState,
+            [props.id]: {
+              ...prevState[props.id],
+              progressTotal: prevState[props.id]["progressTotal"] + 1,
+            },
+          };
+          return newState;
+        });
+      }
+    }
+
+    setPageRulesData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!pageRulesData) {
+  } // don't do anything while the app has not loaded
+  else if (
+    pageRulesData &&
+    pageRulesData[0].success &&
+    pageRulesData[0].result.length
+  ) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        pageRulesData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
