@@ -120,9 +120,11 @@ const BulkCopyProgressModal = ({
                             <ListItem key={err}>
                               <ListIcon as={WarningTwoIcon} color={"red"} />
                               <Stack>
+                                <Text fontWeight={"bold"}>{err.data}</Text>
+                                <Text fontWeight={"bold"}>Code: </Text>
                                 <Text>{err.code}</Text>
+                                <Text fontWeight={"bold"}>Message: </Text>
                                 <Text>{err.message}</Text>
-                                <Text>{err.data}</Text>
                               </Stack>
                             </ListItem>
                           ))}
