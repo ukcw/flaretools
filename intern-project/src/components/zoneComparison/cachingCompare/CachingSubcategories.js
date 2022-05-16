@@ -52,7 +52,8 @@ const returnConditions = (data) => {
 };
 
 const CachingSubcategories = (props) => {
-  const { zoneKeys, credentials, zoneDetails } = useCompareContext();
+  const { zoneKeys, credentials, zoneDetails, zoneCopierFunctions } =
+    useCompareContext();
   const [cachingSubcategoriesData, setCachingSubcategoriesData] = useState();
   const {
     isOpen: ErrorPromptIsOpen,
@@ -321,6 +322,273 @@ const CachingSubcategories = (props) => {
     setCachingSubcategoriesData();
     getData();
   };
+
+  const bulkCopyHandler = async (
+    data,
+    zoneKeys,
+    credentials,
+    setResults,
+    setProgress
+  ) => {
+    setProgress((prevState) => {
+      // trigger spinner on UI
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    async function sendPostRequest(data, endpoint) {
+      const resp = await patchZoneSetting(data, endpoint);
+      return resp;
+    }
+
+    async function getData() {
+      const resp = await Promise.all([
+        getMultipleZoneSettings(zoneKeys, credentials, "/argo/tiered_caching"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/cache/tiered_cache_smart_topology_enable"
+        ),
+        getMultipleZoneSettings(zoneKeys, credentials, "/settings/cache_level"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/browser_cache_ttl"
+        ),
+        getMultipleZoneSettings(zoneKeys, credentials, "/flags"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/always_online"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/development_mode"
+        ),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/sort_query_string_for_cache"
+        ),
+      ]);
+      const processedResp = resp.map((settingArray) =>
+        settingArray.map((zone) => {
+          if (zone.resp.result?.cache !== undefined) {
+            let newObj = { ...zone.resp };
+            newObj["result"].value = zone.resp.result.cache.crawlhints_enabled;
+            return newObj;
+          } else {
+            return zone.resp;
+          }
+        })
+      );
+      setCachingSubcategoriesData(processedResp);
+    }
+
+    // not possible for data not to be loaded (logic is at displaying this button)
+    const baseZoneData = data;
+    const otherZoneKeys = zoneKeys.slice(1);
+
+    const subcategories = {
+      tiered_caching: undefined,
+      tiered_cache_smart_topology_enable: undefined,
+      cache_level: undefined,
+      browser_cache_ttl: undefined,
+      crawlhints: undefined,
+      always_online: undefined,
+      development_mode: undefined,
+      sort_query_string_for_cache: undefined,
+    };
+
+    const subcategoriesEndpoints = {
+      tiered_caching: "/patch/argo/tiered_caching",
+      tiered_cache_smart_topology_enable:
+        "/patch/cache/tiered_cache_smart_topology_enable",
+      cache_level: "/patch/settings/cache_level",
+      browser_cache_ttl: "/patch/settings/browser_cache_ttl",
+      crawlhints: "/post/flags/products/cache/changes",
+      always_online: "/patch/settings/always_online",
+      development_mode: "/patch/settings/development_mode",
+      sort_query_string_for_cache:
+        "/patch/settings/sort_query_string_for_cache",
+    };
+
+    // initialize state
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          status: "copy",
+          totalToCopy: data.length * data[0].slice(1).length,
+          progressTotal: 0,
+          completed: false,
+        },
+      };
+      return newState;
+    });
+
+    // initialize state
+    setResults((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          errors: [],
+          copied: [],
+        },
+      };
+      return newState;
+    });
+
+    for (const record of baseZoneData) {
+      const currentSubcategory = record[0];
+      if (currentSubcategory.success === true && currentSubcategory.result) {
+        if (currentSubcategory.result?.id !== undefined) {
+          // setCurrentProgressSubcategory(currentSubcategory.result.id);
+          const createData = {
+            value: currentSubcategory.result.value,
+          };
+          for (const key of otherZoneKeys) {
+            const dataToCreate = _.cloneDeep(createData);
+            const authObj = {
+              zoneId: credentials[key].zoneId,
+              apiToken: `Bearer ${credentials[key].apiToken}`,
+            };
+            // setCurrentZone(key);
+            const dataWithAuth = { ...authObj, data: dataToCreate };
+            const { resp: postRequestResp } = await sendPostRequest(
+              dataWithAuth,
+              subcategoriesEndpoints[currentSubcategory.result.id]
+            );
+            if (postRequestResp.success === true) {
+              subcategories[currentSubcategory.result.id] = true;
+            } else {
+              const errorObj = {
+                code: postRequestResp.errors[0].code,
+                message: postRequestResp.errors[0].message,
+                data: currentSubcategory.result.id,
+              };
+              setResults((prevState) => {
+                const newState = {
+                  ...prevState,
+                  [props.id]: {
+                    ...prevState[props.id],
+                    errors: prevState[props.id]["errors"].concat(errorObj),
+                  },
+                };
+                return newState;
+              });
+            }
+          }
+        } else if (currentSubcategory.result?.cache !== undefined) {
+          setCurrentProgressSubcategory("Crawlhints");
+          const createData = {
+            feature: "crawlhints_enabled",
+            value: currentSubcategory.result.value, // this case is for Crawlhints
+          };
+          for (const key of otherZoneKeys) {
+            const dataToCreate = _.cloneDeep(createData);
+            const authObj = {
+              zoneId: credentials[key].zoneId,
+              apiToken: `Bearer ${credentials[key].apiToken}`,
+            };
+            setCurrentZone(key);
+            const dataWithAuth = { ...authObj, data: dataToCreate };
+            const { resp: postRequestResp } = await sendPostRequest(
+              dataWithAuth,
+              subcategoriesEndpoints.crawlhints
+            );
+            if (postRequestResp.success === true) {
+              subcategories.crawlhints = true;
+            } else {
+              const errorObj = {
+                code: postRequestResp.errors[0].code,
+                message: postRequestResp.errors[0].message,
+                data: currentSubcategory.result.id,
+              };
+              setResults((prevState) => {
+                const newState = {
+                  ...prevState,
+                  [props.id]: {
+                    ...prevState[props.id],
+                    errors: prevState[props.id]["errors"].concat(errorObj),
+                  },
+                };
+                return newState;
+              });
+            }
+          }
+        } else {
+        }
+      } else {
+      }
+      setProgress((prevState) => {
+        const newState = {
+          ...prevState,
+          [props.id]: {
+            ...prevState[props.id],
+            progressTotal: prevState[props.id]["progressTotal"] + 1,
+          },
+        };
+        return newState;
+      });
+    }
+    setResults((prevState) => {
+      const subcategoriesKeys = Object.keys(subcategories);
+      const copiedData = [];
+      subcategoriesKeys.forEach((k) =>
+        copiedData.push({
+          name: k,
+          success: subcategories[k],
+        })
+      );
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          copied: copiedData,
+        },
+      };
+      return newState;
+    });
+    setCachingSubcategoriesData();
+    getData();
+
+    setProgress((prevState) => {
+      const newState = {
+        ...prevState,
+        [props.id]: {
+          ...prevState[props.id],
+          completed: true,
+        },
+      };
+      return newState;
+    });
+    return;
+  };
+
+  if (!cachingSubcategoriesData) {
+  } // don't do anything while the app has not loaded
+  else if (cachingSubcategoriesData && cachingSubcategoriesData.length) {
+    zoneCopierFunctions[props.id] = (setResults, setProgress) =>
+      bulkCopyHandler(
+        cachingSubcategoriesData,
+        zoneKeys,
+        credentials,
+        setResults,
+        setProgress
+      );
+  } else {
+    zoneCopierFunctions[props.id] = false;
+  }
 
   return (
     <Stack w="100%" spacing={4}>
