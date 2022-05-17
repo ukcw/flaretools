@@ -232,7 +232,6 @@ const DeprecatedFirewallOwaspRules = (props) => {
           );
           if (postRequestResp.success === true) {
             // pass condition
-            console.log(postRequestResp);
           }
         }
       } else {
@@ -558,7 +557,6 @@ const DeprecatedFirewallOwaspRules = (props) => {
 
   return (
     <Stack w="100%" spacing={4}>
-      {console.log(deprecatedFirewallOwaspRulesData)}
       {
         <CategoryTitle
           id={props.id}
@@ -641,7 +639,6 @@ const DeprecatedFirewallOwaspRules = (props) => {
           copyButtonText={`Copy`}
         />
       )}
-      {console.log(deprecatedFirewallOwaspRulesData)}
       {!deprecatedFirewallOwaspRulesData && <LoadingBox />}
       {deprecatedFirewallOwaspRulesData && (
         <Table {...getTableProps}>

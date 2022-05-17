@@ -22,6 +22,7 @@ const BulkCopyDisplayModal = ({
   copyableSettings,
   handleCopy,
   nextModal,
+  //   currentCount, // hacky patch for forcing a refresh on state change
 }) => {
   const [userChosenSettings, setUserChosenSettings] = useState({});
 

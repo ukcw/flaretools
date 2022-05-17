@@ -12,6 +12,7 @@ import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import BulkCopyProgressModal from "../commonComponents/BulkCopyProgressModal";
 import BulkCopyDisplayModal from "../commonComponents/BulkCopyDisplayModal";
 import { BulkCopyResults, BulkCopyProgress } from "../../../utils/utils";
+import _ from "lodash";
 
 const AfterSearch = (props) => {
   const {
@@ -97,9 +98,6 @@ const AfterSearch = (props) => {
       bg="rgba(255,255,255,1)"
       display={"flex"}
     >
-      {console.log(copyProgress)}
-
-      {console.log(copyResults)}
       <Stack
         spacing={2}
         w="100%"
