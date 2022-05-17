@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
 import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import BulkCopyProgressModal from "../commonComponents/BulkCopyProgressModal";
+import BulkCopyDisplayModal from "../commonComponents/BulkCopyDisplayModal";
 import { BulkCopyResults, BulkCopyProgress } from "../../../utils/utils";
 
 const AfterSearch = (props) => {
@@ -28,13 +29,18 @@ const AfterSearch = (props) => {
     onOpen: BulkCopyProgressOnOpen,
     onClose: BulkCopyProgressOnClose,
   } = useDisclosure(); // Not Fully Loaded App Modal
+  const {
+    isOpen: BulkCopyDisplayIsOpen,
+    onOpen: BulkCopyDisplayOnOpen,
+    onClose: BulkCopyDisplayOnClose,
+  } = useDisclosure(); // Checkboxes for copying options
 
   const [copyResults, setCopyResults] = useState(BulkCopyResults);
   const [copyProgress, setCopyProgress] = useState(BulkCopyProgress);
   const [initiatedCopy, setInitiatedCopy] = useState(false);
+  const [userSelection, setUserSelection] = useState({});
 
-  const bulkCopySettings = async (fnObj) => {
-    setInitiatedCopy(true);
+  const bulkCopySettings = (fnObj, settingsToCopy) => {
     NonEmptyPromptOnClose();
 
     const keys = Object.keys(fnObj);
@@ -51,17 +57,21 @@ const AfterSearch = (props) => {
 
     if (doneLoading) {
       BulkCopyProgressOnOpen();
+      setInitiatedCopy(true);
       for (let i = 0; i < keys.length; i++) {
-        if (fnObj[keys[i]] !== undefined && fnObj[keys[i]] !== false) {
+        if (
+          fnObj[keys[i]] !== undefined &&
+          fnObj[keys[i]] !== false &&
+          settingsToCopy[keys[i]] === true
+        ) {
           fnObj[keys[i]](setCopyResults, setCopyProgress);
         }
       }
       // BulkCopyProgressOnClose();
       // keys.forEach((k) => fnObj[k]());
-    } else {
+    } /*else {
       NotLoadedBarOnOpen();
-    }
-    console.log("done", fnObj);
+    }*/
   };
 
   const userPrompt = () => {
@@ -70,7 +80,8 @@ const AfterSearch = (props) => {
       return;
     }
 
-    NonEmptyPromptOnOpen();
+    BulkCopyDisplayOnOpen();
+    // NonEmptyPromptOnOpen();
     return;
   };
 
@@ -123,14 +134,27 @@ const AfterSearch = (props) => {
             }
           />
         )}
+        {BulkCopyDisplayIsOpen && (
+          <BulkCopyDisplayModal
+            isOpen={BulkCopyDisplayIsOpen}
+            onOpen={BulkCopyDisplayOnOpen}
+            onClose={BulkCopyDisplayOnClose}
+            title={`Configuration settings to copy from ${props.zone1name} to ${props.zone2name}`}
+            copyableSettings={props.zoneBulkCopy}
+            handleCopy={setUserSelection}
+            nextModal={NonEmptyPromptOnOpen}
+          />
+        )}
         {NonEmptyPromptIsOpen && (
           <NonEmptyErrorModal
             isOpen={NonEmptyPromptIsOpen}
             onOpen={NonEmptyPromptOnOpen}
             onClose={NonEmptyPromptOnClose}
-            handleDelete={() => bulkCopySettings(props.zoneBulkCopy)}
+            handleDelete={() =>
+              bulkCopySettings(props.zoneBulkCopy, userSelection)
+            }
             title={`If there are existing records in ${props.zone2name}, they will be deleted.`}
-            errorMessage={`To proceed with copying configuration settings from ${props.zone1name} 
+            errorMessage={`To proceed with bulk copying configuration settings from ${props.zone1name} 
           to ${props.zone2name}, any existing records 
           in ${props.zone2name} need to be deleted. This action is irreversible.`}
           />

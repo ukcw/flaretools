@@ -62,7 +62,7 @@ const Navbar = (props) => {
                 bg: useColorModeValue("gray.300", "gray.900"),
               }}
             >
-              Zone Comparison
+              Zone Comparison/Copier
             </Link>
           </PopoverTrigger>
         </Popover>
