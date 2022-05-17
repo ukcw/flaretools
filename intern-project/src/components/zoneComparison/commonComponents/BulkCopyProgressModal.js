@@ -12,8 +12,10 @@ import {
   AccordionPanel,
   Box,
   Button,
+  Code,
   Divider,
   Heading,
+  HStack,
   List,
   ListIcon,
   ListItem,
@@ -93,16 +95,36 @@ const BulkCopyProgressModal = ({
                         <List>
                           {data[key].errors.map((err, idx) => (
                             <ListItem key={idx}>
-                              <ListIcon as={WarningTwoIcon} color={"red"} />
-                              <Stack>
-                                {/* <Text fontWeight={"bold"}>
+                              <HStack
+                                borderColor="#ccc"
+                                borderWidth={0.1}
+                                borderRadius={10}
+                                p={2}
+                                m={3}
+                                boxShadow="0 0 1px #ccc"
+                                overflowWrap={"break-word"}
+                                wordBreak={"break-word"}
+                              >
+                                <Stack>
+                                  <ListIcon as={WarningTwoIcon} color={"red"} />
+                                </Stack>
+                                <Stack>
+                                  {/* <Text fontWeight={"bold"}>
                                   {Humanize(err.data)}
                                 </Text> */}
-                                <Text fontWeight={"bold"}>Code: </Text>
-                                <Text>{err.code}</Text>
-                                <Text fontWeight={"bold"}>Message: </Text>
-                                <Text>{err.message}</Text>
-                              </Stack>
+                                  <Text fontWeight={"bold"}>Data: </Text>
+                                  <Code>
+                                    {JSON.stringify(err.data, null, 2)}
+                                  </Code>
+                                  <Text fontWeight={"bold"}>Code: </Text>
+                                  <Text>{err.code}</Text>
+                                  <Text fontWeight={"bold"}>Message: </Text>
+                                  <Text>{err.message}</Text>
+                                </Stack>
+                              </HStack>
+                              {idx !== data[key].errors.length - 1 ? (
+                                <Divider />
+                              ) : null}
                             </ListItem>
                           ))}
                         </List>
@@ -117,14 +139,34 @@ const BulkCopyProgressModal = ({
                         <List>
                           {data[key].errors.map((err) => (
                             <ListItem key={err}>
-                              <ListIcon as={WarningTwoIcon} color={"red"} />
-                              <Stack>
-                                {/* <Text fontWeight={"bold"}>{err.data}</Text> */}
-                                <Text fontWeight={"bold"}>Code: </Text>
-                                <Text>{err.code}</Text>
-                                <Text fontWeight={"bold"}>Message: </Text>
-                                <Text>{err.message}</Text>
-                              </Stack>
+                              <HStack
+                                borderColor="#ccc"
+                                borderWidth={0.1}
+                                borderRadius={10}
+                                p={2}
+                                m={3}
+                                boxShadow="0 0 1px #ccc"
+                                overflowWrap={"break-word"}
+                                wordBreak={"break-word"}
+                              >
+                                <Stack>
+                                  <ListIcon as={WarningTwoIcon} color={"red"} />
+                                </Stack>
+                                <Stack>
+                                  {/* <Text fontWeight={"bold"}>{err.data}</Text> */}
+                                  <Text fontWeight={"bold"}>Data: </Text>
+                                  <Code>
+                                    {JSON.stringify(err.data, null, 2)}
+                                  </Code>
+                                  <Text fontWeight={"bold"}>Code: </Text>
+                                  <Text>{err.code}</Text>
+                                  <Text fontWeight={"bold"}>Message: </Text>
+                                  <Text>{err.message}</Text>
+                                </Stack>
+                              </HStack>
+                              {idx !== data[key].errors.length - 1 ? (
+                                <Divider />
+                              ) : null}
                             </ListItem>
                           ))}
                         </List>

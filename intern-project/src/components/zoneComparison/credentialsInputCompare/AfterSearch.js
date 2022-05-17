@@ -154,7 +154,7 @@ const AfterSearch = (props) => {
             title={`If there are existing records in ${props.zone2name}, they will be deleted.`}
             errorMessage={`To proceed with bulk copying configuration settings from ${props.zone1name} 
           to ${props.zone2name}, any existing records 
-          in ${props.zone2name} need to be deleted. This action is irreversible.`}
+          in ${props.zone2name} needs to be deleted. This action is irreversible.`}
           />
         )}
         {BulkCopyProgressIsOpen && (
