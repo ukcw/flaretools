@@ -79,7 +79,6 @@ const MobileRedirect = (props) => {
         credentials,
         "/settings/mobile_redirect"
       );
-      console.log("apicall", resp);
       const processedResp = resp.map((zone) => zone.resp);
       const secondaryProcessedResp = [
         [JSON.parse(JSON.stringify(processedResp))], // this method does a deep copy of the objects
@@ -414,7 +413,6 @@ const MobileRedirect = (props) => {
           }
         />
       }
-      {console.log(mobileRedirectData)}
       {ErrorPromptIsOpen && (
         <ErrorPromptModal
           isOpen={ErrorPromptIsOpen}
