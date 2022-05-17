@@ -575,10 +575,7 @@ const HttpResponseHeaderMod = (props) => {
     });
 
     for (const key of otherZoneKeys) {
-      setCurrentZone(key);
-      if (!CopyingProgressBarIsOpen) {
-        CopyingProgressBarOnOpen();
-      }
+      // setCurrentZone(key);
 
       const replacedUrlData = replaceBaseUrl
         ? baseZoneData.map((record) => {

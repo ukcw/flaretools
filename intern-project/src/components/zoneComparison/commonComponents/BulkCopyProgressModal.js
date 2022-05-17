@@ -1,7 +1,6 @@
 import {
   CheckCircleIcon,
   NotAllowedIcon,
-  SpinnerIcon,
   WarningIcon,
   WarningTwoIcon,
 } from "@chakra-ui/icons";
@@ -96,9 +95,9 @@ const BulkCopyProgressModal = ({
                             <ListItem key={idx}>
                               <ListIcon as={WarningTwoIcon} color={"red"} />
                               <Stack>
-                                <Text fontWeight={"bold"}>
+                                {/* <Text fontWeight={"bold"}>
                                   {Humanize(err.data)}
-                                </Text>
+                                </Text> */}
                                 <Text fontWeight={"bold"}>Code: </Text>
                                 <Text>{err.code}</Text>
                                 <Text fontWeight={"bold"}>Message: </Text>
@@ -120,7 +119,7 @@ const BulkCopyProgressModal = ({
                             <ListItem key={err}>
                               <ListIcon as={WarningTwoIcon} color={"red"} />
                               <Stack>
-                                <Text fontWeight={"bold"}>{err.data}</Text>
+                                {/* <Text fontWeight={"bold"}>{err.data}</Text> */}
                                 <Text fontWeight={"bold"}>Code: </Text>
                                 <Text>{err.code}</Text>
                                 <Text fontWeight={"bold"}>Message: </Text>
@@ -145,7 +144,7 @@ const BulkCopyProgressModal = ({
                   }
                 }
                 return (
-                  <AccordionItem key={key}>
+                  <AccordionItem key={idx}>
                     <h2>
                       <AccordionButton>
                         <AccordionIcon />

@@ -8,6 +8,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import ErrorPromptModal from "../commonComponents/ErrorPromptModal";
+import NonEmptyErrorModal from "../commonComponents/NonEmptyErrorModal";
 import BulkCopyProgressModal from "../commonComponents/BulkCopyProgressModal";
 import { BulkCopyResults, BulkCopyProgress } from "../../../utils/utils";
 
@@ -18,6 +19,11 @@ const AfterSearch = (props) => {
     onClose: NotLoadedBarOnClose,
   } = useDisclosure(); // Not Fully Loaded App Modal
   const {
+    isOpen: NonEmptyPromptIsOpen,
+    onOpen: NonEmptyPromptOnOpen,
+    onClose: NonEmptyPromptOnClose,
+  } = useDisclosure(); // NonEmptyPromptModal;
+  const {
     isOpen: BulkCopyProgressIsOpen,
     onOpen: BulkCopyProgressOnOpen,
     onClose: BulkCopyProgressOnClose,
@@ -25,8 +31,12 @@ const AfterSearch = (props) => {
 
   const [copyResults, setCopyResults] = useState(BulkCopyResults);
   const [copyProgress, setCopyProgress] = useState(BulkCopyProgress);
+  const [initiatedCopy, setInitiatedCopy] = useState(false);
 
   const bulkCopySettings = async (fnObj) => {
+    setInitiatedCopy(true);
+    NonEmptyPromptOnClose();
+
     const keys = Object.keys(fnObj);
     let doneLoading = true;
 
@@ -52,6 +62,16 @@ const AfterSearch = (props) => {
       NotLoadedBarOnOpen();
     }
     console.log("done", fnObj);
+  };
+
+  const userPrompt = () => {
+    if (initiatedCopy) {
+      BulkCopyProgressOnOpen();
+      return;
+    }
+
+    NonEmptyPromptOnOpen();
+    return;
   };
 
   return (
@@ -85,10 +105,11 @@ const AfterSearch = (props) => {
           <Heading size="sm">Zone 2</Heading>
           <Text>{props.zone2name}</Text>
         </Stack>
-        <Button
+        {/* <Button
           size={"sm"}
           onClick={() => bulkCopySettings(props.zoneBulkCopy)}
-        >
+        > */}
+        <Button size={"sm"} onClick={() => userPrompt()}>
           Bulk Copy
         </Button>
         {NotLoadedBarIsOpen && (
@@ -100,6 +121,18 @@ const AfterSearch = (props) => {
             errorMessage={
               "Please wait for the application to fully load the contents of your zones."
             }
+          />
+        )}
+        {NonEmptyPromptIsOpen && (
+          <NonEmptyErrorModal
+            isOpen={NonEmptyPromptIsOpen}
+            onOpen={NonEmptyPromptOnOpen}
+            onClose={NonEmptyPromptOnClose}
+            handleDelete={() => bulkCopySettings(props.zoneBulkCopy)}
+            title={`If there are existing records in ${props.zone2name}, they will be deleted.`}
+            errorMessage={`To proceed with copying configuration settings from ${props.zone1name} 
+          to ${props.zone2name}, any existing records 
+          in ${props.zone2name} need to be deleted. This action is irreversible.`}
           />
         )}
         {BulkCopyProgressIsOpen && (
