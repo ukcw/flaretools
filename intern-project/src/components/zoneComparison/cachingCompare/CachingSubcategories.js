@@ -111,7 +111,6 @@ const CachingSubcategories = (props) => {
           "/settings/sort_query_string_for_cache"
         ),
       ]);
-      console.log(resp);
       const processedResp = resp.map((settingArray, idx) =>
         settingArray.map((zone) => {
           if (zone.resp.result?.cache !== undefined) {

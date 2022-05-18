@@ -44,9 +44,9 @@ const returnConditions = (data) => {
     return data.messages[0];
   } else if (data.result?.certificate_authority !== undefined) {
     return data.result["certificate_authority"];
-  } else if (data.result.value === "on") {
+  } else if (data.result.value === "on" || data.result.enabled === "true") {
     return true;
-  } else if (data.result.value === "off") {
+  } else if (data.result.value === "off" || data.result.enabled === "false") {
     return false;
   } else {
     return data.result.value;
@@ -84,7 +84,11 @@ const SslSubcategories = (props) => {
   useEffect(() => {
     async function getData() {
       const resp = await Promise.all([
-        getMultipleZoneSettings(zoneKeys, credentials, "/ssl/recommendation"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/ssl_recommender"
+        ),
         getMultipleZoneSettings(
           zoneKeys,
           credentials,
@@ -117,8 +121,13 @@ const SslSubcategories = (props) => {
           "/settings/tls_client_auth"
         ),
       ]);
-      const processedResp = resp.map((settingArray) =>
-        settingArray.map((zone) => zone.resp)
+      const processedResp = resp.map((settingArray, idx) =>
+        settingArray.map((zone) => {
+          if (idx === 0) {
+            zone.resp.result.value = zone.resp.result.enabled;
+          }
+          return zone.resp;
+        })
       );
       setSslSubcategoriesData(processedResp);
     }
@@ -183,7 +192,11 @@ const SslSubcategories = (props) => {
 
     async function getData() {
       const resp = await Promise.all([
-        getMultipleZoneSettings(zoneKeys, credentials, "/ssl/recommendation"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/ssl_recommender"
+        ),
         getMultipleZoneSettings(
           zoneKeys,
           credentials,
@@ -216,8 +229,13 @@ const SslSubcategories = (props) => {
           "/settings/tls_client_auth"
         ),
       ]);
-      const processedResp = resp.map((settingArray) =>
-        settingArray.map((zone) => zone.resp)
+      const processedResp = resp.map((settingArray, idx) =>
+        settingArray.map((zone) => {
+          if (idx === 0) {
+            zone.resp.result.value = zone.resp.result.enabled;
+          }
+          return zone.resp;
+        })
       );
       setSslSubcategoriesData(processedResp);
     }
@@ -230,7 +248,7 @@ const SslSubcategories = (props) => {
 
     setSubcategoriesCopied("");
     const subcategories = {
-      ssl_recommendation: undefined,
+      ssl_recommender: undefined,
       always_use_https: undefined,
       min_tls_version: undefined,
       opportunistic_encryption: undefined,
@@ -241,7 +259,7 @@ const SslSubcategories = (props) => {
     };
 
     const subcategoriesEndpoints = {
-      ssl_recommendation: "/patch/ssl/recommendation",
+      ssl_recommender: "/patch/settings/ssl_recommender",
       always_use_https: "/patch/settings/always_use_https",
       min_tls_version: "/patch/settings/min_tls_version",
       opportunistic_encryption: "/patch/settings/opportunistic_encryption",
@@ -341,7 +359,11 @@ const SslSubcategories = (props) => {
 
     async function getData() {
       const resp = await Promise.all([
-        getMultipleZoneSettings(zoneKeys, credentials, "/ssl/recommendation"),
+        getMultipleZoneSettings(
+          zoneKeys,
+          credentials,
+          "/settings/ssl_recommender"
+        ),
         getMultipleZoneSettings(
           zoneKeys,
           credentials,
@@ -374,8 +396,13 @@ const SslSubcategories = (props) => {
           "/settings/tls_client_auth"
         ),
       ]);
-      const processedResp = resp.map((settingArray) =>
-        settingArray.map((zone) => zone.resp)
+      const processedResp = resp.map((settingArray, idx) =>
+        settingArray.map((zone) => {
+          if (idx === 0) {
+            zone.resp.result.value = zone.resp.result.enabled;
+          }
+          return zone.resp;
+        })
       );
       setSslSubcategoriesData(processedResp);
     }
@@ -385,7 +412,7 @@ const SslSubcategories = (props) => {
     const otherZoneKeys = zoneKeys.slice(1);
 
     const subcategories = {
-      ssl_recommendation: undefined,
+      ssl_recommender: undefined,
       always_use_https: undefined,
       min_tls_version: undefined,
       opportunistic_encryption: undefined,
@@ -396,7 +423,7 @@ const SslSubcategories = (props) => {
     };
 
     const subcategoriesEndpoints = {
-      ssl_recommendation: "/patch/ssl/recommendation",
+      ssl_recommender: "/patch/settings/ssl_recommender",
       always_use_https: "/patch/settings/always_use_https",
       min_tls_version: "/patch/settings/min_tls_version",
       opportunistic_encryption: "/patch/settings/opportunistic_encryption",

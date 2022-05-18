@@ -415,7 +415,7 @@ router.post('/ssl_tls', async request => {
       custom_hostnames,
     ] = await Promise.all([
       getZoneSetting(query.zoneId, query.apiToken, '/settings/ssl'),
-      getZoneSetting(query.zoneId, query.apiToken, '/ssl/recommendation'),
+      getZoneSetting(query.zoneId, query.apiToken, '/settings/ssl_recommender'),
       getPaginatedZoneSetting(
         query.zoneId,
         query.apiToken,
@@ -505,9 +505,9 @@ router.post('/custom_hostnames', async request => {
 })
 
 // SSL Recommendation
-router.post('/ssl/recommendation', async request => {
+router.post('/settings/ssl_recommender', async request => {
   const { query } = await request.json()
-  return FetchRequest(query.zoneId, query.apiToken, '/ssl/recommendation')
+  return FetchRequest(query.zoneId, query.apiToken, '/settings/ssl_recommender')
 })
 
 // Always Use HTTPS
@@ -2025,12 +2025,12 @@ router.post('/delete/custom_hostnames', async request => {
 /**
  * SSL Recommendation
  */
-router.post('/patch/ssl/recommendation', async request => {
+router.post('/patch/settings/ssl_recommender', async request => {
   const { query } = await request.json()
   return PatchRequest(
     query.zoneId,
     query.apiToken,
-    '/ssl/recommendation',
+    '/settings/ssl_recommender',
     query.data,
   )
 })
