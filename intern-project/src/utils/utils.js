@@ -457,7 +457,8 @@ export const DisabledOrEnabled = (value) => {
  * @returns
  */
 export const createZoneSetting = async (query, endpoint) => {
-  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  // const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const url = `https://flaretools-serverless-api.flaretools.workers.dev${endpoint}`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {
@@ -476,7 +477,8 @@ export const createZoneSetting = async (query, endpoint) => {
  * @returns
  */
 export const patchZoneSetting = async (query, endpoint) => {
-  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  // const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const url = `https://flaretools-serverless-api.flaretools.workers.dev${endpoint}`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {
@@ -495,7 +497,8 @@ export const patchZoneSetting = async (query, endpoint) => {
  * @returns
  */
 export const putZoneSetting = async (query, endpoint) => {
-  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  // const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const url = `https://flaretools-serverless-api.flaretools.workers.dev${endpoint}`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {
@@ -514,7 +517,8 @@ export const putZoneSetting = async (query, endpoint) => {
  * @returns
  */
 export const getZoneSetting = async (query, endpoint) => {
-  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  // const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const url = `https://flaretools-serverless-api.flaretools.workers.dev${endpoint}`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {
@@ -533,7 +537,8 @@ export const getZoneSetting = async (query, endpoint) => {
  * @returns
  */
 export const deleteZoneSetting = async (query, endpoint) => {
-  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  // const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const url = `https://flaretools-serverless-api.flaretools.workers.dev${endpoint}`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {

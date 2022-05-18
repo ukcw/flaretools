@@ -1,5 +1,6 @@
 name = "intern-project"
-account_id = "0d13146e53ce108313d59c78906cd900"
+# account_id = "0d13146e53ce108313d59c78906cd900"
+account_id = "8ca3b5fc5d350c3d41936bc288be236d"
 type = "webpack"
 usage_model = ''
 compatibility_flags = []
@@ -9,7 +10,9 @@ compatibility_date = "2021-12-20"
 
 [env.dev]
 workers_dev = false
-zone_id = 'e6bf1f06148cb143e391370e9edf3aef'
-route = 'https://intern-project.ulysseskee.software/*'
+# zone_id = 'e6bf1f06148cb143e391370e9edf3aef'
+zone_id = 'fcd3a7871c1141880de64514fb6248b6'
+# route = 'https://intern-project.ulysseskee.software/*'
+route = 'https://flaretools.cloudflareuniversity.com/*'
 
 

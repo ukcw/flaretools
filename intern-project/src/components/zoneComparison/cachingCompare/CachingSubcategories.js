@@ -111,11 +111,24 @@ const CachingSubcategories = (props) => {
           "/settings/sort_query_string_for_cache"
         ),
       ]);
-      const processedResp = resp.map((settingArray) =>
+      console.log(resp);
+      const processedResp = resp.map((settingArray, idx) =>
         settingArray.map((zone) => {
           if (zone.resp.result?.cache !== undefined) {
             let newObj = { ...zone.resp };
             newObj["result"].value = zone.resp.result.cache.crawlhints_enabled;
+            return newObj;
+          } else if (
+            idx === 1 &&
+            zone.resp.success === false &&
+            zone.resp.errors[0].code === 1142 &&
+            zone.resp.errors[0].message ===
+              "Unable to retrieve tiered_cache_smart_topology_enable setting value. The zone setting does not exist."
+          ) {
+            let newObj = { ...zone.resp };
+            newObj.result = {};
+            newObj.result.id = "tiered_cache_smart_topology_enable";
+            newObj.result.value = null;
             return newObj;
           } else {
             return zone.resp;
@@ -215,11 +228,23 @@ const CachingSubcategories = (props) => {
           "/settings/sort_query_string_for_cache"
         ),
       ]);
-      const processedResp = resp.map((settingArray) =>
+      const processedResp = resp.map((settingArray, idx) =>
         settingArray.map((zone) => {
           if (zone.resp.result?.cache !== undefined) {
             let newObj = { ...zone.resp };
             newObj["result"].value = zone.resp.result.cache.crawlhints_enabled;
+            return newObj;
+          } else if (
+            idx === 1 &&
+            zone.resp.success === false &&
+            zone.resp.errors[0].code === 1142 &&
+            zone.resp.errors[0].message ===
+              "Unable to retrieve tiered_cache_smart_topology_enable setting value. The zone setting does not exist."
+          ) {
+            let newObj = { ...zone.resp };
+            newObj.result = {};
+            newObj.result.id = "tiered_cache_smart_topology_enable";
+            newObj.result.value = null;
             return newObj;
           } else {
             return zone.resp;
@@ -378,11 +403,23 @@ const CachingSubcategories = (props) => {
           "/settings/sort_query_string_for_cache"
         ),
       ]);
-      const processedResp = resp.map((settingArray) =>
+      const processedResp = resp.map((settingArray, idx) =>
         settingArray.map((zone) => {
           if (zone.resp.result?.cache !== undefined) {
             let newObj = { ...zone.resp };
             newObj["result"].value = zone.resp.result.cache.crawlhints_enabled;
+            return newObj;
+          } else if (
+            idx === 1 &&
+            zone.resp.success === false &&
+            zone.resp.errors[0].code === 1142 &&
+            zone.resp.errors[0].message ===
+              "Unable to retrieve tiered_cache_smart_topology_enable setting value. The zone setting does not exist."
+          ) {
+            let newObj = { ...zone.resp };
+            newObj.result = {};
+            newObj.result.id = "tiered_cache_smart_topology_enable";
+            newObj.result.value = null;
             return newObj;
           } else {
             return zone.resp;

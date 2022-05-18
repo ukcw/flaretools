@@ -1,6 +1,6 @@
-name = "serverless-api"
+name = "flaretools-serverless-api"
 type = "webpack"
-account_id = "0d13146e53ce108313d59c78906cd900"
+account_id = "8ca3b5fc5d350c3d41936bc288be236d"
 route = ''
 zone_id = ''
 usage_model = ''

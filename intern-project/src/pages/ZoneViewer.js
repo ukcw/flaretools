@@ -25,7 +25,8 @@ import LeftSidebar from "../components/zoneComparison/leftSidebar/LeftSidebar";
 import RightSidebar from "../components/zoneViewerComponents/rightSidebar/RightSidebar";
 
 const getZoneSetting = async (query, endpoint) => {
-  const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  // const url = `https://serverless-api.ulysseskcw96.workers.dev${endpoint}`;
+  const url = `https://flaretools-serverless-api.flaretools.workers.dev${endpoint}`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {

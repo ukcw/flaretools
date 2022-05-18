@@ -31,10 +31,10 @@ const Welcome = () => {
           fontSize={{ base: "2xl", sm: "4xl", md: "6xl" }}
           lineHeight={"110%"}
         >
-          Welcome!
+          Welcome to FlareTools!
           <br />
           <Text as={"span"} color={"green.400"}>
-            Click on Zone Viewer to get started.
+            Click on Zone Viewer or Zone Comparison/Copier to get started.
           </Text>
         </Heading>
       </Stack>
